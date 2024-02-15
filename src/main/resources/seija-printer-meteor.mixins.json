@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "package": "com.kijinseija.seija_printer.mixin.meteor_client_mixin",
+  "compatibilityLevel": "JAVA_16",
+  "client": [
+    "DefaultSettingsWidgetFactoryMixin"
+  ],
+  "mixins": [
+
+  ]
+}

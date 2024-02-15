@@ -1,0 +1,72 @@
+//file:noinspection JCenterRepository
+//file:noinspection GrDeprecatedAPIUsage
+plugins {
+    id 'fabric-loom' version '1.1-SNAPSHOT'
+    id 'maven-publish'
+}
+
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
+
+archivesBaseName = project.archives_base_name
+version = project.mod_version
+group = project.maven_group
+
+
+
+repositories {
+    jcenter()
+
+    maven {
+        name = "jitpack"
+        url = "https://jitpack.io"
+    }
+
+
+    maven { url = "https://www.cursemaven.com" }
+    maven { url = "https://masa.dy.fi/maven" }
+
+    maven {
+        name = "meteor-maven"
+        url = "https://maven.meteordev.org/releases"
+    }
+
+    maven {
+        name = "meteor-maven-snapshots"
+        url = "https://maven.meteordev.org/snapshots"
+    }
+}
+loom {
+    accessWidenerPath = file("src/main/resources/seija-printer.accesswidener")
+}
+dependencies {
+    // Minecraft
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings "net.fabricmc:yarn:${project.yarn_version}:v2"
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+
+
+    // Meteor
+    modImplementation "meteordevelopment:meteor-client:${project.meteor_version}"
+    modImplementation "baritone:fabric:${project.minecraft_version}-SNAPSHOT"
+    //Download https://maven.meteordev.org/snapshots/meteordevelopment/meteor-client/0.5.4-SNAPSHOT/maven-metadata.xml, took 434 ms (0 B)
+    //Download https://maven.meteordev.org/snapshots/meteordevelopment/meteor-client/0.5.4-SNAPSHOT/meteor-client-0.5.4-20230723.170226-4.jar, took 3 s 318 ms (4.97 MB)
+    //Download https://maven.meteordev.org/snapshots/meteordevelopment/meteor-client/0.5.4-SNAPSHOT/meteor-client-0.5.4-20230723.170226-4-sources.jar, took 2 s 268 ms (1.69 MB)
+
+    //litematica
+    modImplementation "curse.maven:litematica-${project.litematica_projectid}:${project.litematica_fileid}"
+    //modImplementation "fi.dy.masa.malilib:malilib-fabric-${project.minecraft_version}:${project.malilib_version}"
+    //modImplementation "fi.dy.masa.malilib:malilib-fabric-1.20.1.0.16.1"
+    modImplementation "fi.dy.masa.malilib:malilib-fabric-1.20.1:${project.malilib_version}"
+
+
+}
+
+processResources {
+    filesMatching("fabric.mod.json") {
+        expand "version": project.version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    it.options.encoding("UTF-8")
+}

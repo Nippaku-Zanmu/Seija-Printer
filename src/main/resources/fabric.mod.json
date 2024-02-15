@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "name": "Seija Printer",
+  "id": "seija-printer",
+  "version": "${version}",
+  "description": "Fast printer for litematica made with meteor.",
+  "authors": [
+    "KijinSeija"
+  ],
+  "contact": {
+    "repo": "https://github.com/"
+  },
+  "icon": "assets/seija_printer/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "meteor": [
+      "com.kijinseija.seija_printer.Addon"
+    ]
+  },
+  "mixins": [
+    "seija-printer.mixins.json",
+    "seija-printer-meteor.mixins.json"
+  ],
+  "accessWidener":  "seija-printer.accesswidener",
+  "depends": {
+    "java": ">=17",
+    "minecraft": "1.20.x",
+    "meteor-client": ">=0.5.0"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "com.kijinseija.seija_printer.mixin",
+  "compatibilityLevel": "JAVA_16",
+  "client": [
+    "ClientWorldAccessor"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "mixins": [
+  ]
+}
