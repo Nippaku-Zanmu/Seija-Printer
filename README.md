@@ -1,3 +1,4 @@
 # SeijaPrinter
 
-Fast printer to litematica mod without rubberbanding
+Fast printer to litematica mod
+this can bypass some antiCheat
