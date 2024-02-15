@@ -27,7 +27,7 @@ public class DoorDataGetter extends AbstractDataGetter {
         DoorHinge needHinge = needState.get(Properties.DOOR_HINGE);
         for (Direction clickDir : dirs) {
             Vec3d centerVec = pos.toCenterPos().offset(clickDir,0.5);
-            ArrayList<Vec3d> extendVec = BlockUtil.getExtendVec(centerVec, clickDir, true);
+            ArrayList<Vec3d> extendVec = BlockUtil.getExtendVec(clickDir, true);
             for (Vec3d vec3d : extendVec) {
                 Vec3d hitVec = centerVec.add(vec3d.multiply(0.3));
                 Direction faceDir = Direction.fromRotation(SeijaUtil.getYaw(hitVec));

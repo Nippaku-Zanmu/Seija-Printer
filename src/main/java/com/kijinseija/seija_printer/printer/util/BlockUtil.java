@@ -244,7 +244,7 @@ public class BlockUtil {
 
     //Vec扩展 给定方块点击面上的中心Vec 将Vec向四周扩展
     //给的是扩展的量而不是扩张后的坐标
-    public static ArrayList<Vec3d> getExtendVec(Vec3d clickVec, Direction clickDir, boolean corner) {
+    public static ArrayList<Vec3d> getExtendVec(Direction clickDir, boolean corner) {
         ArrayList<Direction> extendDir = getExtendDir(clickDir);
         ArrayList<Vec3d> offVec = new ArrayList<>();
         for (int i = 0; i < extendDir.size(); i++) {
