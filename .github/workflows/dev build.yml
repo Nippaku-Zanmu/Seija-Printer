@@ -16,4 +16,12 @@ jobs:
         run: |
           chmod +x ./gradlew
           ./gradlew build
-      
+      - name: Create Dev Build release
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: '${{ secrets.AWD }}'
+          automatic_release_tag: latest
+          prerelease: false
+          title: Dev Build
+          files: |
+            ./build/libs/*.jar
