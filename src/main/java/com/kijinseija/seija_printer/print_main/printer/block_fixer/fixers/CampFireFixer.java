@@ -1,0 +1,43 @@
+package com.kijinseija.seija_printer.print_main.printer.block_fixer.fixers;
+
+import com.kijinseija.seija_printer.print_main.printer.block_fixer.AbstractFixer;
+import com.kijinseija.seija_printer.print_main.printer.util.BlockUtil;
+import com.kijinseija.seija_printer.print_main.printer.util.DirDataI;
+import com.kijinseija.seija_printer.print_main.printer.util.InvUtil;
+import com.kijinseija.seija_printer.print_main.printer.util.PlaceData;
+import net.minecraft.block.*;
+import net.minecraft.item.ShovelItem;
+import net.minecraft.state.property.Properties;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Vec3d;
+
+import java.util.List;
+
+public class CampFireFixer extends AbstractFixer {
+    @Override
+    public boolean fixBlock(BlockPos pos, BlockState needState) {
+        List<Direction> interactDir = BlockUtil.getInteractDir(pos);
+        DirDataI dirDataI = new DirDataI(pos, interactDir);
+        if (!InvUtil.findItem(stack -> stack.getItem()instanceof ShovelItem)) {
+            return false;
+        }
+        for (Direction dir : dirDataI.dirs()) {
+            for (Vec3d clickVec : dirDataI.clickVecs(dir)) {
+                if (InvUtil.switchItem(stack -> stack.getItem()instanceof ShovelItem)) {
+                    BlockUtil.interactBlock(new PlaceData(dirDataI.placePos(),dir,clickVec,true,null));
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public boolean needFix(BlockPos pos, BlockState needState) {
+        Block block = mc.world.getBlockState(pos).getBlock();
+        return needState.getBlock() instanceof CampfireBlock
+            && needState.getBlock()==block
+            && mc.world.getBlockState(pos).get(Properties.LIT);
+    }
+}
