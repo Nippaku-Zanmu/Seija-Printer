@@ -3,6 +3,7 @@
 package com.kijinseija.seija_printer.print_main.printer.util;
 
 
+import com.kijinseija.seija_printer.print_main.printer.Printer;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -33,6 +34,10 @@ public class PredictUtility {
             posVec = posVec.add(motionX, motionY, motionZ);
         }
         return PredictUtility.equipAndReturn(entity, posVec);
+    }
+
+    public static Vec3d getPredPlayerVec(){
+        return predictPlayerVec(mc.player, Printer.INSTANCE.predTick.get());
     }
     public static Vec3d predictPlayerVec(PlayerEntity entity, int ticks) {
         //if (ticks<=0)return entity;

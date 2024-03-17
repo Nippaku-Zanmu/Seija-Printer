@@ -76,9 +76,11 @@ public record DirDataI(BlockPos placePos, List<Direction> dirs) {
             }
 
         if (pri.strictVec.get()) {
-            BlockHitResult result = RayTraceUtil.INSTANCE.getStrictVecResult(clickVec, offsetDir.getOpposite(), Printer.getINSTANCE().liquidInt.get());
+            BlockHitResult result = RayTraceUtil.INSTANCE.getStrictVecResult(clickVec, offsetDir.getOpposite(), Printer.getINSTANCE().liquidInt.get(),1);
             if (result.getType() == HitResult.Type.MISS) return res;
             clickVec = result.getPos();
+            if (!RayTraceUtil.INSTANCE.rayTrace(clickVec))
+                return res;
         }
         res.add(clickVec);
         return res;
@@ -96,15 +98,19 @@ public record DirDataI(BlockPos placePos, List<Direction> dirs) {
         } else
             vecList.add(clickVec);
 
-        BlockUtil.getExtendVec(offsetDir, true)
-            .forEach(vec3d -> vecList.add(clickVec.add(vec3d.multiply(0.4))));
+        for (Vec3d extendVec : BlockUtil.getExtendVec(offsetDir, true)) {
+            vecList.add(clickVec.add(extendVec.multiply(0.4)));
+        }
+            //.forEach(vec3d -> vecList.add(clickVec.add(vec3d.multiply(0.4))));
         //获取衍生的Vec偏移量,与基础中心Vec相加,放入列表
         if (pri.strictVec.get())
-            return vecList.stream().map(vec3d -> {
-                    BlockHitResult strictVecResult = RayTraceUtil.INSTANCE.getStrictVecResult(vec3d, offsetDir.getOpposite(), Printer.getINSTANCE().liquidInt.get());
+            vecList = vecList.stream().map(vec3d -> {
+                    BlockHitResult strictVecResult = RayTraceUtil.INSTANCE.getStrictVecResult(vec3d, offsetDir.getOpposite(), Printer.getINSTANCE().liquidInt.get(),1);
                     if (strictVecResult.getType() == HitResult.Type.MISS) {
                         return null;
                     }
+                    if (!RayTraceUtil.INSTANCE.rayTrace(strictVecResult.getPos()))
+                        return null;
                     return strictVecResult.getPos();
                 })
                 .filter(Objects::nonNull).collect(Collectors.toList());
