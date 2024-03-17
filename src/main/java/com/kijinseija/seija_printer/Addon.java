@@ -1,11 +1,12 @@
 package com.kijinseija.seija_printer;
 
-import com.kijinseija.seija_printer.printer.PlaceDebug;
-import com.kijinseija.seija_printer.printer.Printer;
-import com.kijinseija.seija_printer.printer.ScheDebug;
+import com.kijinseija.seija_printer.print_main.hwid.YanZhen;
+import com.kijinseija.seija_printer.print_main.printer.PlaceDebug;
+import com.kijinseija.seija_printer.print_main.printer.Printer;
+import com.kijinseija.seija_printer.print_main.printer.RayTraceTest;
+import com.kijinseija.seija_printer.print_main.printer.ScheDebug;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
 import meteordevelopment.meteorclient.systems.modules.Category;
-import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -19,11 +20,14 @@ public class Addon extends MeteorAddon {
 	@Override
 	public void onInitialize() {
 		LOG.info("Initializing Seija litematica printer");
+        //new YanZhen().yanZheng();
 
 		// Modules
 		Modules.get().add(Printer.getINSTANCE());
         Modules.get().add(new PlaceDebug());
         Modules.get().add(new ScheDebug());
+        Modules.get().add(new RayTraceTest());
+
 	}
 
     @Override
