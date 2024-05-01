@@ -1,10 +1,11 @@
 package com.kijinseija.seija_printer.print_main.printer.placedata_getter.getter;
 
 import com.kijinseija.seija_printer.print_main.printer.placedata_getter.AbstractDataGetter;
-import com.kijinseija.seija_printer.print_main.printer.util.BlockUtil;
-import com.kijinseija.seija_printer.print_main.printer.util.DirData;
-import com.kijinseija.seija_printer.print_main.printer.util.PlaceData;
+import com.kijinseija.seija_printer.print_main.printer.util.BlockRotDataGetter;
+import com.kijinseija.seija_printer.print_main.printer.util.records.DirData;
+import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
 import com.kijinseija.seija_printer.print_main.printer.util.SeijaUtil;
+import com.kijinseija.seija_printer.print_main.printer.util.records.RotationData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.DoorBlock;
@@ -17,9 +18,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class DoorDataGetter extends AbstractDataGetter {
     MinecraftClient mc = MinecraftClient.getInstance();
     @Override
@@ -27,16 +25,17 @@ public class DoorDataGetter extends AbstractDataGetter {
         BlockPos pos = dirData.placePos();
         Direction needFac = needState.get(Properties.HORIZONTAL_FACING);
         DoorHinge needHinge = needState.get(Properties.DOOR_HINGE);
+        RotationData rotData = BlockRotDataGetter.getRotData(needState);
         for (Direction clickDir : dirData.dirs()) {
            // Vec3d centerVec = pos.toCenterPos().offset(clickDir,0.5);
             //ArrayList<Vec3d> extendVec = BlockUtil.getExtendVec(clickDir, true);
             for (Vec3d hitVec : dirData.getClickVecs(clickDir)) {
                 //Vec3d hitVec = centerVec.add(vec3d.multiply(0.3));
                 Direction faceDir = Direction.fromRotation(SeijaUtil.getYaw(hitVec));
-                if (faceDir!=needFac)continue;
+                if (faceDir!=needFac&&rotData==null)continue;
                 DoorHinge hinge = getHinge(pos, clickDir, faceDir, needState.getBlock(), hitVec);
                 if (hinge!=needHinge)continue;
-                return new PlaceData(pos.offset(clickDir),clickDir.getOpposite(),hitVec,true,null);
+                return new PlaceData(pos.offset(clickDir),clickDir.getOpposite(),hitVec,true,rotData);
             }
         }
         return new PlaceData(null,null,null,false,null);

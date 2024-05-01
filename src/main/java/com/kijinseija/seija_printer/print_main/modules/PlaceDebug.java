@@ -1,4 +1,4 @@
-package com.kijinseija.seija_printer.print_main.printer;
+package com.kijinseija.seija_printer.print_main.modules;
 
 import com.kijinseija.seija_printer.Addon;
 import com.kijinseija.seija_printer.print_main.hwid.YanZhen;

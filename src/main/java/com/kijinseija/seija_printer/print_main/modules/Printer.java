@@ -1,10 +1,12 @@
-package com.kijinseija.seija_printer.print_main.printer;
+package com.kijinseija.seija_printer.print_main.modules;
 
 import com.kijinseija.seija_printer.Addon;
-import com.kijinseija.seija_printer.print_main.hwid.YanZhen;
 import com.kijinseija.seija_printer.print_main.printer.block_fixer.FixerManager;
 import com.kijinseija.seija_printer.print_main.printer.placedata_getter.PlaceDataManager;
 import com.kijinseija.seija_printer.print_main.printer.util.*;
+import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
+import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceDataPack;
+import com.kijinseija.seija_printer.print_main.printer.util.records.PosInfo;
 import com.kijinseija.seija_printer.print_main.settings.DirectionListSetting;
 import fi.dy.masa.litematica.data.DataManager;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
@@ -25,6 +27,7 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -39,14 +42,17 @@ import java.util.stream.Collectors;
 
 
 public class Printer extends Module {
+    //todo 切换智能排序 背包切换延迟 红石放置修复 红石火把放置修复
     public static Printer getINSTANCE() {
         return INSTANCE;
     }
 
     public static final Printer INSTANCE = new Printer();
 
-
-    private final SettingGroup sgBasicCalc = settings.createGroup("sgBasicCalc");
+    private Printer() {
+        super(Addon.CATEGORY, "Seija-litematica-printer", "Automatically prints open schematics");
+    }
+    private final SettingGroup sgBasicCalc = settings.createGroup("BasicCalc");
     public final Setting<Double> printingRange = sgBasicCalc.add(new DoubleSetting.Builder()
         .name("PrintingRange")
         .description("The block place range.")
@@ -79,58 +85,66 @@ public class Printer extends Module {
         .max(10000).sliderMax(1000)
         .build()
     );
+    private final Setting<Integer> blockPreTick = sgBasicCalc.add(new IntSetting.Builder()
+        .name("BlockPreTick")
+        .defaultValue(1)
+        .min(0).sliderMin(0)
+        .max(10000).sliderMax(10)
+        .build()
+    );
 
-    public final Setting<Boolean> strictDir = sgBasicCalc.add(new BoolSetting.Builder()
+    public final Setting<Boolean> airPlace = sgBasicCalc.add(new BoolSetting.Builder()
+        .name("Air-Place")
+        .description("Allow the bot to place in the air.")
+        .defaultValue(false)
+        .build()
+    );
+    public final Setting<Boolean> liquidInt = sgBasicCalc.add(new BoolSetting.Builder()
+        .name("LiquidInteract")
+        .description("Allow the printer to place on the Liquid.")
+        .defaultValue(false)
+        .build()
+    );
+
+    private final SettingGroup sgACBypass = settings.createGroup("AC-Bypass");
+
+    public final Setting<Boolean> rotate = sgACBypass.add(new BoolSetting.Builder()
+        .name("Rotate")
+        .defaultValue(true)
+        .build());
+
+    public final Setting<Boolean> strictDir = sgACBypass.add(new BoolSetting.Builder()
         .name("Strict Direction")
         .description("Doesn't place on faces which aren't in your direction.")
         .defaultValue(true)
         .build());
 
-    public final Setting<Boolean> strictVec = sgBasicCalc.add(new BoolSetting.Builder()
+    public final Setting<Boolean> strictVec = sgACBypass.add(new BoolSetting.Builder()
         .name("Strict ClickVec")
+        .visible(() -> !airPlace.get())
         .defaultValue(true)
         .build());
-    public final Setting<Boolean> randomOffset = sgBasicCalc.add(new BoolSetting.Builder()
+    public final Setting<Boolean> randomOffset = sgACBypass.add(new BoolSetting.Builder()
         .name("randomOffsetVec")
         .defaultValue(true)
         .build());
-    public final Setting<Boolean> multiDetection = sgBasicCalc.add(new BoolSetting.Builder()
+    public final Setting<Boolean> multiDetection = sgACBypass.add(new BoolSetting.Builder()
         .name("Multi-focus detection")
         .defaultValue(false)
         .build());
 
-    public final Setting<Boolean> rayTrace = sgBasicCalc.add(new BoolSetting.Builder()
+    public final Setting<Boolean> rayTrace = sgACBypass.add(new BoolSetting.Builder()
         .name("rayTrace")
         .defaultValue(true)
         .visible(strictVec::get)
         .build());
-    public final Setting<Boolean> ignoreEntity = sgBasicCalc.add(new BoolSetting.Builder()
+    public final Setting<Boolean> ignoreEntity = sgACBypass.add(new BoolSetting.Builder()
         .name("ignoreEntityRay")
         .defaultValue(false)
-        .visible(()->rayTrace.isVisible()&&rayTrace.get())
+        .visible(() -> rayTrace.isVisible() && rayTrace.get())
         .build());
 
-    public final Setting<Integer> predTick = sgBasicCalc.add(new IntSetting.Builder()
-        .name("RotatePredTick")
-        .defaultValue(1)
-        .min(0).sliderMin(0)
-        .max(10000).sliderMax(16)
-        .build()
-    );
 
-    public final Setting<Boolean> sneak = sgBasicCalc.add(new BoolSetting.Builder()
-        .name("SneakPlace")
-        .defaultValue(true)
-        .build());
-
-    public final Setting<Boolean> packetRotate = sgBasicCalc.add(new BoolSetting.Builder()
-        .name("PacketRotate")
-        .defaultValue(false)
-        .build());
-    public final Setting<Boolean> packetPlace = sgBasicCalc.add(new BoolSetting.Builder()
-        .name("PacketPlace")
-        .defaultValue(false)
-        .build());
     SettingGroup sgSort = settings.createGroup("Sort");
 
     public enum DistanceMode {
@@ -144,19 +158,38 @@ public class Printer extends Module {
 
 
     SettingGroup sgAdvancedSettings = settings.createGroup("AdvancedSettings");
+    public final Setting<Boolean> illegalRotate = sgAdvancedSettings.add(new BoolSetting.Builder()
+        .name("illegalRotate")
+        .defaultValue(false)
+        .build());
 
-    public final Setting<Boolean> airPlace = sgAdvancedSettings.add(new BoolSetting.Builder()
-        .name("Air-Place")
-        .description("Allow the bot to place in the air.")
-        .defaultValue(false)
+    public final Setting<Integer> predTick = sgAdvancedSettings.add(new IntSetting.Builder()
+
+        .name("RotatePredTick")
+        .defaultValue(1)
+        .min(0).sliderMin(0)
+        .max(10000).sliderMax(16)
         .build()
     );
-    public final Setting<Boolean> liquidInt = sgAdvancedSettings.add(new BoolSetting.Builder()
-        .name("LiquidInteract")
-        .description("Allow the printer to place on the Liquid.")
+    public final Setting<Boolean> antiWrongBlock = sgAdvancedSettings.add(new BoolSetting.Builder()
+        .name("AntiWrongBlock")
         .defaultValue(false)
-        .build()
-    );
+        .build());
+
+    public final Setting<Boolean> sneak = sgAdvancedSettings.add(new BoolSetting.Builder()
+        .name("SneakPlace")
+        .defaultValue(true)
+        .build());
+
+    public final Setting<Boolean> packetRotate = sgAdvancedSettings.add(new BoolSetting.Builder()
+        .name("PacketRotate")
+        .visible(rotate::get)
+        .defaultValue(false)
+        .build());
+    public final Setting<Boolean> packetPlace = sgAdvancedSettings.add(new BoolSetting.Builder()
+        .name("PacketPlace")
+        .defaultValue(false)
+        .build());
 
     public final Setting<Integer> surfaceSize = sgAdvancedSettings.add(new IntSetting.Builder()
         .name("SurfaceSize")
@@ -192,6 +225,12 @@ public class Printer extends Module {
         .name("enablePrecisionPlace")
         .defaultValue(true)
         .build());
+    public final Setting<Boolean> tryVanillaPrecisionPlace =
+        sgAdvancedSettings.add(new BoolSetting.Builder()
+            .name("TryVanillaPrecision")
+            .visible(enablePrecisionPlace::get)
+            .defaultValue(true)
+            .build());
     public final Setting<Boolean> enableBlockFixer = sgAdvancedSettings.add(new BoolSetting.Builder()
         .name("enableBlockFixer")
         .defaultValue(true)
@@ -280,6 +319,7 @@ public class Printer extends Module {
     @Override
     public WWidget getWidget(GuiTheme theme) {
         WVerticalList list = theme.verticalList();
+
         WButton start = list.add(theme.button("Load!")).expandX().widget();
         start.action = () -> new Thread(() -> loadMap(replaceBlockFile.get())).start();
 
@@ -327,10 +367,7 @@ public class Printer extends Module {
     public final HashMap<Block, List<Block>> replaceMap = new HashMap<>();
 
 
-    private Printer() {
-        super(Addon.CATEGORY, "Seija-litematica-printer", "Automatically prints open schematics");
 
-    }
 
     SeijaTimer timer = new SeijaTimer();
     public final List<PosInfo> blackList = Collections.synchronizedList(new ArrayList<>());
@@ -370,37 +407,33 @@ public class Printer extends Module {
             //表面模式检测
             .collect(Collectors.toList());
         PosSorter.sort(collect);
-
+        //放置计数
+        int placeCount = 0;
         for (BlockPos blockPos : collect) {//遍历所有的可操作方块
+            if (placeCount >= blockPreTick.get()) return;
             BlockState needState = BlockReplaceUtils.INSTANCE.getScheState(blockPos);//获取需要的方块状态
             BlockState placeNeedState = BlockReplaceUtils.INSTANCE.normalReplaceState(needState);
-            PlaceData placeData = getPlaceData(blockPos, placeNeedState);//获取放置数据
-            if (placeData.valid()) {//如果数据可用
+            PlaceDataPack placeDataPack = PlaceDataManager.getPlaceData(blockPos, placeNeedState);//获取放置数据
+            if (placeDataPack.data().valid()) {//如果数据可用
                 InvUtil.switchBlock(placeNeedState.getBlock());//把需要的方块拿到手上
-                BlockUtil.placeBlock(placeData);//放置
+                if (placeDataPack.placeMode()) {
+                    BlockUtil.placeBlock(placeDataPack.data());//放置
+                } else {
+                    BlockUtil.interactBlock(placeDataPack.data());
+                }
                 timer.reset();//重置计时器
                 isAniRenderSizeAdd = true;
-                return;
+                placeCount += 1;
             }
 
             //若方块放置失败则尝试修复
             if (FixerManager.INSTANCE.doFix(blockPos, needState)) {
                 timer.reset();//若进行了修复操作则重置计时器
                 isAniRenderSizeAdd = true;
-                return;
+                placeCount += 1;
             }
         }
         isAniRenderSizeAdd = false;
-    }
-
-
-    public PlaceData getPlaceData(BlockPos pos, BlockState needState) {
-        List<Direction> dirs = BlockUtil.getDirs(pos);
-        if (dirs.isEmpty() || !InvUtil.findBlock(needState.getBlock()) || !BlockUtil.canPlaceIn(pos)) {
-            //没有可用Facing//找不到方块//不可放置
-            return new PlaceData(null, null, null, false, null);
-        }
-        return PlaceDataManager.INSTANCE.getPlaceData(pos, needState, dirs);
     }
 
 

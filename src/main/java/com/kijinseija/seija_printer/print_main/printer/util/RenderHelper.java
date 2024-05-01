@@ -1,5 +1,6 @@
 package com.kijinseija.seija_printer.print_main.printer.util;
 
+import com.kijinseija.seija_printer.print_main.printer.util.records.PosInfo;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.render.color.RainbowColor;

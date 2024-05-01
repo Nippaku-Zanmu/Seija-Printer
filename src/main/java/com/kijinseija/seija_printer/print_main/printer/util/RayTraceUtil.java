@@ -1,12 +1,9 @@
 package com.kijinseija.seija_printer.print_main.printer.util;
 
-import com.kijinseija.seija_printer.Addon;
-import com.kijinseija.seija_printer.print_main.printer.Printer;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
+import com.kijinseija.seija_printer.print_main.modules.Printer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.text.Text;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -46,7 +43,7 @@ public class RayTraceUtil {
         return mc.world.raycast(new RaycastContext(vec3d, vec3d3, RaycastContext.ShapeType.OUTLINE, includeFluids ? RaycastContext.FluidHandling.ANY : RaycastContext.FluidHandling.NONE, mc.player));
     }
 
-    private static  Vec3d getRotationVector(float pitch, float yaw) {
+    public static  Vec3d getRotationVector(float pitch, float yaw) {
         float f = pitch * ((float) Math.PI / 180);
         float g = -yaw * ((float) Math.PI / 180);
         float h = MathHelper.cos(g);
@@ -56,7 +53,7 @@ public class RayTraceUtil {
         return new Vec3d(i * j, -k, h * j);
     }
     public boolean rayTrace(Vec3d target){
-        if (!(pri.strictVec.get()&&pri.rayTrace.get()))return true;
+        if (!(pri.rayTrace.isVisible()&&pri.rayTrace.get()))return true;
 
         Entity entity2 = mc.getCameraEntity();
         if (entity2 == null) {

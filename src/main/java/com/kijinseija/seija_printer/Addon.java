@@ -1,10 +1,8 @@
 package com.kijinseija.seija_printer;
 
 
-import com.kijinseija.seija_printer.print_main.printer.PlaceDebug;
-import com.kijinseija.seija_printer.print_main.printer.Printer;
-import com.kijinseija.seija_printer.print_main.printer.RayTraceTest;
-import com.kijinseija.seija_printer.print_main.printer.ScheDebug;
+import com.kijinseija.seija_printer.print_main.hwid.YanZhen;
+import com.kijinseija.seija_printer.print_main.modules.*;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
 import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.modules.Modules;
@@ -27,7 +25,8 @@ public class Addon extends MeteorAddon {
         Modules.get().add(new PlaceDebug());
         Modules.get().add(new ScheDebug());
         Modules.get().add(new RayTraceTest());
-
+        Modules.get().add(new SideTest());
+        Modules.get().add(new YanZhen());
 	}
 
     @Override

@@ -1,6 +1,8 @@
 package com.kijinseija.seija_printer.print_main.printer.util;
 
-import com.kijinseija.seija_printer.print_main.printer.Printer;
+import com.kijinseija.seija_printer.print_main.modules.Printer;
+import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
+import com.kijinseija.seija_printer.print_main.printer.util.records.PosInfo;
 import meteordevelopment.meteorclient.utils.player.Rotations;
 import net.minecraft.block.*;
 import net.minecraft.block.enums.BedPart;
@@ -45,24 +47,36 @@ public class BlockUtil {
         BlockPos pos = data.pos();
         Direction dir = data.dir();
         Runnable r = () -> {
+            if (pri.illegalRotate.get() && data.exRotateData() != null) {
+                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.exRotateData().yaw(), (float) data.exRotateData().pitch(), mc.player.isOnGround()));
+            }//非法转头
             if (pri.packetPlace.get()) {
                 mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, getHitRes(pos, dir, hitVec), SeijaUtil.getSequence()));
                 mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             } else {
                 mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, getHitRes(pos, dir, hitVec));
             }
+
             pri.blackList.add(RenderHelper.getBlackInfo(pos));
             pri.renderList.add(RenderHelper.getBlackInfo(pos));
         };
-        if (pri.packetRotate.get()) {
-            mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) SeijaUtil.getYaw(hitVec), (float) SeijaUtil.getPitch(hitVec), mc.player.isOnGround()));
-            r.run();
-        } else
-            Rotations.rotate(SeijaUtil.getYaw(hitVec), SeijaUtil.getPitch(hitVec), r);
+        if (pri.rotate.get()) {
+            if (pri.packetRotate.get()) {
+                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) SeijaUtil.getYaw(hitVec), (float) SeijaUtil.getPitch(hitVec), mc.player.isOnGround()));
+                r.run();
+            } else
+                Rotations.rotate(SeijaUtil.getYaw(hitVec), SeijaUtil.getPitch(hitVec), r);
+        }else r.run();
+
+
+
+
     }
 
     public static List<Direction> getDirs(BlockPos pos) {
-
+        if (!mc.world.getBlockState(pos).isReplaceable()){
+            return new ArrayList<>();
+        }
         List<Direction> validDirs = getValidDirs(pos);
         return validDirs.stream()
             .filter(dir -> {
@@ -72,6 +86,8 @@ public class BlockUtil {
                 if (pri.liquidInt.get() && bs.getBlock() instanceof FluidBlock) return true;
                 return bs.isSolid();
             })
+            .filter(dir->(mc.world.getBlockState(pos).isAir())||!mc.world.getBlockState(pos).isSideSolid(mc.world,pos,dir,SideShapeType.FULL))
+            //方块自身阻挡检测
             .filter(dir -> mc.player.getY() - pos.toCenterPos().offset(dir, 0.5).y < pri.printingYDistance.get())
             //高度检测 针对于放置比自己低太多的方块
             .filter(dir -> pri.sneak.get() || !isCanUseBlock(pos.offset(dir), mc.world.getBlockState(pos.offset(dir)), mc.world))
@@ -79,10 +95,17 @@ public class BlockUtil {
             .filter(dir -> pos.toCenterPos().offset(dir, 0.5).distanceTo(mc.player.getEyePos()) <= pri.printingRange.get())
             //距离检测
             .collect(Collectors.toList());
+
     }
 
     public static void placeBlock(PlaceData data) {
-        BlockPos pos = data.pos();
+        final BlockPos prPos = data.pos();
+        final BlockPos pos;
+        if (mc.world.getBlockState(prPos).isAir())
+            pos = prPos.offset(data.dir());
+        else pos = prPos;
+        //计算airplace
+
         Direction dir = data.dir();
         Vec3d hitVec = data.hitVec();
         Runnable r = () -> {
@@ -94,6 +117,10 @@ public class BlockUtil {
                     mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
                 }
             }
+            //非法转头
+            if (pri.illegalRotate.get() && data.exRotateData() != null) {
+                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.exRotateData().yaw(), (float) data.exRotateData().pitch(), mc.player.isOnGround()));
+            }
             if (pri.packetPlace.get()) {
                 mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, getHitRes(pos, dir, hitVec), SeijaUtil.getSequence()));
                 mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
@@ -101,67 +128,35 @@ public class BlockUtil {
                 mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, getHitRes(pos, dir, hitVec));
                 mc.player.swingHand(Hand.MAIN_HAND);
             }
+//            if (pri.illegalRotate.get() && data.exRotateData() != null) {
+//                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.exRotateData().yaw(), (float) data.exRotateData().pitch(), mc.player.isOnGround()));
+//            }
+
 
             if (sneakToggle) {
                 mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
                 mc.player.setSneaking(false);
             }
-            pri.blackList.add(RenderHelper.getBlackInfo(pos.offset(dir)));
-            pri.renderList.add(RenderHelper.getBlackInfo(pos.offset(dir)));
+            PosInfo blackInfo = RenderHelper.getBlackInfo(prPos.offset(dir));
+            pri.blackList.add(blackInfo);
+            pri.renderList.add(blackInfo);
         };
-        if (pri.packetRotate.get()) {
-            mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) SeijaUtil.getYaw(hitVec), (float) SeijaUtil.getPitch(hitVec), mc.player.isOnGround()));
+        if (pri.rotate.get()) {
+            if (pri.packetRotate.get()) {
+                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) SeijaUtil.getYaw(hitVec), (float) SeijaUtil.getPitch(hitVec), mc.player.isOnGround()));
+                r.run();
+            } else
+                Rotations.rotate(SeijaUtil.getYaw(hitVec), SeijaUtil.getPitch(hitVec), r);
+        } else {
             r.run();
-        } else
-            Rotations.rotate(SeijaUtil.getYaw(hitVec), SeijaUtil.getPitch(hitVec), r);
+        }
 
     }
 
     public static BlockHitResult getHitRes(BlockPos pos, Direction dir, Vec3d hitVec) {
-        Vec3d eyes = mc.player.getEyePos();
+        Vec3d eyes = PredictUtility.getPredPlayerVec().offset(Direction.UP, SeijaUtil.getEyeHeight());
         boolean inside = eyes.x > (double) pos.getX() && eyes.x < (double) (pos.getX() + 1) && eyes.y > (double) pos.getY() && eyes.y < (double) (pos.getY() + 1) && eyes.z > (double) pos.getZ() && eyes.z < (double) (pos.getZ() + 1);
         return new BlockHitResult(hitVec, dir, pos, inside);
-    }
-
-    public static Direction[] getEntityFacingOrder(float yaw, float pitch) {
-        Direction direction3;
-        float f = pitch * ((float) Math.PI / 180);
-        float g = -yaw * ((float) Math.PI / 180);
-        float h = MathHelper.sin(f);
-        float i = MathHelper.cos(f);
-        float j = MathHelper.sin(g);
-        float k = MathHelper.cos(g);
-        boolean bl = j > 0.0f;
-        boolean bl2 = h < 0.0f;
-        boolean bl3 = k > 0.0f;
-        float l = bl ? j : -j;
-        float m = bl2 ? -h : h;
-        float n = bl3 ? k : -k;
-        float o = l * i;
-        float p = n * i;
-        Direction direction = bl ? Direction.EAST : Direction.WEST;
-        Direction direction2 = bl2 ? Direction.UP : Direction.DOWN;
-        Direction direction4 = direction3 = bl3 ? Direction.SOUTH : Direction.NORTH;
-        if (l > n) {
-            if (m > o) {
-                return listClosest(direction2, direction, direction3);
-            }
-            if (p > m) {
-                return listClosest(direction, direction3, direction2);
-            }
-            return listClosest(direction, direction2, direction3);
-        }
-        if (m > p) {
-            return listClosest(direction2, direction3, direction);
-        }
-        if (o > m) {
-            return listClosest(direction3, direction, direction2);
-        }
-        return listClosest(direction3, direction2, direction);
-    }
-
-    private static Direction[] listClosest(Direction first, Direction second, Direction third) {
-        return new Direction[]{first, second, third, third.getOpposite(), second.getOpposite(), first.getOpposite()};
     }
 
     public static List<Direction> getValidDirs(BlockPos pos) {

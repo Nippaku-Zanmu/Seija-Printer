@@ -2,9 +2,9 @@ package com.kijinseija.seija_printer.print_main.printer.block_fixer.fixers;
 
 import com.kijinseija.seija_printer.print_main.printer.block_fixer.AbstractFixer;
 import com.kijinseija.seija_printer.print_main.printer.util.BlockUtil;
-import com.kijinseija.seija_printer.print_main.printer.util.DirData;
+import com.kijinseija.seija_printer.print_main.printer.util.records.DirData;
 import com.kijinseija.seija_printer.print_main.printer.util.InvUtil;
-import com.kijinseija.seija_printer.print_main.printer.util.PlaceData;
+import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SlabBlock;

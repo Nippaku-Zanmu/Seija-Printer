@@ -1,9 +1,11 @@
 package com.kijinseija.seija_printer.print_main.printer.placedata_getter.getter;
 
-import com.kijinseija.seija_printer.print_main.printer.util.DirData;
-import com.kijinseija.seija_printer.print_main.printer.util.PlaceData;
+import com.kijinseija.seija_printer.print_main.printer.util.BlockRotDataGetter;
+import com.kijinseija.seija_printer.print_main.printer.util.records.DirData;
+import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
 import com.kijinseija.seija_printer.print_main.printer.placedata_getter.AbstractDataGetter;
 import com.kijinseija.seija_printer.print_main.printer.util.SeijaUtil;
+import com.kijinseija.seija_printer.print_main.printer.util.records.RotationData;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.StairsBlock;
 import net.minecraft.block.enums.BlockHalf;
@@ -12,7 +14,6 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class StairDataGetter extends AbstractDataGetter {
     //楼梯
@@ -22,6 +23,7 @@ public class StairDataGetter extends AbstractDataGetter {
         BlockHalf blockHalf = needState.get(StairsBlock.HALF);
         Direction direction = needState.get(StairsBlock.FACING);
         ArrayList<Direction> directions = new ArrayList<>(dirData.dirs());
+        RotationData rotData = BlockRotDataGetter.getRotData(needState);
         switch (blockHalf) {
             case TOP -> directions.remove(Direction.DOWN);
             case BOTTOM -> directions.remove(Direction.UP);
@@ -32,8 +34,8 @@ public class StairDataGetter extends AbstractDataGetter {
                     if (blockHalf == BlockHalf.TOP) hitVec = hitVec.add(0, 0.1, 0);
                     else hitVec = hitVec.add(0, -0.1, 0);
 
-                if (Direction.fromRotation(SeijaUtil.getYaw(hitVec)) == direction) {
-                    return new PlaceData(pos.offset(dir), dir.getOpposite(), hitVec, true, null);
+                if (Direction.fromRotation(SeijaUtil.getYaw(hitVec)) == direction || rotData != null) {
+                    return new PlaceData(pos.offset(dir), dir.getOpposite(), hitVec, true, rotData);
                 }
             }
 //            Vec3d hitVec = pos.toCenterPos().offset(dir, 0.5);

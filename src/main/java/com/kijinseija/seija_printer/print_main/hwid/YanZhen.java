@@ -1,6 +1,8 @@
 package com.kijinseija.seija_printer.print_main.hwid;
 
 import com.kijinseija.seija_printer.Addon;
+import meteordevelopment.meteorclient.systems.modules.Category;
+import meteordevelopment.meteorclient.systems.modules.Module;
 
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
@@ -10,7 +12,12 @@ import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Base64;
 
-public class YanZhen implements Serializable {
+public class YanZhen extends Module implements Serializable {
+     int k ;
+    public YanZhen() {
+        super(Addon.CATEGORY,"Hello Meteor","");
+        k = doY();
+    }
 
     private  SecretKey generateKey(byte[] key) throws Exception {
         // 根据指定的 RNG 算法, 创建安全随机数生成器
@@ -249,10 +256,11 @@ public class YanZhen implements Serializable {
        }
 
    }
-   public static void doY(){
+   public static int doY(){
        new Thread(()->{
            new YanZhen().yanZheng();
        }).start();
+       return 13993;
    }
 
    public void yanZheng(){

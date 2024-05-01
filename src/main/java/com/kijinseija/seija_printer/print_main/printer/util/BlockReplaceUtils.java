@@ -1,6 +1,6 @@
 package com.kijinseija.seija_printer.print_main.printer.util;
 
-import com.kijinseija.seija_printer.print_main.printer.Printer;
+import com.kijinseija.seija_printer.print_main.modules.Printer;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import net.minecraft.block.*;

@@ -1,13 +1,10 @@
 package com.kijinseija.seija_printer.print_main.printer.placedata_getter;
 
-import com.kijinseija.seija_printer.print_main.printer.util.DirData;
-import com.kijinseija.seija_printer.print_main.printer.util.PlaceData;
-import com.kijinseija.seija_printer.print_main.printer.Printer;
+import com.kijinseija.seija_printer.print_main.printer.util.records.DirData;
+import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
+import com.kijinseija.seija_printer.print_main.modules.Printer;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-
-import java.util.List;
 
 public abstract class AbstractDataGetter {
     public Printer pri = Printer.getINSTANCE();
