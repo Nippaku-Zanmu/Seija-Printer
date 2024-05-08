@@ -99,6 +99,17 @@ public class Printer extends Module {
         .defaultValue(false)
         .build());
 
+    public final Setting<Boolean> rayTrace = sgBasicCalc.add(new BoolSetting.Builder()
+        .name("rayTrace")
+        .defaultValue(true)
+        .visible(strictVec::get)
+        .build());
+    public final Setting<Boolean> ignoreEntity = sgBasicCalc.add(new BoolSetting.Builder()
+        .name("ignoreEntityRay")
+        .defaultValue(false)
+        .visible(()->rayTrace.isVisible()&&rayTrace.get())
+        .build());
+
     public final Setting<Integer> predTick = sgBasicCalc.add(new IntSetting.Builder()
         .name("RotatePredTick")
         .defaultValue(1)
@@ -317,7 +328,7 @@ public class Printer extends Module {
 
 
     private Printer() {
-        super(Addon.CATEGORY, "litematica-printer", "Automatically prints open schematics");
+        super(Addon.CATEGORY, "Seija-litematica-printer", "Automatically prints open schematics");
 
     }
 
@@ -356,7 +367,7 @@ public class Printer extends Module {
             .filter(bp -> !SeijaUtil.intersectsWithEntity(new Box(bp), entity -> !entity.isSpectator() && !(entity instanceof ItemEntity) && !(entity instanceof ArmorStandEntity)))
             //没被实体卡住
             .filter(bp -> BlockUtil.surfaceCheck(bp, surfaceSize.get()))
-
+            //表面模式检测
             .collect(Collectors.toList());
         PosSorter.sort(collect);
 

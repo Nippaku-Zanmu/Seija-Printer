@@ -12,6 +12,7 @@ import meteordevelopment.meteorclient.mixin.WorldAccessor;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.PendingUpdateManager;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityPose;
 import net.minecraft.util.math.*;
 import net.minecraft.world.entity.EntityLookup;
 import net.minecraft.world.entity.EntityTrackingSection;
@@ -24,16 +25,29 @@ import java.util.function.Predicate;
 public class SeijaUtil {
     public static Printer pri = Printer.INSTANCE;
     static MinecraftClient mc = MinecraftClient.getInstance();
+    public static  double getEyeHeight(){
+        double eyeHeight;
+        if (pri.sneak.get()) {
+
+            if (mc.player.getEyeHeight(mc.player.getPose()) < 1) {
+                eyeHeight = mc.player.getEyeHeight(mc.player.getPose());
+            } else eyeHeight = mc.player.getEyeHeight(EntityPose.CROUCHING);
+        } else
+            eyeHeight = mc.player.getEyePos().y - mc.player.getPos().y;
+        return eyeHeight;
+    }
 
     public static double getYaw(Vec3d pos) {
 
-        Vec3d pVec = PredictUtility.predictPlayerVec(mc.player, pri.predTick.get());
+        Vec3d pVec = PredictUtility.getPredPlayerVec();
         return mc.player.getYaw() + MathHelper.wrapDegrees((float) Math.toDegrees(Math.atan2(pos.getZ() - pVec.getZ(), pos.getX() - pVec.getX())) - 90f - mc.player.getYaw());
     }
 
     public static double getPitch(Vec3d pos) {
-        Vec3d pVec = PredictUtility.predictPlayerVec(mc.player, pri.predTick.get());
-        double eyeHeight = mc.player.getEyePos().y - mc.player.getPos().y;
+        Vec3d pVec = PredictUtility.getPredPlayerVec();
+        double eyeHeight = getEyeHeight();
+
+
         double diffX = pos.getX() - pVec.getX();
         double diffY = pos.getY() - (pVec.getY() + eyeHeight);
         double diffZ = pos.getZ() - pVec.getZ();

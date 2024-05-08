@@ -99,6 +99,7 @@ public class BlockUtil {
                 mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             } else {
                 mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, getHitRes(pos, dir, hitVec));
+                mc.player.swingHand(Hand.MAIN_HAND);
             }
 
             if (sneakToggle) {
