@@ -1,10 +1,6 @@
 package com.kijinseija.seija_printer.print_main.printer.placedata_getter;
 
 import com.kijinseija.seija_printer.print_main.modules.Printer;
-import com.kijinseija.seija_printer.print_main.printer.placedata_getter.getter.HFaceDirOpposite.BigDripLeafDataGetter;
-import com.kijinseija.seija_printer.print_main.printer.placedata_getter.getter.HFaceDirOpposite.HFaceDirOppositeDataGetter;
-import com.kijinseija.seija_printer.print_main.printer.placedata_getter.getter.HFaceDirOpposite.RedStoneGateDataGetter;
-import com.kijinseija.seija_printer.print_main.printer.placedata_getter.getter.HFaceDirOpposite.SmallDripDataGetter;
 import com.kijinseija.seija_printer.print_main.printer.placedata_getter.vanilla_precision_placer.DataGetter;
 import com.kijinseija.seija_printer.print_main.printer.util.BlockUtil;
 import com.kijinseija.seija_printer.print_main.printer.util.InvUtil;
@@ -12,6 +8,7 @@ import com.kijinseija.seija_printer.print_main.printer.util.records.DirData;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
 import com.kijinseija.seija_printer.print_main.printer.placedata_getter.getter.*;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceDataPack;
+import net.minecraft.block.AirBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.ItemStack;
@@ -27,11 +24,14 @@ public class PlaceDataManager {
     private static final Printer pri = Printer.getINSTANCE();
     private static final MinecraftClient mc = MinecraftClient.getInstance();
     public static PlaceDataPack getPlaceData(BlockPos pos, BlockState needState) {
+
         List<Direction> dirs = BlockUtil.getDirs(pos);
         List<ItemStack> stacks;
-        if (/*dirs.isEmpty() ||*/ (stacks = InvUtil.getBlockStacks(needState.getBlock())).size() == 0) {
+        if (/*dirs.isEmpty() ||*/ needState.getBlock() instanceof AirBlock ||(stacks = InvUtil.getBlockStacks(needState.getBlock())).size() == 0) {
             //没有可用Facing(后移至原版计算(for))//找不到方块//不可放置
+
             return PlaceDataPack.NULL;
+
         }
         return PlaceDataManager.INSTANCE.getPlaceData(pos, needState, dirs, stacks);
     }
@@ -47,17 +47,17 @@ public class PlaceDataManager {
      */
     public PlaceDataPack getPlaceData(BlockPos pos, BlockState needState, List<Direction> dirs, List<ItemStack> stacks) {
         DirData dirData = new DirData(pos, dirs);
-
+        //ChatUtils.sendMsg(Text.of("GetData2"));
 //        if (true)
 //            return DataGetter.getData(needState, new DirData(pos, dirs), stacks.get(0));
 
-        if (pri.enablePrecisionPlace.get())//是否启用精准放置
+        if (pri.bSetEnablePrecisionPlace.get())//是否启用精准放置
             try {
                 for (AbstractDataGetter dataGetter : dataGetters) {
                     //遍历所有数据获取器,以求更加精准的放置数据
                     if (dataGetter.isSuitable(needState, pos)) {
                         //适合则进行数据获取
-
+                      //  ChatUtils.sendMsg(Text.of("RetData"));
                         return PlaceDataPack.plac(dataGetter.getData(needState, dirData));
                     }
                 }
@@ -65,8 +65,8 @@ public class PlaceDataManager {
                 //异常处理,防止小天才乱玩方块替换
             }
         //默认放置
-
-        if (pri.enablePrecisionPlace.get() && pri.tryVanillaPrecisionPlace.get()) {
+        //ChatUtils.sendMsg(Text.of("GetDataDef"));
+        if (pri.bSetEnablePrecisionPlace.get() && pri.bSetTryVanillaPrecisionPlace.get()) {
             return DataGetter.getData(needState, new DirData(pos, dirs), stacks.get(0));
         }
         for (Direction dir : dirData.dirs()) {
@@ -98,7 +98,7 @@ public class PlaceDataManager {
 //        dataGetters.add(new DoorDataGetter());
 //        dataGetters.add(new HopperDataGetter());
 //        dataGetters.add(new HFaceDirDataGetter());
-        dataGetters.add(new ChestDataGetter());
+//        dataGetters.add(new ChestDataGetter());
 //        dataGetters.add(new AnvilDataGetter());
 //        dataGetters.add(new TorchBlockDataGetter());
         dataGetters.add(new ObserverDataGetter());

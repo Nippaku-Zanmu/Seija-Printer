@@ -19,7 +19,7 @@ import java.util.List;
 
 public class SlabFixer extends AbstractFixer {
     @Override
-    public boolean fixBlock(BlockPos pos, BlockState needState) {
+    public int fixBlock(BlockPos pos, BlockState needState) {
         PlaceData data = null;
         BlockState blockState = mc.world.getBlockState(pos);
         SlabType slabType = blockState.get(Properties.SLAB_TYPE);
@@ -65,7 +65,7 @@ public class SlabFixer extends AbstractFixer {
             final Vec3d centerPos = pos.toCenterPos();
             switch (slabType) {
                 case BOTTOM -> {
-                    if ((!pri.strictDir.get()) || centerPos.getY() >= mc.player.getEyePos().getY() - 0.4) {
+                    if ((!pri.bSetStrictDir.get()) || centerPos.getY() >= mc.player.getEyePos().getY() - 0.4) {
                         for (Vec3d clickVec : dirData.clickVecs(Direction.UP)) {
                             data = new PlaceData(pos, Direction.DOWN, clickVec, true, null);
 
@@ -73,7 +73,7 @@ public class SlabFixer extends AbstractFixer {
                     }
                 }
                 case TOP -> {
-                    if ((!pri.strictDir.get()) || centerPos.getY() <= mc.player.getEyePos().getY() + 0.4)
+                    if ((!pri.bSetStrictDir.get()) || centerPos.getY() <= mc.player.getEyePos().getY() + 0.4)
                         for (Vec3d clickVec : dirData.clickVecs(Direction.DOWN)) {
                             data = new PlaceData(pos, Direction.UP, clickVec, true, null);
 
@@ -84,26 +84,27 @@ public class SlabFixer extends AbstractFixer {
         }
         if (data != null) {
             if (!InvUtil.switchBlock(needState.getBlock())) {
-                return false;
+                return AbstractFixer.RETURN;
             }
 
             BlockUtil.placeBlock(data);
 
 
-            return true;
+            return AbstractFixer.SUCCESS;
         }
-        return false;
+        return AbstractFixer.CONTINUE;
     }
 
     @Override
     public boolean needFix(BlockPos pos, BlockState needState) {
-
+        if (!InvUtil.findBlock(needState.getBlock())) return false;
         BlockState blockState = mc.world.getBlockState(pos);
         if (blockState.getBlock() instanceof AirBlock || needState.getBlock() instanceof AirBlock)
             return false;
         if ((!(needState.getBlock() instanceof SlabBlock)) || (!blockState.getBlock().equals(needState.getBlock()))) {
             return false;
         }
+
         //不同方块,不为台阶则不需要修复
         if (blockState.get(Properties.SLAB_TYPE) != SlabType.DOUBLE
             && needState.get(Properties.SLAB_TYPE) == SlabType.DOUBLE) {

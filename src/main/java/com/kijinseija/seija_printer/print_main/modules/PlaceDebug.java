@@ -14,7 +14,7 @@ public class PlaceDebug extends Module {
 
     public PlaceDebug() {
         super(Addon.CATEGORY, "PlaceDebug", "Test");
-        new YanZhen().yanZheng();
+
     }
     @EventHandler
     public void onPacket(PacketEvent.Send send){

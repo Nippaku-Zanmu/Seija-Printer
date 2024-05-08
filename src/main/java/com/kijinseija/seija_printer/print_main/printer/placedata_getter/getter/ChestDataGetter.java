@@ -50,9 +50,9 @@ public class ChestDataGetter extends AbstractDataGetter {
 
                     && (rotData==null||needDir == Direction.fromRotation(SeijaUtil.getYaw(clickVec)).getOpposite())) {
 
-                    if (neiOffset != null) {
-                        Printer.getINSTANCE().blackList.add(RenderHelper.getBlackInfo(pos.offset(neiOffset)));
-                    }
+//                    if (neiOffset != null) {
+//                        Printer.getINSTANCE().blackList.add(RenderHelper.getBlackInfo(pos.offset(neiOffset)));
+//                    }
 
                     return new PlaceData(pos.offset(dir), dir.getOpposite(), clickVec, true, rotData);
                 } else if (needType != ChestType.SINGLE && neiOffset == dir)

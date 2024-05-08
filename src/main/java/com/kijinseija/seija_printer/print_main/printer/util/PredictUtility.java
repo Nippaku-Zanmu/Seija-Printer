@@ -37,7 +37,7 @@ public class PredictUtility {
     }
 
     public static Vec3d getPredPlayerVec(){
-        return predictPlayerVec(mc.player, Printer.INSTANCE.predTick.get());
+        return predictPlayerVec(mc.player, Printer.INSTANCE.iSetPredTick.get());
     }
     public static Vec3d predictPlayerVec(PlayerEntity entity, int ticks) {
         //if (ticks<=0)return entity;

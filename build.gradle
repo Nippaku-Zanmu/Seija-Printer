@@ -54,8 +54,6 @@ dependencies {
 
     //litematica
     modImplementation "curse.maven:litematica-${project.litematica_projectid}:${project.litematica_fileid}"
-    //modImplementation "fi.dy.masa.malilib:malilib-fabric-${project.minecraft_version}:${project.malilib_version}"
-    //modImplementation "fi.dy.masa.malilib:malilib-fabric-1.20.1.0.16.1"
     modImplementation "fi.dy.masa.malilib:malilib-fabric-1.20.1:${project.malilib_version}"
 
 

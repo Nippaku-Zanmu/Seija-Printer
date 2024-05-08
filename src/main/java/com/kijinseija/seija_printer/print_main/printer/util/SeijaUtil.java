@@ -18,7 +18,6 @@ import net.minecraft.world.entity.EntityLookup;
 import net.minecraft.world.entity.EntityTrackingSection;
 import net.minecraft.world.entity.SectionedEntityCache;
 import net.minecraft.world.entity.SimpleEntityLookup;
-import org.reflections.vfs.Vfs;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
@@ -28,12 +27,12 @@ public class SeijaUtil {
     static MinecraftClient mc = MinecraftClient.getInstance();
 
     public static boolean isSneak(){
-        return mc.player.isSneaking()||pri.sneak.get();
+        return mc.player.isSneaking()||pri.bSetSneak.get();
     }
 
     public static double getEyeHeight() {
         double eyeHeight;
-        if (pri.sneak.get()) {
+        if (pri.bSetSneak.get()) {
 
             if (mc.player.getEyeHeight(mc.player.getPose()) < 1) {
                 eyeHeight = mc.player.getEyeHeight(mc.player.getPose());

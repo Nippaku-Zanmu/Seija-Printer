@@ -8,6 +8,9 @@ import net.minecraft.util.math.BlockPos;
 public class DaylightDetectorFixer extends AbstractClickFixer{
     @Override
     public boolean needFix(BlockPos pos, BlockState needState) {
+        if (!super.needFix(pos,needState)) {
+            return false;
+        }
         BlockState blockState = mc.world.getBlockState(pos);
         if (
             blockState.getBlock() instanceof DaylightDetectorBlock &&needState.getBlock()==blockState.getBlock()) {

@@ -14,7 +14,7 @@ import net.minecraft.util.math.Vec3d;
 
 public class DirtFixer extends AbstractFixer {
     @Override
-    public boolean fixBlock(BlockPos pos, BlockState needState) {
+    public int fixBlock(BlockPos pos, BlockState needState) {
 
         DirDataI dirDataI = new DirDataI(pos, BlockUtil.getInteractDir(pos));
         if (needState.getBlock() instanceof DirtPathBlock)
@@ -24,16 +24,20 @@ public class DirtFixer extends AbstractFixer {
                 if (InvUtil.switchItem(stack -> needState.getBlock() instanceof DirtPathBlock
                     ? stack.getItem() instanceof ShovelItem : stack.getItem() instanceof HoeItem)) {
                     BlockUtil.interactBlock(new PlaceData(dirDataI.placePos(),dir,clickVec,true,null));
-                    return true;
-                }
+                    return AbstractFixer.SUCCESS;
+                }else return AbstractFixer.RETURN;
             }
         }
-        return false;
+        return AbstractFixer.CONTINUE;
     }
 
     @Override
     public boolean needFix(BlockPos pos, BlockState needState) {
         Block block = mc.world.getBlockState(pos).getBlock();
+        if (needState.getBlock() instanceof DirtPathBlock &&!InvUtil.findItem(stack -> stack.getItem() instanceof ShovelItem))
+            return false;
+        if (needState.getBlock() instanceof FarmlandBlock &&!InvUtil.findItem(stack -> stack.getItem() instanceof HoeItem))
+            return false;
         return ((needState.getBlock() instanceof DirtPathBlock || needState.getBlock() instanceof FarmlandBlock)
             && (block instanceof SpreadableBlock || block.equals(Blocks.DIRT)
             || block.equals(Blocks.ROOTED_DIRT) || block.equals(Blocks.PODZOL)));

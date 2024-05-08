@@ -1,10 +1,10 @@
 package com.kijinseija.seija_printer.print_main.modules;
 
 import com.kijinseija.seija_printer.Addon;
+import com.kijinseija.seija_printer.print_main.printer.block_fixer.AbstractFixer;
 import com.kijinseija.seija_printer.print_main.printer.block_fixer.FixerManager;
 import com.kijinseija.seija_printer.print_main.printer.placedata_getter.PlaceDataManager;
 import com.kijinseija.seija_printer.print_main.printer.util.*;
-import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceDataPack;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PosInfo;
 import com.kijinseija.seija_printer.print_main.settings.DirectionListSetting;
@@ -27,7 +27,6 @@ import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -42,7 +41,7 @@ import java.util.stream.Collectors;
 
 
 public class Printer extends Module {
-    //todo 切换智能排序 背包切换延迟 红石放置修复 红石火把放置修复
+    //todo 切换智能排序
     public static Printer getINSTANCE() {
         return INSTANCE;
     }
@@ -52,8 +51,9 @@ public class Printer extends Module {
     private Printer() {
         super(Addon.CATEGORY, "Seija-litematica-printer", "Automatically prints open schematics");
     }
+
     private final SettingGroup sgBasicCalc = settings.createGroup("BasicCalc");
-    public final Setting<Double> printingRange = sgBasicCalc.add(new DoubleSetting.Builder()
+    public final Setting<Double> dSetPrintingRange = sgBasicCalc.add(new DoubleSetting.Builder()
         .name("PrintingRange")
         .description("The block place range.")
         .defaultValue(4.7)
@@ -61,7 +61,7 @@ public class Printer extends Module {
         .sliderMax(6)
         .build()
     );
-    public final Setting<Double> printingYDistance = sgBasicCalc.add(new DoubleSetting.Builder()
+    public final Setting<Double> dSetPrintingYDistance = sgBasicCalc.add(new DoubleSetting.Builder()
         .name("PrintingYDistance")
         .description("Maximum depth.")
         .defaultValue(2.5)
@@ -69,7 +69,7 @@ public class Printer extends Module {
         .sliderMax(6)
         .build()
     );
-    public final Setting<Double> antiReplaceTime = sgBasicCalc.add(new DoubleSetting.Builder()
+    public final Setting<Double> dSetAntiReplaceTime = sgBasicCalc.add(new DoubleSetting.Builder()
         .name("AntiReplaceTime")
         .description("")
         .defaultValue(150)
@@ -77,7 +77,7 @@ public class Printer extends Module {
         .sliderMax(1000)
         .build()
     );
-    private final Setting<Integer> printingDelay = sgBasicCalc.add(new IntSetting.Builder()
+    private final Setting<Integer> iSetPrintingDelay = sgBasicCalc.add(new IntSetting.Builder()
         .name("PrintingDelay")
         .description("Delay between printing blocks in ticks.")
         .defaultValue(51)
@@ -85,7 +85,7 @@ public class Printer extends Module {
         .max(10000).sliderMax(1000)
         .build()
     );
-    private final Setting<Integer> blockPreTick = sgBasicCalc.add(new IntSetting.Builder()
+    private final Setting<Integer> iSetBlockPreTick = sgBasicCalc.add(new IntSetting.Builder()
         .name("BlockPreTick")
         .defaultValue(1)
         .min(0).sliderMin(0)
@@ -93,13 +93,13 @@ public class Printer extends Module {
         .build()
     );
 
-    public final Setting<Boolean> airPlace = sgBasicCalc.add(new BoolSetting.Builder()
+    public final Setting<Boolean> bSetAirPlace = sgBasicCalc.add(new BoolSetting.Builder()
         .name("Air-Place")
         .description("Allow the bot to place in the air.")
         .defaultValue(false)
         .build()
     );
-    public final Setting<Boolean> liquidInt = sgBasicCalc.add(new BoolSetting.Builder()
+    public final Setting<Boolean> bSetLiquidInt = sgBasicCalc.add(new BoolSetting.Builder()
         .name("LiquidInteract")
         .description("Allow the printer to place on the Liquid.")
         .defaultValue(false)
@@ -108,40 +108,40 @@ public class Printer extends Module {
 
     private final SettingGroup sgACBypass = settings.createGroup("AC-Bypass");
 
-    public final Setting<Boolean> rotate = sgACBypass.add(new BoolSetting.Builder()
+    public final Setting<Boolean> bSetRotate = sgACBypass.add(new BoolSetting.Builder()
         .name("Rotate")
         .defaultValue(true)
         .build());
 
-    public final Setting<Boolean> strictDir = sgACBypass.add(new BoolSetting.Builder()
+    public final Setting<Boolean> bSetStrictDir = sgACBypass.add(new BoolSetting.Builder()
         .name("Strict Direction")
         .description("Doesn't place on faces which aren't in your direction.")
         .defaultValue(true)
         .build());
 
-    public final Setting<Boolean> strictVec = sgACBypass.add(new BoolSetting.Builder()
+    public final Setting<Boolean> bSetStrictVec = sgACBypass.add(new BoolSetting.Builder()
         .name("Strict ClickVec")
-        .visible(() -> !airPlace.get())
+        .visible(() -> !bSetAirPlace.get())
         .defaultValue(true)
         .build());
-    public final Setting<Boolean> randomOffset = sgACBypass.add(new BoolSetting.Builder()
+    public final Setting<Boolean> bSetRandomOffset = sgACBypass.add(new BoolSetting.Builder()
         .name("randomOffsetVec")
         .defaultValue(true)
         .build());
-    public final Setting<Boolean> multiDetection = sgACBypass.add(new BoolSetting.Builder()
+    public final Setting<Boolean> bSetMultiDetection = sgACBypass.add(new BoolSetting.Builder()
         .name("Multi-focus detection")
         .defaultValue(false)
         .build());
 
-    public final Setting<Boolean> rayTrace = sgACBypass.add(new BoolSetting.Builder()
+    public final Setting<Boolean> bSetRayTrace = sgACBypass.add(new BoolSetting.Builder()
         .name("rayTrace")
         .defaultValue(true)
-        .visible(strictVec::get)
+        .visible(bSetStrictVec::get)
         .build());
-    public final Setting<Boolean> ignoreEntity = sgACBypass.add(new BoolSetting.Builder()
+    public final Setting<Boolean> bSetIgnoreEntity = sgACBypass.add(new BoolSetting.Builder()
         .name("ignoreEntityRay")
         .defaultValue(false)
-        .visible(() -> rayTrace.isVisible() && rayTrace.get())
+        .visible(() -> bSetRayTrace.isVisible() && bSetRayTrace.get())
         .build());
 
 
@@ -151,19 +151,40 @@ public class Printer extends Module {
         LOW, HIGH, NONE
     }
 
-    public final Setting<DistanceMode> angleSortMode = sgSort.add(new EnumSetting.Builder<DistanceMode>()
+    public final Setting<DistanceMode> eSetAngleSortMode = sgSort.add(new EnumSetting.Builder<DistanceMode>()
         .name("angleMode").defaultValue(DistanceMode.LOW).build());
-    public final Setting<DistanceMode> distanceSortMode = sgSort.add(new EnumSetting.Builder<DistanceMode>()
+    public final Setting<DistanceMode> eSetDistanceSortMode = sgSort.add(new EnumSetting.Builder<DistanceMode>()
         .name("DistanceMode").defaultValue(DistanceMode.HIGH).build());
 
-
+    SettingGroup sgItemSwitch = settings.createGroup("ItemSwitch");
+    public  enum InvSwitchMode{
+        NONE,SWAP,PICK
+    }
+    public final Setting<InvSwitchMode> eSetInvSwitchMode = sgItemSwitch.add(new EnumSetting.Builder<InvSwitchMode>()
+        .name("InvSwitchMode")
+        .defaultValue(InvSwitchMode.SWAP)
+        .build()
+    );
+    public final Setting<Boolean> bSetAntiWrongBlock = sgItemSwitch.add(new BoolSetting.Builder()
+        .name("AntiWrongBlock")
+        .defaultValue(false)
+        .build());
+    public final Setting<Boolean> bSetIndirectInvSwap = sgItemSwitch.add(new BoolSetting.Builder()
+        .name("IndirectInvSwap")
+        .defaultValue(false)
+        .build());
+    public final Setting<String> sSetInvSwapSlot = sgItemSwitch.add(new StringSetting.Builder()
+        .name("InvSwapSlot")
+        .visible(bSetIndirectInvSwap::get)
+        .defaultValue("4,5,6,7,8")
+        .build());
     SettingGroup sgAdvancedSettings = settings.createGroup("AdvancedSettings");
-    public final Setting<Boolean> illegalRotate = sgAdvancedSettings.add(new BoolSetting.Builder()
+    public final Setting<Boolean> bSetIllegalRotate = sgAdvancedSettings.add(new BoolSetting.Builder()
         .name("illegalRotate")
         .defaultValue(false)
         .build());
 
-    public final Setting<Integer> predTick = sgAdvancedSettings.add(new IntSetting.Builder()
+    public final Setting<Integer> iSetPredTick = sgAdvancedSettings.add(new IntSetting.Builder()
 
         .name("RotatePredTick")
         .defaultValue(1)
@@ -171,67 +192,72 @@ public class Printer extends Module {
         .max(10000).sliderMax(16)
         .build()
     );
-    public final Setting<Boolean> antiWrongBlock = sgAdvancedSettings.add(new BoolSetting.Builder()
-        .name("AntiWrongBlock")
-        .defaultValue(false)
-        .build());
 
-    public final Setting<Boolean> sneak = sgAdvancedSettings.add(new BoolSetting.Builder()
+
+    public final Setting<Boolean> bSetSneak = sgAdvancedSettings.add(new BoolSetting.Builder()
         .name("SneakPlace")
         .defaultValue(true)
         .build());
 
-    public final Setting<Boolean> packetRotate = sgAdvancedSettings.add(new BoolSetting.Builder()
+    public final Setting<Boolean> bSetPacketRotate = sgAdvancedSettings.add(new BoolSetting.Builder()
         .name("PacketRotate")
-        .visible(rotate::get)
+        .visible(bSetRotate::get)
         .defaultValue(false)
         .build());
-    public final Setting<Boolean> packetPlace = sgAdvancedSettings.add(new BoolSetting.Builder()
+    public final Setting<Boolean> bSetPacketPlace = sgAdvancedSettings.add(new BoolSetting.Builder()
         .name("PacketPlace")
         .defaultValue(false)
         .build());
+    public enum SurfaceModes{
+        MANHATTAN,CHEBYSHEV
+    }
+    public final Setting<SurfaceModes> eSetSurfaceMode = sgAdvancedSettings
+        .add(new EnumSetting.Builder<SurfaceModes>()
+            .name("SurfaceMode")
+            .defaultValue(SurfaceModes.CHEBYSHEV)
+            .build());
 
-    public final Setting<Integer> surfaceSize = sgAdvancedSettings.add(new IntSetting.Builder()
+    public final Setting<Integer> iSetSurfaceSize = sgAdvancedSettings.add(new IntSetting.Builder()
         .name("SurfaceSize")
         .defaultValue(0)
         .min(0).sliderMin(0)
         .max(10).sliderMax(2)
         .build()
     );
-    public final Setting<Boolean> bridgeMode = sgAdvancedSettings.add(new BoolSetting.Builder()
+    public final Setting<Boolean> bSetBridgeMode = sgAdvancedSettings.add(new BoolSetting.Builder()
         .name("BridgeMode")
         .defaultValue(false)
         .build());
-    public final Setting<List<Block>> bridgeBlocks = sgAdvancedSettings.add(new BlockListSetting.Builder()
+    public final Setting<List<Block>> liSetBridgeBlocks = sgAdvancedSettings.add(new BlockListSetting.Builder()
         .name("BridgeBlocks")
-        .visible(bridgeMode::get)
+        .visible(bSetBridgeMode::get)
         .defaultValue(Blocks.SLIME_BLOCK)
         .build()
     );
-    public final Setting<List<Direction>> bridgeDirs = sgAdvancedSettings.add(new DirectionListSetting.Builder()
+    public final Setting<List<Direction>> liSetBridgeDirs = sgAdvancedSettings.add(new DirectionListSetting.Builder()
         .name("BridgeDirection")
-        .visible(bridgeMode::get)
+        .visible(bSetBridgeMode::get)
         .defaultValue(Direction.UP)
         .build());
 
 
-    private final Setting<List<Block>> blackLists = sgAdvancedSettings.add(new BlockListSetting.Builder()
+    private final Setting<List<Block>> liSetBlackLists = sgAdvancedSettings.add(new BlockListSetting.Builder()
         .name("BlackList")
         .description("Black List.")
         .build()
     );
 
-    public final Setting<Boolean> enablePrecisionPlace = sgAdvancedSettings.add(new BoolSetting.Builder()
+    public final Setting<Boolean> bSetEnablePrecisionPlace = sgAdvancedSettings.add(new BoolSetting.Builder()
         .name("enablePrecisionPlace")
         .defaultValue(true)
         .build());
-    public final Setting<Boolean> tryVanillaPrecisionPlace =
+    public final Setting<Boolean> bSetTryVanillaPrecisionPlace =
         sgAdvancedSettings.add(new BoolSetting.Builder()
             .name("TryVanillaPrecision")
-            .visible(enablePrecisionPlace::get)
+            .visible(bSetEnablePrecisionPlace::get)
             .defaultValue(true)
             .build());
-    public final Setting<Boolean> enableBlockFixer = sgAdvancedSettings.add(new BoolSetting.Builder()
+    public final Setting<Boolean> bSetEnableBlockFixer = sgAdvancedSettings.add(new BoolSetting.Builder()
         .name("enableBlockFixer")
         .defaultValue(true)
         .build());
@@ -240,76 +266,77 @@ public class Printer extends Module {
     private final SettingGroup sgRendering = settings.createGroup("Rendering");
 
     public enum RenderMode {
-        NONE, MULTI, ANIMATION
+        NONE, MULTI, ANIMATION,DEBUG
     }
 
-    private final Setting<RenderMode> renderMode = sgRendering.add(new EnumSetting.Builder<RenderMode>()
+    public final Setting<RenderMode> eSetRenderMode = sgRendering.add(new EnumSetting.Builder<RenderMode>()
         .name("RenderMode").defaultValue(RenderMode.MULTI).build());
-    public final Setting<Double> renderTime = sgRendering.add(new DoubleSetting.Builder()
+    public final Setting<Double> dSetRenderTime = sgRendering.add(new DoubleSetting.Builder()
         .name("renderTime")
-        .visible(() -> renderMode.get() == RenderMode.MULTI)
+        .visible(() -> eSetRenderMode.get() == RenderMode.MULTI||eSetRenderMode.get() == RenderMode.DEBUG)
         .defaultValue(500)
         .min(0).sliderMin(0)
         .sliderMax(2000)
         .build()
     );
-    public final Setting<Double> animationSpeed = sgRendering.add(new DoubleSetting.Builder()
+    public final Setting<Double> dSetAnimationSpeed = sgRendering.add(new DoubleSetting.Builder()
         .name("AnimationSpeed")
-        .visible(() -> renderMode.get() == RenderMode.ANIMATION)
+        .visible(() -> eSetRenderMode.get() == RenderMode.ANIMATION)
         .sliderRange(0, 100)
         .range(0, 100)
         .defaultValue(10)
         .build());
-    public final Setting<Double> sizeExpandMultiplier = sgRendering.add(new DoubleSetting.Builder()
+    public final Setting<Double> dSetSizeExpandMultiplier = sgRendering.add(new DoubleSetting.Builder()
         .name("SizeExpandMultiplier")
-        .visible(() -> renderMode.get() == RenderMode.ANIMATION)
+        .visible(() -> eSetRenderMode.get() == RenderMode.ANIMATION)
         .sliderRange(0, 10)
         .range(0, 100)
         .defaultValue(1.5)
         .build());
-    public final Setting<Double> sizeShrinkMultiplier = sgRendering.add(new DoubleSetting.Builder()
+    public final Setting<Double> dSetSizeShrinkMultiplier = sgRendering.add(new DoubleSetting.Builder()
         .name("SizeShrinkMultiplier")
-        .visible(() -> renderMode.get() == RenderMode.ANIMATION)
+        .visible(() -> eSetRenderMode.get() == RenderMode.ANIMATION)
         .sliderRange(0, 10)
         .range(0, 100)
         .defaultValue(1)
         .build());
 
-    private final Setting<Double> rainbowSpeed = sgRendering.add(new DoubleSetting.Builder()
+    private final Setting<Double> dSetRainbowSpeed = sgRendering.add(new DoubleSetting.Builder()
         .name("rainbowSpeed")
         .sliderRange(0, 20)
         .defaultValue(1)
         .min(0)
-        .visible(() -> renderMode.get() == RenderMode.MULTI)
+        .visible(() -> eSetRenderMode.get() == RenderMode.MULTI)
         .build());
-    private final Setting<Boolean> renderFill = sgRendering.add(new BoolSetting.Builder()
+    public final Setting<Boolean> bSetRenderFill = sgRendering.add(new BoolSetting.Builder()
         .name("render-fill")
         .defaultValue(true)
-        .visible(() -> renderMode.get() != RenderMode.NONE)
+        .visible(() -> eSetRenderMode.get() != RenderMode.NONE)
         .build()
     );
-    private final Setting<SettingColor> fillColor = sgRendering.add(new ColorSetting.Builder()
+
+    public final Setting<SettingColor> colSetFillColor = sgRendering.add(new ColorSetting.Builder()
         .name("colour")
         .description("The cubes colour.")
         .defaultValue(new SettingColor(95, 190, 100))
-        .visible(renderFill::isVisible)
+        .visible(bSetRenderFill::isVisible)
         .build()
     );
-    private final Setting<Boolean> renderOutline = sgRendering.add(new BoolSetting.Builder()
+    public final Setting<Boolean> bSetRenderOutline = sgRendering.add(new BoolSetting.Builder()
         .name("outline")
         .defaultValue(true)
-        .visible(() -> renderMode.get() != RenderMode.NONE)
+        .visible(() -> eSetRenderMode.get() != RenderMode.NONE)
         .build()
     );
-    private final Setting<SettingColor> outLineColor = sgRendering.add(new ColorSetting.Builder()
+    public final Setting<SettingColor> colSetOutLineColor = sgRendering.add(new ColorSetting.Builder()
         .name("outLine")
         .description("The cubes outline colour.")
         .defaultValue(new SettingColor(95, 190, 255))
-        .visible(renderOutline::isVisible)
+        .visible(bSetRenderOutline::isVisible)
         .build()
     );
     private final SettingGroup sgReplaceBlockFile = settings.createGroup("ReplaceBlock");
-    private final Setting<String> replaceBlockFile =
+    private final Setting<String> sSetReplaceBlockFile =
         sgReplaceBlockFile.add(new StringSetting.Builder()
             .name("replaceBlockFile")
             .defaultValue("D://a.txt")
@@ -321,7 +348,7 @@ public class Printer extends Module {
         WVerticalList list = theme.verticalList();
 
         WButton start = list.add(theme.button("Load!")).expandX().widget();
-        start.action = () -> new Thread(() -> loadMap(replaceBlockFile.get())).start();
+        start.action = () -> new Thread(() -> loadMap(sSetReplaceBlockFile.get())).start();
 
         return list;
     }
@@ -367,13 +394,11 @@ public class Printer extends Module {
     public final HashMap<Block, List<Block>> replaceMap = new HashMap<>();
 
 
-
-
     SeijaTimer timer = new SeijaTimer();
     public final List<PosInfo> blackList = Collections.synchronizedList(new ArrayList<>());
 
     private boolean isInBlackList(BlockPos pos) {
-        if (blackLists.get().contains(BlockReplaceUtils.INSTANCE.getScheState(pos).getBlock())) {
+        if (liSetBlackLists.get().contains(BlockReplaceUtils.INSTANCE.getScheState(pos).getBlock())) {
             return true;
         }
         for (PosInfo info : blackList) {
@@ -386,13 +411,13 @@ public class Printer extends Module {
 
 
     public void doPrint() {
-        if (!timer.passed(printingDelay.get())) return;
+        if (!timer.passed(iSetPrintingDelay.get())) return;
         if (mc.player == null || mc.world == null) return;
         //刷掉过时的黑名单方块
-        blackList.removeIf(b -> System.currentTimeMillis() - b.timestamp() > antiReplaceTime.get());
+        blackList.removeIf(b -> System.currentTimeMillis() - b.timestamp() > dSetAntiReplaceTime.get());
         //WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
 
-        List<BlockPos> sphere = BlockUtil.getSphere(mc.player.getBlockPos(), printingRange.get().intValue(), printingRange.get().intValue());
+        List<BlockPos> sphere = BlockUtil.getSphere(mc.player.getBlockPos(), dSetPrintingRange.get().intValue(), dSetPrintingRange.get().intValue());
         List<BlockPos> collect = sphere.stream()
             //.filter(SeijaUtil::canPlaceIn)
             .filter(bp -> DataManager.getRenderLayerRange().isPositionWithinRange(bp))
@@ -403,90 +428,58 @@ public class Printer extends Module {
             //不是床头之类的不可放置方块
             .filter(bp -> !SeijaUtil.intersectsWithEntity(new Box(bp), entity -> !entity.isSpectator() && !(entity instanceof ItemEntity) && !(entity instanceof ArmorStandEntity)))
             //没被实体卡住
-            .filter(bp -> BlockUtil.surfaceCheck(bp, surfaceSize.get()))
+            .filter(bp -> SurfaceUtil.surfaceCheck(bp, iSetSurfaceSize.get()))
             //表面模式检测
             .collect(Collectors.toList());
         PosSorter.sort(collect);
         //放置计数
         int placeCount = 0;
         for (BlockPos blockPos : collect) {//遍历所有的可操作方块
-            if (placeCount >= blockPreTick.get()) return;
+            if (placeCount >= iSetBlockPreTick.get()) return;
             BlockState needState = BlockReplaceUtils.INSTANCE.getScheState(blockPos);//获取需要的方块状态
             BlockState placeNeedState = BlockReplaceUtils.INSTANCE.normalReplaceState(needState);
             PlaceDataPack placeDataPack = PlaceDataManager.getPlaceData(blockPos, placeNeedState);//获取放置数据
             if (placeDataPack.data().valid()) {//如果数据可用
-                InvUtil.switchBlock(placeNeedState.getBlock());//把需要的方块拿到手上
+                if (!InvUtil.switchBlock(placeNeedState.getBlock())) {
+                    timer.reset();
+                    return;
+                }
                 if (placeDataPack.placeMode()) {
                     BlockUtil.placeBlock(placeDataPack.data());//放置
                 } else {
                     BlockUtil.interactBlock(placeDataPack.data());
                 }
                 timer.reset();//重置计时器
-                isAniRenderSizeAdd = true;
+                RenderUtil.isAniRenderSizeAdd = true;
                 placeCount += 1;
             }
 
             //若方块放置失败则尝试修复
-            if (FixerManager.INSTANCE.doFix(blockPos, needState)) {
-                timer.reset();//若进行了修复操作则重置计时器
-                isAniRenderSizeAdd = true;
-                placeCount += 1;
+            switch (FixerManager.INSTANCE.doFix(blockPos, needState)) {
+                case AbstractFixer.SUCCESS :{
+                    timer.reset();//若进行了修复操作则重置计时器
+                    RenderUtil.isAniRenderSizeAdd = true;
+                    placeCount += 1;
+                    break;
+                }
+                case AbstractFixer.RETURN:{
+                    timer.reset();
+                    return;
+                }
+                case AbstractFixer.CONTINUE:
             }
         }
-        isAniRenderSizeAdd = false;
+        RenderUtil.isAniRenderSizeAdd = false;
     }
 
 
-    public final List<PosInfo> renderList = Collections.synchronizedList(new ArrayList<>());
 
-    public void updateAniRenderSize(double i) {
-        aniRenderSize += i;
-        aniRenderSize = MathHelper.clamp(aniRenderSize, 0, 100);
-    }
 
-    boolean isAniRenderSizeAdd = false;
-    Vec3d aniRenderCenter = Vec3d.ZERO;
-    double aniRenderSize = 0;
 
     @EventHandler
     private void onRender3d(Render3DEvent event) {
         doPrint();
-        updateRenderList();
-        if (renderMode.get() == RenderMode.ANIMATION && !renderList.isEmpty() && aniRenderSize != 0) {
-            //更新显示中点
-            Vec3d placeCenter = renderList.get(renderList.size() - 1).pos().toCenterPos();
-            double distance = aniRenderCenter.distanceTo(placeCenter);
-            if (distance > 16 || distance < 0.1) {
-                aniRenderCenter = placeCenter;
-            } else {
-                Vec3d distanceVec = placeCenter.subtract(aniRenderCenter);
-                aniRenderCenter = aniRenderCenter.add(distanceVec.multiply(animationSpeed.get() / 100));
-            }
-            //渲染
-            Vec3d posH1 = aniRenderCenter.add(aniRenderSize / 200, aniRenderSize / 200, aniRenderSize / 200);
-            Vec3d posH2 = aniRenderCenter.subtract(aniRenderSize / 200, aniRenderSize / 200, aniRenderSize / 200);
-            if (renderFill.get())
-                event.renderer.box(new Box(posH1, posH2), fillColor.get(), null, ShapeMode.Sides, 0);
-            if (renderOutline.get())
-                RenderHelper.drawBoxOutline(new Box(posH1, posH2), outLineColor.get(), event);
-
-        } else if (renderMode.get() == RenderMode.MULTI) {
-            renderList.forEach(bi -> {
-                BlockPos pos = bi.pos();
-                double per = 1 - (System.currentTimeMillis() - bi.timestamp()) / renderTime.get();
-                Vec3d posH1 = pos.toCenterPos().add(per * 0.5, per * 0.5, per * 0.5);
-                Vec3d posH2 = pos.toCenterPos().subtract(per * 0.5, per * 0.5, per * 0.5);
-
-                if (renderFill.get()) {
-                    Color col = fillColor.get().rainbow ? bi.renderColor().a(fillColor.get().a) : new Color(fillColor.get().r, fillColor.get().g, fillColor.get().b, (int) (per * fillColor.get().a));
-                    event.renderer.box(new Box(posH1, posH2), col, null, ShapeMode.Sides, 0);
-                }
-                if (renderOutline.get()) {
-                    Color col = outLineColor.get().rainbow ? bi.renderColor().a(outLineColor.get().a) : new Color(outLineColor.get().r, outLineColor.get().g, outLineColor.get().b, (int) (per * outLineColor.get().a));
-                    RenderHelper.drawBoxOutline(/*pos,*/ new Box(posH1, posH2), col, event);
-                }
-            });
-        }
+        RenderUtil.render(event);
     }
 //    @EventHandler
 //    public void onRender2d(Render2DEvent event){
@@ -511,23 +504,11 @@ public class Printer extends Module {
 
     @EventHandler()
     private void tick(TickEvent.Post e) {
-        RenderHelper.COLOR.setSpeed(rainbowSpeed.get() / 100);
+        RenderHelper.COLOR.setSpeed(dSetRainbowSpeed.get() / 100);
         RenderHelper.COLOR.getNext();
 
     }
 
-    private void updateRenderList() {
-        if (renderMode.get() != RenderMode.MULTI && !renderList.isEmpty()) {
-            PosInfo posInfo = renderList.get(renderList.size() - 1);
-            renderList.clear();
-            renderList.add(posInfo);
-            if (isAniRenderSizeAdd)
-                updateAniRenderSize(sizeExpandMultiplier.get());
-            else
-                updateAniRenderSize(-sizeShrinkMultiplier.get());
-        }
-        renderList.removeIf(b -> System.currentTimeMillis() - b.timestamp() > renderTime.get());
 
-    }
 
 }

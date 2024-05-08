@@ -53,7 +53,7 @@ public record DirData(BlockPos placePos, List<Direction> dirs) {
         //if (i >= dirs.size() - 1) return null;
         Vec3d centerVec = placePos.toCenterPos();
         //Direction offsetDir = dirs.get(i);
-        return centerVec.offset(offsetDir, pri.strictVec.get()&&pri.strictVec.isVisible() ? -0.1 : 0.5);
+        return centerVec.offset(offsetDir, pri.bSetStrictVec.get()&&pri.bSetStrictVec.isVisible() ? -0.1 : 0.5);
     }
 
     public List<Vec3d> getClickVecs(final Direction offsetDir) {
@@ -66,7 +66,7 @@ public record DirData(BlockPos placePos, List<Direction> dirs) {
 
 
         Vec3d clickVec =getClickVec(offsetDir);// placePos.toCenterPos().offset(offsetDir, pri.strictVec.get()&&pri.strictVec.isVisible() ? -0.1 : 0.5);
-        if (pri.randomOffset.get())
+        if (pri.bSetRandomOffset.get())
             clickVec = BlockUtil.randomOffsetVec(clickVec, offsetDir);
         if (offsetDir.getAxis() != Direction.Axis.Y)
             switch (mode) {
@@ -78,8 +78,8 @@ public record DirData(BlockPos placePos, List<Direction> dirs) {
 
             }
 
-        if (pri.strictVec.get()&&pri.strictVec.isVisible()) {
-            BlockHitResult result = RayTraceUtil.INSTANCE.getStrictVecResult(clickVec, offsetDir, Printer.getINSTANCE().liquidInt.get(),1.55);
+        if (pri.bSetStrictVec.get()&&pri.bSetStrictVec.isVisible()) {
+            BlockHitResult result = RayTraceUtil.INSTANCE.getStrictVecResult(clickVec, offsetDir, Printer.getINSTANCE().bSetLiquidInt.get(),1.55);
             if (result.getType() == HitResult.Type.MISS) return res;
             clickVec = result.getPos();
             if (!RayTraceUtil.INSTANCE.rayTrace(clickVec))
@@ -97,7 +97,7 @@ public record DirData(BlockPos placePos, List<Direction> dirs) {
         //final Direction offsetDir = dirs.get(i);//偏移方向
 
         Vec3d clickVec = getClickVec(offsetDir);//基础的中心Vec
-        if (pri.randomOffset.get()) {//随机offset 用于bypass
+        if (pri.bSetRandomOffset.get()) {//随机offset 用于bypass
             vecList.add(BlockUtil.randomOffsetVec(clickVec, offsetDir));
         } else
             vecList.add(clickVec);
@@ -107,9 +107,9 @@ public record DirData(BlockPos placePos, List<Direction> dirs) {
 //        BlockUtil.getExtendVec(offsetDir, true)
 //            .forEach(vec3d -> vecList.add(clickVec.add(vec3d.multiply(0.4))));
         //获取衍生的Vec偏移量,与基础中心Vec相加,放入列表
-        if (pri.strictVec.get()&&pri.strictVec.isVisible())
+        if (pri.bSetStrictVec.get()&&pri.bSetStrictVec.isVisible())
             vecList = vecList.stream().map(vec3d -> {
-                    BlockHitResult strictVecResult = RayTraceUtil.INSTANCE.getStrictVecResult(vec3d, offsetDir, Printer.getINSTANCE().liquidInt.get(),1.6);
+                    BlockHitResult strictVecResult = RayTraceUtil.INSTANCE.getStrictVecResult(vec3d, offsetDir, Printer.getINSTANCE().bSetLiquidInt.get(),1.6);
                     if (strictVecResult.getType() == HitResult.Type.MISS) {
                         return null;
                     }
@@ -128,7 +128,7 @@ public record DirData(BlockPos placePos, List<Direction> dirs) {
     }
 
     public List<Vec3d> clickVecs(Direction offset, int mode) {
-        if (pri.multiDetection.get())
+        if (pri.bSetMultiDetection.get())
             return getClickVecs(offset, mode);
         return getClickVec1(offset, mode);
     }

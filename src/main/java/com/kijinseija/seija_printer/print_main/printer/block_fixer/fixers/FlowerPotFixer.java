@@ -14,7 +14,7 @@ import net.minecraft.util.math.Vec3d;
 
 public class FlowerPotFixer extends AbstractFixer {
     @Override
-    public boolean fixBlock(BlockPos pos, BlockState needState) {
+    public int fixBlock(BlockPos pos, BlockState needState) {
 
         //block替换 仅自定义替换,不使用内置替换
         DirDataI dirDataI = new DirDataI(pos, BlockUtil.getInteractDir(pos));
@@ -22,13 +22,15 @@ public class FlowerPotFixer extends AbstractFixer {
         if (InvUtil.findBlock(((FlowerPotBlock) needState.getBlock()).getContent())){
             for (Direction dir : dirDataI.dirs()) {
                 for (Vec3d clickVec : dirDataI.clickVecs(dir)) {
-                    InvUtil.switchBlock(((FlowerPotBlock) needState.getBlock()).getContent());
+                    if (!InvUtil.switchBlock(((FlowerPotBlock) needState.getBlock()).getContent())) {
+                        return RETURN;
+                    }
                     BlockUtil.interactBlock(new PlaceData(dirDataI.placePos(),dir,clickVec,true,null));
-                    return true;
+                    return SUCCESS;
                 }
             }
         }
-        return false;
+        return CONTINUE;
     }
 
     @Override
@@ -39,6 +41,7 @@ public class FlowerPotFixer extends AbstractFixer {
             //仅自定义替换,不使用内置替换规则
             && needState.getBlock() instanceof FlowerPotBlock
             && ((FlowerPotBlock) blockState.getBlock()).getContent() instanceof AirBlock
-            && (!(((FlowerPotBlock) needState.getBlock()).getContent() instanceof AirBlock));
+            && (!(((FlowerPotBlock) needState.getBlock()).getContent() instanceof AirBlock))
+            &&((FlowerPotBlock) blockState.getBlock()).getContent() instanceof AirBlock;
     }
 }

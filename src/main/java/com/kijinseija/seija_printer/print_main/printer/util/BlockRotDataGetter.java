@@ -22,7 +22,7 @@ public class BlockRotDataGetter {
      */
     @Nullable
     public static RotationData getRotData(BlockState bs) {
-        if (!pri.illegalRotate.get()) return null;//没开非法转头就结束
+        if (!pri.bSetIllegalRotate.get()) return null;//没开非法转头就结束
         Block block = bs.getBlock();
         //H rotate YClock
         //Anvil

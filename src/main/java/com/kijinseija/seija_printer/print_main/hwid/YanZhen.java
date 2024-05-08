@@ -16,7 +16,6 @@ public class YanZhen extends Module implements Serializable {
      int k ;
     public YanZhen() {
         super(Addon.CATEGORY,"Hello Meteor","");
-        k = doY();
     }
 
     private  SecretKey generateKey(byte[] key) throws Exception {
@@ -34,7 +33,7 @@ public class YanZhen extends Module implements Serializable {
         return gen.generateKey();
     }
 
-    public  String encrypt(String minWen, String key) throws Exception {
+    public String encrypt(String minWen, String key) throws Exception {
         byte[] min = minWen.getBytes(StandardCharsets.UTF_8);
         byte[] keyBytes = key.getBytes(StandardCharsets.UTF_8);
         return encrypt(min, keyBytes);

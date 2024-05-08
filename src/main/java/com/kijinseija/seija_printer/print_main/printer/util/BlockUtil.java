@@ -32,11 +32,11 @@ public class BlockUtil {
 
 
     public static List<Direction> getInteractDir(BlockPos pos) {
-        return canTorchFac(pos).stream()
+        return (pri.bSetStrictDir.get()? canTorchFac(pos): Arrays.asList(Direction.values())) .stream()
             .filter(dir -> canPlaceIn(pos.offset(dir)))
-            .filter(dir -> mc.player.getY() - pos.toCenterPos().offset(dir, 0.5).y < pri.printingYDistance.get())
+            .filter(dir -> mc.player.getY() - pos.toCenterPos().offset(dir, 0.5).y < pri.dSetPrintingYDistance.get())
             //高度检测 针对于放置比自己低太多的方块
-            .filter(dir -> pos.toCenterPos().offset(dir, 0.5).distanceTo(mc.player.getEyePos()) <= pri.printingRange.get())
+            .filter(dir -> pos.toCenterPos().offset(dir, 0.5).distanceTo(mc.player.getEyePos()) <= pri.dSetPrintingRange.get())
             //距离检测
             .collect(Collectors.toList());
 
@@ -47,21 +47,22 @@ public class BlockUtil {
         BlockPos pos = data.pos();
         Direction dir = data.dir();
         Runnable r = () -> {
-            if (pri.illegalRotate.get() && data.exRotateData() != null) {
+            if (pri.bSetIllegalRotate.get() && data.exRotateData() != null) {
                 mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.exRotateData().yaw(), (float) data.exRotateData().pitch(), mc.player.isOnGround()));
             }//非法转头
-            if (pri.packetPlace.get()) {
+            if (pri.bSetPacketPlace.get()) {
                 mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, getHitRes(pos, dir, hitVec), SeijaUtil.getSequence()));
                 mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             } else {
                 mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, getHitRes(pos, dir, hitVec));
             }
 
-            pri.blackList.add(RenderHelper.getBlackInfo(pos));
-            pri.renderList.add(RenderHelper.getBlackInfo(pos));
+            PosInfo blackInfo = RenderHelper.getBlackInfo(pos,dir,hitVec,false);
+            pri.blackList.add(blackInfo);
+            RenderUtil.renderList.add(blackInfo);
         };
-        if (pri.rotate.get()) {
-            if (pri.packetRotate.get()) {
+        if (pri.bSetRotate.get()) {
+            if (pri.bSetPacketRotate.get()) {
                 mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) SeijaUtil.getYaw(hitVec), (float) SeijaUtil.getPitch(hitVec), mc.player.isOnGround()));
                 r.run();
             } else
@@ -82,17 +83,17 @@ public class BlockUtil {
             .filter(dir -> {
                 BlockPos offset = pos.offset(dir);
                 BlockState bs = mc.world.getBlockState(offset);
-                if (pri.airPlace.get()) return true;
-                if (pri.liquidInt.get() && bs.getBlock() instanceof FluidBlock) return true;
+                if (pri.bSetAirPlace.get()) return true;
+                if (pri.bSetLiquidInt.get() && bs.getBlock() instanceof FluidBlock) return true;
                 return bs.isSolid();
             })
             .filter(dir->(mc.world.getBlockState(pos).isAir())||!mc.world.getBlockState(pos).isSideSolid(mc.world,pos,dir,SideShapeType.FULL))
             //方块自身阻挡检测
-            .filter(dir -> mc.player.getY() - pos.toCenterPos().offset(dir, 0.5).y < pri.printingYDistance.get())
+            .filter(dir -> mc.player.getY() - pos.toCenterPos().offset(dir, 0.5).y < pri.dSetPrintingYDistance.get())
             //高度检测 针对于放置比自己低太多的方块
-            .filter(dir -> pri.sneak.get() || !isCanUseBlock(pos.offset(dir), mc.world.getBlockState(pos.offset(dir)), mc.world))
+            .filter(dir -> pri.bSetSneak.get() || !isCanUseBlock(pos.offset(dir), mc.world.getBlockState(pos.offset(dir)), mc.world))
             //不可交互
-            .filter(dir -> pos.toCenterPos().offset(dir, 0.5).distanceTo(mc.player.getEyePos()) <= pri.printingRange.get())
+            .filter(dir -> pos.toCenterPos().offset(dir, 0.5).distanceTo(mc.player.getEyePos()) <= pri.dSetPrintingRange.get())
             //距离检测
             .collect(Collectors.toList());
 
@@ -110,7 +111,7 @@ public class BlockUtil {
         Vec3d hitVec = data.hitVec();
         Runnable r = () -> {
             boolean sneakToggle = false;
-            if (pri.sneak.get()) {
+            if (pri.bSetSneak.get()) {
                 if (!mc.player.isSneaking()) {
                     sneakToggle = true;
                     mc.player.setSneaking(true);
@@ -118,10 +119,10 @@ public class BlockUtil {
                 }
             }
             //非法转头
-            if (pri.illegalRotate.get() && data.exRotateData() != null) {
+            if (pri.bSetIllegalRotate.get() && data.exRotateData() != null) {
                 mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.exRotateData().yaw(), (float) data.exRotateData().pitch(), mc.player.isOnGround()));
             }
-            if (pri.packetPlace.get()) {
+            if (pri.bSetPacketPlace.get()) {
                 mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, getHitRes(pos, dir, hitVec), SeijaUtil.getSequence()));
                 mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             } else {
@@ -137,12 +138,12 @@ public class BlockUtil {
                 mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
                 mc.player.setSneaking(false);
             }
-            PosInfo blackInfo = RenderHelper.getBlackInfo(prPos.offset(dir));
+            PosInfo blackInfo = RenderHelper.getBlackInfo(prPos.offset(dir),dir,hitVec,true);
             pri.blackList.add(blackInfo);
-            pri.renderList.add(blackInfo);
+            RenderUtil.renderList.add(blackInfo);
         };
-        if (pri.rotate.get()) {
-            if (pri.packetRotate.get()) {
+        if (pri.bSetRotate.get()) {
+            if (pri.bSetPacketRotate.get()) {
                 mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) SeijaUtil.getYaw(hitVec), (float) SeijaUtil.getPitch(hitVec), mc.player.isOnGround()));
                 r.run();
             } else
@@ -162,7 +163,7 @@ public class BlockUtil {
     public static List<Direction> getValidDirs(BlockPos pos) {
         List<Direction> values = new ArrayList<>(List.of(Direction.values()));
 
-        if (pri.strictDir.get()) {
+        if (pri.bSetStrictDir.get()) {
             List<Direction> directions = canTorchFac(pos);
             for (Direction direction : directions) {
                 values.remove(direction);
@@ -215,7 +216,7 @@ public class BlockUtil {
     public static boolean isCanUseBlock(BlockPos p, BlockState state, World world) {
         Block block = state.getBlock();
         return block instanceof AbstractRedstoneGateBlock
-            || block instanceof BlockWithEntity
+//            || block instanceof BlockWithEntity
             || block instanceof DoorBlock
             || block instanceof TrapdoorBlock
             || block instanceof FenceGateBlock
@@ -246,7 +247,7 @@ public class BlockUtil {
     private static Random random = new CheckedRandom(2335353);
 
     private static double getRandomOffset() {
-        return Printer.getINSTANCE().randomOffset.get() ?
+        return Printer.getINSTANCE().bSetRandomOffset.get() ?
             MathHelper.nextDouble(random, -0.15, 0.15) : 0;
     }
 
@@ -285,17 +286,7 @@ public class BlockUtil {
         return directions;
     }
 
-    public static boolean surfaceCheck(BlockPos pos, int c) {
-        if (c == 0) return true;
-        Set<BlockPos> surface = getSurface(pos, c);
-        surface.remove(pos);
-        for (BlockPos blockPos : surface) {
-            if (!BlockReplaceUtils.INSTANCE.getScheState(blockPos).isSolid()) return true;
-        }
-        return false;
-    }
-
-//    public static Set<BlockPos> getSurface(BlockPos pos, int c) {
+    //    public static Set<BlockPos> getSurface(BlockPos pos, int c) {
 //        HashSet<BlockPos> pos1 = new LinkedHashSet<>();
 //        pos1.add(pos);
 //        for (int i = 0; i < c; i++) {
@@ -315,22 +306,6 @@ public class BlockUtil {
 //    }
 
 
-    public static Set<BlockPos> getSurface(BlockPos pos, int c) {
-        Set<BlockPos> result = new HashSet<>();
-        result.add(pos);
-        for (int i = 0; i < c; i++) {
-            result = getSurface(result);
-        }
-        return result;
-    }
-
-    private static Set<BlockPos> getSurface(Set<BlockPos> set) {
-        return set.stream()
-            .flatMap(blockPos -> Arrays.stream(Direction.values())
-                .map(blockPos::offset)
-                .toList().stream())
-            .collect(Collectors.toSet());
-    }
 }
 
 

@@ -92,7 +92,7 @@ public class BlockReplaceUtils {
         List<Direction> interactDir = BlockUtil.getInteractDir(pos);
 
         if (
-            pri.bridgeMode.get()//开了桥模式
+            pri.bSetBridgeMode.get()//开了桥模式
                 && BlockUtil.isCanPlaceInBlock(bs.getBlock())//替换的位置原本需要方块为空
                 && pos != null
                 && BlockUtil.canPlaceIn(pos)//实际也为空
@@ -100,13 +100,13 @@ public class BlockReplaceUtils {
                 && (!interactDir.isEmpty()))//有用
         {
             for (Direction direction : interactDir) {
-                if (pri.bridgeDirs.get().contains(direction)//是可以用的方位
+                if (pri.liSetBridgeDirs.get().contains(direction)//是可以用的方位
                     && !BlockUtil.isCanPlaceInBlock(getScheState(pos.offset(direction)).getBlock())
                     //被支持的方块是投影中是需要放置的方块
                     && BlockUtil.getDirs(pos.offset(direction)).isEmpty()//被支持的方块不能直接放置
                 ) {
                     //可用支撑
-                    for (Block block : pri.bridgeBlocks.get()) {
+                    for (Block block : pri.liSetBridgeBlocks.get()) {
                         if (InvUtil.findBlock(block)) return block;
                     }
                     return null;

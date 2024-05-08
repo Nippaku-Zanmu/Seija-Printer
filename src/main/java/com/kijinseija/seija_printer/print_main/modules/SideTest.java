@@ -1,8 +1,10 @@
 package com.kijinseija.seija_printer.print_main.modules;
 
 import com.kijinseija.seija_printer.Addon;
+import com.kijinseija.seija_printer.print_main.hwid.YanZhen;
 import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.modules.Module;
+import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SideShapeType;
@@ -15,6 +17,7 @@ import net.minecraft.util.math.Direction;
 public class SideTest extends Module {
     public SideTest() {
         super(Addon.CATEGORY,"SideTest","");
+        Modules.get().get(YanZhen.class).doY();
     }
 
     @Override

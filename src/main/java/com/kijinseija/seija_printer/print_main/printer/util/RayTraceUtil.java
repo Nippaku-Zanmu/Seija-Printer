@@ -53,7 +53,7 @@ public class RayTraceUtil {
         return new Vec3d(i * j, -k, h * j);
     }
     public boolean rayTrace(Vec3d target){
-        if (!(pri.rayTrace.isVisible()&&pri.rayTrace.get()))return true;
+        if (!(pri.bSetRayTrace.isVisible()&&pri.bSetRayTrace.get()))return true;
 
         Entity entity2 = mc.getCameraEntity();
         if (entity2 == null) {
@@ -63,7 +63,7 @@ public class RayTraceUtil {
             return false;
         }
 
-        double d = pri.printingRange.get();
+        double d = pri.dSetPrintingRange.get();
         HitResult crosshairTarget = null;
 
         //crosshairTarget = entity2.raycast(d, 1, false);
@@ -93,7 +93,7 @@ public class RayTraceUtil {
         }
 
 
-        if (!pri.ignoreEntity.get()){
+        if (!pri.bSetIgnoreEntity.get()){
             Box box = entity2.getBoundingBox().stretch(vec3d2.multiply(d)).expand(1.0, 1.0, 1.0);
             EntityHitResult entityHitResult = ProjectileUtil.raycast(entity2, vec3d, vec3d3, box, entity -> !entity.isSpectator() && entity.canHit(), e);
             if (entityHitResult != null) {

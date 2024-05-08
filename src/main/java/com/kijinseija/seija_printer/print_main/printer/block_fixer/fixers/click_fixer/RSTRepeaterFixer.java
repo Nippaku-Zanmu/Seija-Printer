@@ -9,6 +9,9 @@ public class RSTRepeaterFixer extends AbstractClickFixer {
 
     @Override
     public boolean needFix(BlockPos pos, BlockState needState) {
+        if (!super.needFix(pos,needState)) {
+            return false;
+        }
         BlockState blockState = mc.world.getBlockState(pos);
         if (
             blockState.getBlock() instanceof RepeaterBlock

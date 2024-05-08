@@ -13,18 +13,24 @@ import java.util.List;
 
 public abstract class AbstractClickFixer extends AbstractFixer {
     @Override
-    public boolean fixBlock(BlockPos pos, BlockState needState) {
-        List<Direction> interactDir = BlockUtil.getInteractDir(pos);
-        if (interactDir.isEmpty())
-            return false;
+    public int fixBlock(BlockPos pos, BlockState needState) {
+
 //        BlockUtil.interactBlock(pos,interactDir.get(0));
         DirDataI dirDataI = new DirDataI(pos, BlockUtil.getInteractDir(pos));
         for (Direction dir : dirDataI.dirs()) {
             for (Vec3d clickVec : dirDataI.clickVecs(dir)) {
                 BlockUtil.interactBlock(new PlaceData(dirDataI.placePos(),dir,clickVec,true,null));
-                return true;
+                return AbstractFixer.SUCCESS;
             }
         }
-        return false;
+        return AbstractFixer.CONTINUE;
+    }
+
+    @Override
+    public boolean needFix(BlockPos pos, BlockState needState) {
+        List<Direction> interactDir = BlockUtil.getInteractDir(pos);
+        if (interactDir.isEmpty())
+            return false;
+        return true;
     }
 }
