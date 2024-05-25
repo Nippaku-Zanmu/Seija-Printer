@@ -27,7 +27,7 @@ public class BlockRotDataGetter {
         //H rotate YClock
         //Anvil
         if (block instanceof AnvilBlock) {
-            return getVecFromDir(bs.get(Properties.HORIZONTAL_FACING).rotateYCounterclockwise());
+            return getRotateDataFromDir(bs.get(Properties.HORIZONTAL_FACING).rotateYCounterclockwise());
         }
         //H opposite
         //Trapdoor Chest EnderChestBlock AbstractFurnaceBlock LecternBlock StonecutterBlock BeehiveBlock
@@ -42,7 +42,7 @@ public class BlockRotDataGetter {
             || block instanceof GlazedTerracottaBlock || block instanceof JigsawBlock
             || block instanceof LoomBlock
         ) {
-            return getVecFromDir(bs.get(Properties.HORIZONTAL_FACING).getOpposite());
+            return getRotateDataFromDir(bs.get(Properties.HORIZONTAL_FACING).getOpposite());
         }
 
         //H nor
@@ -62,7 +62,7 @@ public class BlockRotDataGetter {
         if (block instanceof PistonBlock || block instanceof DispenserBlock
             || block instanceof DropperBlock || block instanceof BarrelBlock
             || block instanceof CommandBlock) {
-            return getVecFromDir(bs.get(Properties.FACING).getOpposite());
+            return getRotateDataFromDir(bs.get(Properties.FACING).getOpposite());
         }
 
         //Fac
@@ -70,10 +70,10 @@ public class BlockRotDataGetter {
 
 
         if (bs.getProperties().contains(Properties.FACING)) {
-            return getVecFromDir(bs.get(Properties.FACING));
+            return getRotateDataFromDir(bs.get(Properties.FACING));
         }
         if (bs.getProperties().contains(Properties.HORIZONTAL_FACING)) {
-            return getVecFromDir(bs.get(Properties.HORIZONTAL_FACING));
+            return getRotateDataFromDir(bs.get(Properties.HORIZONTAL_FACING));
         }
         if (bs.getProperties().contains(Properties.ROTATION)) {
             return getVecFromRotProp2(bs.get(Properties.ROTATION));
@@ -82,7 +82,7 @@ public class BlockRotDataGetter {
         return null;
     }
 
-    public static RotationData getVecFromDir(Direction dir) {
+    public static RotationData getRotateDataFromDir(Direction dir) {
         RotationData data = new RotationData(0, 0);
         switch (dir) {
             case EAST -> data = new RotationData(-90, 0);

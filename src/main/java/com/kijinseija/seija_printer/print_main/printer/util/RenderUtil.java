@@ -71,9 +71,9 @@ public class RenderUtil {
 
             }
             event.renderer.box(new Box(c1,c2),pri.colSetFillColor.get(),pri.colSetOutLineColor.get(),ShapeMode.Both,1);
-//            Vec3d off = center.offset(dir,0.4);
+            Vec3d off = center.offset(dir,0.4);
             Vec3d centerPos = pi.pos().toCenterPos();
-            event.renderer.line(center.x,center.y,center.z, centerPos.x, centerPos.y, centerPos.z,pi.isPlaceMode()?Color.WHITE:Color.BLACK);
+            event.renderer.line(center.x,center.y,center.z, off.x, off.y, off.z,pi.isPlaceMode()?Color.WHITE:Color.BLACK);
             event.renderer.box(new Box(centerPos.add(0.05,0.05,0.05),centerPos.add(-0.05,-0.05,-0.05)),Color.ORANGE,pri.colSetOutLineColor.get(),ShapeMode.Both,1);
 
         });

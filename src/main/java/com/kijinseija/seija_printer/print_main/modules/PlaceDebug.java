@@ -1,7 +1,6 @@
 package com.kijinseija.seija_printer.print_main.modules;
 
 import com.kijinseija.seija_printer.Addon;
-import com.kijinseija.seija_printer.print_main.hwid.YanZhen;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;

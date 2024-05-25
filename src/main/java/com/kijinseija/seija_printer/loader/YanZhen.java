@@ -1,7 +1,6 @@
-package com.kijinseija.seija_printer.print_main.hwid;
+package com.kijinseija.seija_printer.loader;
 
 import com.kijinseija.seija_printer.Addon;
-import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.modules.Module;
 
 import javax.crypto.Cipher;

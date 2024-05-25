@@ -1,13 +1,15 @@
 package com.kijinseija.seija_printer.print_main.modules;
 
 import com.kijinseija.seija_printer.Addon;
+import com.kijinseija.seija_printer.loader.LoaderAntiCrash;
 import com.kijinseija.seija_printer.print_main.printer.block_fixer.AbstractFixer;
 import com.kijinseija.seija_printer.print_main.printer.block_fixer.FixerManager;
 import com.kijinseija.seija_printer.print_main.printer.placedata_getter.PlaceDataManager;
+import com.kijinseija.seija_printer.print_main.printer.placedata_getter.vanilla_precision_placer.FakePlacementContext;
 import com.kijinseija.seija_printer.print_main.printer.util.*;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceDataPack;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PosInfo;
-import com.kijinseija.seija_printer.print_main.settings.DirectionListSetting;
+import com.kijinseija.seija_printer.settings.DirectionListSetting;
 import fi.dy.masa.litematica.data.DataManager;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -15,11 +17,9 @@ import meteordevelopment.meteorclient.gui.GuiTheme;
 import meteordevelopment.meteorclient.gui.widgets.WWidget;
 import meteordevelopment.meteorclient.gui.widgets.containers.WVerticalList;
 import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
-import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
-import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
@@ -40,16 +40,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
-public class Printer extends Module {
+public class Printer extends LoaderAntiCrash {
     //todo 切换智能排序
     public static Printer getINSTANCE() {
         return INSTANCE;
     }
 
-    public static final Printer INSTANCE = new Printer();
+    private static Printer INSTANCE = new Printer();
 
-    private Printer() {
+    public Printer() {
         super(Addon.CATEGORY, "Seija-litematica-printer", "Automatically prints open schematics");
+        INSTANCE = this;
     }
 
     private final SettingGroup sgBasicCalc = settings.createGroup("BasicCalc");
@@ -157,9 +158,11 @@ public class Printer extends Module {
         .name("DistanceMode").defaultValue(DistanceMode.HIGH).build());
 
     SettingGroup sgItemSwitch = settings.createGroup("ItemSwitch");
-    public  enum InvSwitchMode{
-        NONE,SWAP,PICK
+
+    public enum InvSwitchMode {
+        NONE, SWAP, PICK
     }
+
     public final Setting<InvSwitchMode> eSetInvSwitchMode = sgItemSwitch.add(new EnumSetting.Builder<InvSwitchMode>()
         .name("InvSwitchMode")
         .defaultValue(InvSwitchMode.SWAP)
@@ -208,9 +211,11 @@ public class Printer extends Module {
         .name("PacketPlace")
         .defaultValue(false)
         .build());
-    public enum SurfaceModes{
-        MANHATTAN,CHEBYSHEV
+
+    public enum SurfaceModes {
+        MANHATTAN, CHEBYSHEV
     }
+
     public final Setting<SurfaceModes> eSetSurfaceMode = sgAdvancedSettings
         .add(new EnumSetting.Builder<SurfaceModes>()
             .name("SurfaceMode")
@@ -266,14 +271,14 @@ public class Printer extends Module {
     private final SettingGroup sgRendering = settings.createGroup("Rendering");
 
     public enum RenderMode {
-        NONE, MULTI, ANIMATION,DEBUG
+        NONE, MULTI, ANIMATION, DEBUG
     }
 
     public final Setting<RenderMode> eSetRenderMode = sgRendering.add(new EnumSetting.Builder<RenderMode>()
         .name("RenderMode").defaultValue(RenderMode.MULTI).build());
     public final Setting<Double> dSetRenderTime = sgRendering.add(new DoubleSetting.Builder()
         .name("renderTime")
-        .visible(() -> eSetRenderMode.get() == RenderMode.MULTI||eSetRenderMode.get() == RenderMode.DEBUG)
+        .visible(() -> eSetRenderMode.get() == RenderMode.MULTI || eSetRenderMode.get() == RenderMode.DEBUG)
         .defaultValue(500)
         .min(0).sliderMin(0)
         .sliderMax(2000)
@@ -456,13 +461,13 @@ public class Printer extends Module {
 
             //若方块放置失败则尝试修复
             switch (FixerManager.INSTANCE.doFix(blockPos, needState)) {
-                case AbstractFixer.SUCCESS :{
+                case AbstractFixer.SUCCESS: {
                     timer.reset();//若进行了修复操作则重置计时器
                     RenderUtil.isAniRenderSizeAdd = true;
                     placeCount += 1;
                     break;
                 }
-                case AbstractFixer.RETURN:{
+                case AbstractFixer.RETURN: {
                     timer.reset();
                     return;
                 }
@@ -472,12 +477,9 @@ public class Printer extends Module {
         RenderUtil.isAniRenderSizeAdd = false;
     }
 
-
-
-
-
-    @EventHandler
-    private void onRender3d(Render3DEvent event) {
+    @Override
+    public void render3d(Render3DEvent event) {
+        if (event == null || mc == null || mc.world == null || mc.player == null) return;
         doPrint();
         RenderUtil.render(event);
     }
@@ -502,13 +504,18 @@ public class Printer extends Module {
 //
 //    }
 
-    @EventHandler()
-    private void tick(TickEvent.Post e) {
+    @Override
+    public void tick(TickEvent.Post e) {
+        if (e == null || mc == null || mc.world == null || mc.player == null) return;
         RenderHelper.COLOR.setSpeed(dSetRainbowSpeed.get() / 100);
         RenderHelper.COLOR.getNext();
-
     }
 
-
+    @Override
+    public void onActivate() {
+        super.onActivate();
+        FakePlacementContext.updatePlayerEntity();
+        //更新玩家实体(避免重连客户端导致原版计算失效)
+    }
 
 }

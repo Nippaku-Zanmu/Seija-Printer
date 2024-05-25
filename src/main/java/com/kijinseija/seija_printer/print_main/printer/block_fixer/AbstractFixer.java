@@ -7,7 +7,7 @@ import net.minecraft.util.math.BlockPos;
 
 public abstract class AbstractFixer {
     public MinecraftClient mc = MinecraftClient.getInstance();
-    public Printer pri = Printer.INSTANCE;
+    public Printer pri = Printer.getINSTANCE();
 
 
     /**

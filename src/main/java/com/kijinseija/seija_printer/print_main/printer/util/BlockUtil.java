@@ -27,7 +27,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class BlockUtil {
-    private static Printer pri = Printer.INSTANCE;
+    private static Printer pri = Printer.getINSTANCE();
     private static MinecraftClient mc = MinecraftClient.getInstance();
 
 
@@ -75,9 +75,9 @@ public class BlockUtil {
     }
 
     public static List<Direction> getDirs(BlockPos pos) {
-        if (!mc.world.getBlockState(pos).isReplaceable()){
-            return new ArrayList<>();
-        }
+//        if (!mc.world.getBlockState(pos).isReplaceable()){
+//            return new ArrayList<>();
+//        }
         List<Direction> validDirs = getValidDirs(pos);
         return validDirs.stream()
             .filter(dir -> {
@@ -85,7 +85,7 @@ public class BlockUtil {
                 BlockState bs = mc.world.getBlockState(offset);
                 if (pri.bSetAirPlace.get()) return true;
                 if (pri.bSetLiquidInt.get() && bs.getBlock() instanceof FluidBlock) return true;
-                return bs.isSolid();
+                return !bs.isReplaceable();
             })
             .filter(dir->(mc.world.getBlockState(pos).isAir())||!mc.world.getBlockState(pos).isSideSolid(mc.world,pos,dir,SideShapeType.FULL))
             //方块自身阻挡检测
@@ -100,12 +100,8 @@ public class BlockUtil {
     }
 
     public static void placeBlock(PlaceData data) {
-        final BlockPos prPos = data.pos();
-        final BlockPos pos;
-        if (mc.world.getBlockState(prPos).isAir())
-            pos = prPos.offset(data.dir());
-        else pos = prPos;
-        //计算airplace
+        final BlockPos pos = data.pos();
+
 
         Direction dir = data.dir();
         Vec3d hitVec = data.hitVec();
@@ -138,7 +134,7 @@ public class BlockUtil {
                 mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
                 mc.player.setSneaking(false);
             }
-            PosInfo blackInfo = RenderHelper.getBlackInfo(prPos.offset(dir),dir,hitVec,true);
+            PosInfo blackInfo = RenderHelper.getBlackInfo(pos.offset(dir),dir,hitVec,true);
             pri.blackList.add(blackInfo);
             RenderUtil.renderList.add(blackInfo);
         };
@@ -215,21 +211,14 @@ public class BlockUtil {
 
     public static boolean isCanUseBlock(BlockPos p, BlockState state, World world) {
         Block block = state.getBlock();
+//        if (true)return false;//test
         return block instanceof AbstractRedstoneGateBlock
 //            || block instanceof BlockWithEntity
             || block instanceof DoorBlock
             || block instanceof TrapdoorBlock
             || block instanceof FenceGateBlock
             || block instanceof WallMountedBlock;
-//        List<Direction> dirs = getValidDirs(p);
-//        if (dirs.isEmpty()) {
-//            return true;
-//        }
-//        Direction direction = dirs.get(0);
-//
-//        BlockHitResult hitRes = getHitRes(p.offset(direction), direction.getOpposite(), p.toCenterPos().offset(direction, 0.5));
-//
-//        return state.onUse(world, mc.player, Hand.MAIN_HAND, hitRes) != ActionResult.PASS;
+
     }
 
     public static boolean isValidState(BlockState needState, BlockPos pos) {

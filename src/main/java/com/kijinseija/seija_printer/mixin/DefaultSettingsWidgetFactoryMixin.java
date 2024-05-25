@@ -1,6 +1,6 @@
 package com.kijinseija.seija_printer.mixin;
 
-import com.kijinseija.seija_printer.print_main.settings.PrinterSettings;
+import com.kijinseija.seija_printer.settings.PrinterSettings;
 import meteordevelopment.meteorclient.gui.DefaultSettingsWidgetFactory;
 import meteordevelopment.meteorclient.gui.GuiTheme;
 import meteordevelopment.meteorclient.gui.utils.SettingsWidgetFactory;

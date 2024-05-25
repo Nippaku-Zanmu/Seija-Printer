@@ -20,7 +20,7 @@ import java.util.UUID;
 
 public class FakePlacementContext extends ItemPlacementContext {
     private static final MinecraftClient mc = MinecraftClient.getInstance();
-    private static final PlayerEntity fakePlayer = new PlayerEntity(mc.world, BlockPos.ORIGIN, 1, new GameProfile(UUID.fromString("66123666-1234-5432-6666-667563866600"), "PredictEntity339")){
+    private static PlayerEntity fakePlayer = new PlayerEntity(mc.world, BlockPos.ORIGIN, 1, new GameProfile(UUID.fromString("66123666-1234-5432-6666-667563866600"), "PredictEntity339")){
 
         public boolean isSpectator() {
             return false;
@@ -30,6 +30,18 @@ public class FakePlacementContext extends ItemPlacementContext {
             return false;
         }
     };
+    public static void updatePlayerEntity(){
+        fakePlayer = new PlayerEntity(mc.world, BlockPos.ORIGIN, 1, new GameProfile(UUID.fromString("66123666-1234-5432-6666-667563866600"), "PredictEntity339")){
+
+            public boolean isSpectator() {
+                return false;
+            }
+
+            public boolean isCreative() {
+                return false;
+            }
+        };
+    }
     public static FakePlacementContext getInstanceInte(Vec3d clickVec, BlockPos placePos, Direction offsetDir, ItemStack stack){
         BlockHitResult hitRes = BlockUtil.getHitRes(placePos, offsetDir, clickVec);
         fakePlayer.setPosition(PredictUtility.getPredPlayerVec());
@@ -40,38 +52,43 @@ public class FakePlacementContext extends ItemPlacementContext {
     }
     public static FakePlacementContext getInstanceInte(Vec3d clickVec, BlockPos placePos, Direction offsetDir, ItemStack stack, @Nullable RotationData rdata){
         if (rdata == null) return getInstanceInte(clickVec,placePos,offsetDir,stack);
-
         BlockHitResult hitRes = BlockUtil.getHitRes(placePos, offsetDir, clickVec);
         fakePlayer.setPosition(PredictUtility.getPredPlayerVec());
-
         fakePlayer.setYaw((float) rdata.yaw());
         fakePlayer.setPitch((float) rdata.pitch());
         fakePlayer.setSneaking(SeijaUtil.isSneak());
         return new FakePlacementContext(fakePlayer,Hand.MAIN_HAND,stack,hitRes);
     }
     public static FakePlacementContext getInstancePlac(Vec3d clickVec, BlockPos placePos, Direction offsetDir, ItemStack stack){
-        BlockHitResult hitRes = BlockUtil.getHitRes(placePos.offset(offsetDir), offsetDir.getOpposite(), clickVec);
-        fakePlayer.setPosition(PredictUtility.getPredPlayerVec());
-        fakePlayer.setYaw((float) SeijaUtil.getYaw(clickVec));
-        fakePlayer.setPitch((float) SeijaUtil.getPitch(clickVec));
-        fakePlayer.setSneaking(SeijaUtil.isSneak());
-        return new FakePlacementContext(fakePlayer,Hand.MAIN_HAND,stack,hitRes);
+        return getInstanceInte(clickVec,placePos.offset(offsetDir),offsetDir.getOpposite(),stack);
+
+//        BlockHitResult hitRes = BlockUtil.getHitRes(placePos.offset(offsetDir), offsetDir.getOpposite(), clickVec);
+//        fakePlayer.setPosition(PredictUtility.getPredPlayerVec());
+//        fakePlayer.setYaw((float) SeijaUtil.getYaw(clickVec));
+//        fakePlayer.setPitch((float) SeijaUtil.getPitch(clickVec));
+//        fakePlayer.setSneaking(SeijaUtil.isSneak());
+//        return new FakePlacementContext(fakePlayer,Hand.MAIN_HAND,stack,hitRes);
     }
+    //方便使用
+    //直接拿get到的方向和要填充方块的坐标带入即可
     public static FakePlacementContext getInstancePlac(Vec3d clickVec, BlockPos placePos, Direction offsetDir, ItemStack stack, @Nullable RotationData rdata){
-        if (rdata == null) return getInstancePlac(clickVec,placePos,offsetDir,stack);
-
-        BlockHitResult hitRes = BlockUtil.getHitRes(placePos.offset(offsetDir), offsetDir.getOpposite(), clickVec);
-        fakePlayer.setPosition(PredictUtility.getPredPlayerVec());
-
-        fakePlayer.setYaw((float) rdata.yaw());
-        fakePlayer.setPitch((float) rdata.pitch());
-        fakePlayer.setSneaking(SeijaUtil.isSneak());
-        return new FakePlacementContext(fakePlayer,Hand.MAIN_HAND,stack,hitRes);
+        return getInstanceInte(clickVec,placePos.offset(offsetDir),offsetDir.getOpposite(),stack,rdata);
+//        if (rdata == null) return getInstancePlac(clickVec,placePos,offsetDir,stack);
+//        BlockHitResult hitRes = BlockUtil.getHitRes(placePos.offset(offsetDir), offsetDir.getOpposite(), clickVec);
+//        fakePlayer.setPosition(PredictUtility.getPredPlayerVec());
+//        fakePlayer.setYaw((float) rdata.yaw());
+//        fakePlayer.setPitch((float) rdata.pitch());
+//        fakePlayer.setSneaking(SeijaUtil.isSneak());
+//        return new FakePlacementContext(fakePlayer,Hand.MAIN_HAND,stack,hitRes);
     }
 
     public FakePlacementContext(PlayerEntity player, Hand hand, ItemStack stack, BlockHitResult hitResult) {
         super(player, hand, stack, hitResult);
          }
 
-
+    @Override
+    public String toString() {
+        return "Vec: "+getHitResult().getPos()+" Block: "+getHitResult().getBlockPos()
+            +" Dir: "+getHitResult().getSide();
+    }
 }

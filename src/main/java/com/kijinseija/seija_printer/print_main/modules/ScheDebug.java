@@ -21,6 +21,6 @@ public class ScheDebug extends Module {
 
     @Override
     public void onActivate() {
-        ChatUtils.sendMsg((Text) BlockReplaceUtils.INSTANCE.getScheState(posSetting.get()).getBlock());
+        ChatUtils.sendMsg(Text.of(BlockReplaceUtils.INSTANCE.getScheState(posSetting.get()).getBlock().toString()));
     }
 }

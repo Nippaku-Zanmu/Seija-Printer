@@ -23,7 +23,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
 public class SeijaUtil {
-    public static Printer pri = Printer.INSTANCE;
+    public static Printer pri = Printer.getINSTANCE();
     static MinecraftClient mc = MinecraftClient.getInstance();
 
     public static boolean isSneak(){

@@ -23,11 +23,17 @@ public class PlaceDataManager {
     public static final PlaceDataManager INSTANCE = new PlaceDataManager();
     private static final Printer pri = Printer.getINSTANCE();
     private static final MinecraftClient mc = MinecraftClient.getInstance();
-    public static PlaceDataPack getPlaceData(BlockPos pos, BlockState needState) {
 
+    public static PlaceDataPack getPlaceData(BlockPos pos, BlockState needState) {
+        if (!mc.world.getBlockState(pos).isReplaceable())
+            return PlaceDataPack.NULL;
+        //若某位置已有不可被替换的方块 则返回
+        if (needState.isAir())
+            return PlaceDataPack.NULL;
+        //若投影中某位置为空气,则返回
         List<Direction> dirs = BlockUtil.getDirs(pos);
         List<ItemStack> stacks;
-        if (/*dirs.isEmpty() ||*/ needState.getBlock() instanceof AirBlock ||(stacks = InvUtil.getBlockStacks(needState.getBlock())).size() == 0) {
+        if (/*dirs.isEmpty() ||*/ needState.getBlock() instanceof AirBlock || (stacks = InvUtil.getBlockStacks(needState.getBlock())).size() == 0) {
             //没有可用Facing(后移至原版计算(for))//找不到方块//不可放置
 
             return PlaceDataPack.NULL;
@@ -57,7 +63,7 @@ public class PlaceDataManager {
                     //遍历所有数据获取器,以求更加精准的放置数据
                     if (dataGetter.isSuitable(needState, pos)) {
                         //适合则进行数据获取
-                      //  ChatUtils.sendMsg(Text.of("RetData"));
+                        //  ChatUtils.sendMsg(Text.of("RetData"));
                         return PlaceDataPack.plac(dataGetter.getData(needState, dirData));
                     }
                 }
@@ -90,7 +96,7 @@ public class PlaceDataManager {
 //        dataGetters.add(new SmallDripDataGetter());
 //        dataGetters.add(new PillarDataGetter());
         dataGetters.add(new PistonDataGetter());
-        dataGetters.add(new SlabDataGetter());
+//        dataGetters.add(new SlabDataGetter());
 //        dataGetters.add(new StairDataGetter());
 //        dataGetters.add(new TrapdoorDataGetter());
 //       //dataGetters.add(new WallMountedDataGetter());

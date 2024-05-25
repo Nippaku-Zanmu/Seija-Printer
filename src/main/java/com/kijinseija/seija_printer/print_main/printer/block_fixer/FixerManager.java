@@ -51,6 +51,7 @@ public class FixerManager {
 
     private FixerManager() {
         //修复器注册表
+        fixers.add(new ScaffoldFixer());
         fixers.add(new SlabFixer());
         fixers.add(new DirtFixer());
         fixers.add(new DoorFixer());

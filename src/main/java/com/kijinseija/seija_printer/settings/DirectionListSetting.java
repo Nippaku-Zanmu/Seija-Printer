@@ -1,4 +1,4 @@
-package com.kijinseija.seija_printer.print_main.settings;
+package com.kijinseija.seija_printer.settings;
 
 import meteordevelopment.meteorclient.settings.IVisible;
 import meteordevelopment.meteorclient.settings.Setting;

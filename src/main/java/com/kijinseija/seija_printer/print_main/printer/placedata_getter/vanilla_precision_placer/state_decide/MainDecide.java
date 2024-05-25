@@ -1,8 +1,10 @@
 package com.kijinseija.seija_printer.print_main.printer.placedata_getter.vanilla_precision_placer.state_decide;
 
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.state.property.Properties;
 import net.minecraft.state.property.Property;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
@@ -11,9 +13,11 @@ import java.util.List;
 public class MainDecide {
     public static final MainDecide INSTANCE = new MainDecide();
     private final List<Decide> DECIDES = new ArrayList<>();
+
     private MainDecide() {
         DECIDES.add(new MultifaceGrowthDecide());
         DECIDES.add(new ChestDecide());
+        DECIDES.add(new SlabDecide());
     }
 
     public static Property[] props = new Property[]{
@@ -25,8 +29,8 @@ public class MainDecide {
 
     public boolean test(BlockState needState, BlockState nowState, BlockPos placePos) {
         for (Decide decide : DECIDES) {
-            if (decide.isSuit(needState,nowState,placePos)){
-                return decide.test(needState, nowState,placePos);
+            if (decide.isSuit(needState, nowState, placePos)) {
+                return decide.test(needState, nowState, placePos);
             }
         }
         for (Property property : props) {
@@ -43,7 +47,10 @@ public class MainDecide {
             }
 
             if (now != need) {
-                // ChatUtils.sendMsg(Text.of("cont5"));
+//                ChatUtils.sendMsg(Text.of("Now:"+now+"need:"+need));
+//                for (Property<?> nowStateProperty : nowState.getProperties()) {
+//                    ChatUtils.sendMsg(Text.of(nowStateProperty+" : "+needState.get(nowStateProperty)));
+//                }
                 return false;
             }
         }
