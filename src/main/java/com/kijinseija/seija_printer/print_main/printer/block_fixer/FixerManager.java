@@ -63,5 +63,6 @@ public class FixerManager {
         fixers.add(new CampFireFixer());
         fixers.add(new NoteBlockFixer());
         fixers.add(new StrippedFixer());
+        fixers.add(new RedStoneFixer());
     }
 }

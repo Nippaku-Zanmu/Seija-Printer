@@ -30,8 +30,8 @@ public class PosSorter {
             else {
                 int distanceVal;
                 switch (pri.eSetDistanceSortMode.get()) {
-                    case HIGH -> distanceVal = -Integer.compare((int) pos1.toCenterPos().distanceTo(mc.player.getEyePos()), Integer.valueOf((int) pos2.toCenterPos().distanceTo(mc.player.getEyePos())));
-                    case LOW -> distanceVal = Integer.compare((int) pos1.toCenterPos().distanceTo(mc.player.getEyePos()), Integer.valueOf((int) pos2.toCenterPos().distanceTo(mc.player.getEyePos())));
+                    case HIGH -> distanceVal = -Integer.compare((int) pos1.toCenterPos().squaredDistanceTo(mc.player.getEyePos()), Integer.valueOf((int) pos2.toCenterPos().squaredDistanceTo(mc.player.getEyePos())));
+                    case LOW -> distanceVal = Integer.compare((int) pos1.toCenterPos().squaredDistanceTo(mc.player.getEyePos()), Integer.valueOf((int) pos2.toCenterPos().squaredDistanceTo(mc.player.getEyePos())));
                     default ->  distanceVal = 0;
                 }
                 return distanceVal;

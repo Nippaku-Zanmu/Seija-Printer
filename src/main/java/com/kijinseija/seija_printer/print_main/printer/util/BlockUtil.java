@@ -8,6 +8,9 @@ import net.minecraft.block.*;
 import net.minecraft.block.enums.BedPart;
 import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
@@ -15,10 +18,7 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.util.math.random.CheckedRandom;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
@@ -32,7 +32,7 @@ public class BlockUtil {
 
 
     public static List<Direction> getInteractDir(BlockPos pos) {
-        return (pri.bSetStrictDir.get()? canTorchFac(pos): Arrays.asList(Direction.values())) .stream()
+        return (pri.bSetStrictDir.get() ? canTorchFac(pos) : Arrays.asList(Direction.values())).stream()
             .filter(dir -> canPlaceIn(pos.offset(dir)))
             .filter(dir -> mc.player.getY() - pos.toCenterPos().offset(dir, 0.5).y < pri.dSetPrintingYDistance.get())
             //高度检测 针对于放置比自己低太多的方块
@@ -57,7 +57,7 @@ public class BlockUtil {
                 mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, getHitRes(pos, dir, hitVec));
             }
 
-            PosInfo blackInfo = RenderHelper.getBlackInfo(pos,dir,hitVec,false);
+            PosInfo blackInfo = RenderHelper.getBlackInfo(pos, dir, hitVec, false);
             pri.blackList.add(blackInfo);
             RenderUtil.renderList.add(blackInfo);
         };
@@ -67,11 +67,14 @@ public class BlockUtil {
                 r.run();
             } else
                 Rotations.rotate(SeijaUtil.getYaw(hitVec), SeijaUtil.getPitch(hitVec), r);
-        }else r.run();
+        } else r.run();
 
 
-
-
+    }
+    public static List<Direction> getSortedDirs(BlockPos pos){
+        if (pri.bSetSortDir.get())
+            return DirSorter.sort(getDirs(pos),pos);
+        return getDirs(pos);
     }
 
     public static List<Direction> getDirs(BlockPos pos) {
@@ -80,23 +83,23 @@ public class BlockUtil {
 //        }
         List<Direction> validDirs = getValidDirs(pos);
         return validDirs.stream()
-            .filter(dir -> {
-                BlockPos offset = pos.offset(dir);
-                BlockState bs = mc.world.getBlockState(offset);
-                if (pri.bSetAirPlace.get()) return true;
-                if (pri.bSetLiquidInt.get() && bs.getBlock() instanceof FluidBlock) return true;
-                return !bs.isReplaceable();
-            })
-            .filter(dir->(mc.world.getBlockState(pos).isAir())||!mc.world.getBlockState(pos).isSideSolid(mc.world,pos,dir,SideShapeType.FULL))
+//            .filter(dir -> {
+//                BlockPos offset = pos.offset(dir);
+//                BlockState bs = mc.world.getBlockState(offset);
+//                if (pri.bSetAirPlace.get()) return true;
+//                if (pri.bSetLiquidInt.get() && bs.getBlock() instanceof FluidBlock) return true;
+//                return !bs.isReplaceable();
+//            })
+            .filter(dir -> !mc.world.getBlockState(pos.offset(dir)).isReplaceable())
+            .filter(dir -> (mc.world.getBlockState(pos).isAir()) || !mc.world.getBlockState(pos).isSideSolid(mc.world, pos, dir, SideShapeType.FULL))
             //方块自身阻挡检测
             .filter(dir -> mc.player.getY() - pos.toCenterPos().offset(dir, 0.5).y < pri.dSetPrintingYDistance.get())
             //高度检测 针对于放置比自己低太多的方块
-            .filter(dir -> pri.bSetSneak.get() || !isCanUseBlock(pos.offset(dir), mc.world.getBlockState(pos.offset(dir)), mc.world))
+            .filter(dir -> SeijaUtil.isSneak() || !isCanUseBlock(pos.offset(dir), mc.world.getBlockState(pos.offset(dir)), mc.world))
             //不可交互
             .filter(dir -> pos.toCenterPos().offset(dir, 0.5).distanceTo(mc.player.getEyePos()) <= pri.dSetPrintingRange.get())
             //距离检测
             .collect(Collectors.toList());
-
     }
 
     public static void placeBlock(PlaceData data) {
@@ -134,7 +137,7 @@ public class BlockUtil {
                 mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
                 mc.player.setSneaking(false);
             }
-            PosInfo blackInfo = RenderHelper.getBlackInfo(pos.offset(dir),dir,hitVec,true);
+            PosInfo blackInfo = RenderHelper.getBlackInfo(pos.offset(dir), dir, hitVec, true);
             pri.blackList.add(blackInfo);
             RenderUtil.renderList.add(blackInfo);
         };
@@ -212,12 +215,27 @@ public class BlockUtil {
     public static boolean isCanUseBlock(BlockPos p, BlockState state, World world) {
         Block block = state.getBlock();
 //        if (true)return false;//test
-        return block instanceof AbstractRedstoneGateBlock
-//            || block instanceof BlockWithEntity
+        return (block instanceof AbstractRedstoneGateBlock
+            || block instanceof BlockWithEntity
+            ||block instanceof  ScaffoldingBlock
             || block instanceof DoorBlock
             || block instanceof TrapdoorBlock
             || block instanceof FenceGateBlock
-            || block instanceof WallMountedBlock;
+            || block instanceof WallMountedBlock
+            || block instanceof ChestBlock
+            || block instanceof AnvilBlock
+            || block instanceof CraftingTableBlock
+            || block instanceof LoomBlock
+            || block instanceof EnderChestBlock
+            || block instanceof EnchantingTableBlock
+            || block instanceof SmithingTableBlock
+            || block instanceof GrindstoneBlock
+            || block instanceof StonecutterBlock
+
+        )
+            || (state.createScreenHandlerFactory(world, p) != null)
+            //调用createScreenHandlerFactory检测对帧率影响极大
+            ;
 
     }
 
@@ -273,6 +291,9 @@ public class BlockUtil {
         directions.remove(dir);
         directions.remove(dir.getOpposite());
         return directions;
+    }
+    public static boolean isStuckPos(BlockPos pos){
+        return SeijaUtil.intersectsWithEntity(new Box(pos), entity -> !entity.isSpectator() && !(entity instanceof ItemEntity) && !(entity instanceof ArrowEntity));
     }
 
     //    public static Set<BlockPos> getSurface(BlockPos pos, int c) {

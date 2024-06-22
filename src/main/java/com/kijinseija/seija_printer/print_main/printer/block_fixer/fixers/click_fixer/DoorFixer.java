@@ -16,7 +16,7 @@ public class DoorFixer extends AbstractClickFixer {
             &&(blockState.getBlock() instanceof DoorBlock
             || blockState.getBlock() instanceof FenceGateBlock
             || blockState.getBlock() instanceof TrapdoorBlock)) {
-            return needState.getBlock()==blockState.getBlock()
+            return needState.getBlock().getClass().equals(blockState.getBlock().getClass())
                 &&blockState.get(Properties.OPEN) != needState.get(Properties.OPEN);
         }
         return false;

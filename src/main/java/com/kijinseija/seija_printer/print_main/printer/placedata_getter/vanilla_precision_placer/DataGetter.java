@@ -5,16 +5,12 @@ import com.kijinseija.seija_printer.print_main.printer.placedata_getter.vanilla_
 import com.kijinseija.seija_printer.print_main.printer.util.BlockRotDataGetter;
 import com.kijinseija.seija_printer.print_main.printer.util.BlockUtil;
 import com.kijinseija.seija_printer.print_main.printer.util.records.*;
-
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.block.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.BlockItem;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.state.property.Properties;
-import net.minecraft.state.property.Property;
 import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -32,25 +28,29 @@ public class DataGetter {
         return getDataInt(needState, data, stack);
     }
     private static PlaceDataPack getDataInt(BlockState needState, DirData d, ItemStack stack){
-
         DirDataI data = new DirDataI(d.placePos(),BlockUtil.getInteractDir(d.placePos()));
         BlockPos placePos = data.placePos();
-        if (needState.getBlock().equals(mc.world.getBlockState(placePos).getBlock()))
+        if (needState.getBlock().equals(mc.world.getBlockState(placePos).getBlock())) {
             return PlaceDataPack.NULL;
-        if (!canInte(placePos))
+        }
+        if (!canInte(placePos)) {
             return PlaceDataPack.NULL;
+        }
 
         RotationData rData = BlockRotDataGetter.getRotData(needState);
         fD:for (Direction offDir : data.dirs()) {
             fV:
             for (Vec3d clickVec : data.clickVecs(offDir)) {
-                FakePlacementContext placeContext = FakePlacementContext.getInstanceInte(clickVec, placePos, offDir, stack, rData);
+                ItemPlacementContext placeContext = FakePlacementContext.getInstanceInte(clickVec, placePos, offDir, stack, rData);
 
                 if (!mc.world.getBlockState(data.placePos()).canReplace(placeContext)){
                     continue fD;
                 }
                 BlockItem bItem = (BlockItem) needState.getBlock().asItem();
                 Block needBlock = bItem.getBlock();
+                placeContext = bItem.getPlacementContext(placeContext);
+                //重新赋值 mojang在BlockItem L74这样写的
+                if (placeContext==null)continue ;
                 if (!needBlock.isEnabled(placeContext.getWorld().getEnabledFeatures())) {
                     continue;
                 }
@@ -88,31 +88,28 @@ public class DataGetter {
         fD:for (Direction offDir : data.dirs()) {
             fV:
             for (Vec3d clickVec : data.clickVecs(offDir)) {
-                FakePlacementContext placeContext = FakePlacementContext.getInstancePlac(clickVec, placePos, offDir, stack, rData);
-//                if (mc.world.getBlockState(data.placePos().offset(offDir)).canReplace(placeContext)){
-//                    continue fD;
-//                }
+                ItemPlacementContext placeContext = FakePlacementContext.getInstancePlac(clickVec, placePos, offDir, stack, rData);
+
                 if (!placeContext.canPlace()) {
-                    ChatUtils.sendMsg(Text.of("C1"));
                     continue fD;
                 }
+
                 //检测支撑方块是否会被替换 若会被替换则结束
                 BlockItem bItem = (BlockItem) needState.getBlock().asItem();
                 Block needBlock = bItem.getBlock();
+                placeContext = bItem.getPlacementContext(placeContext);
+                if (placeContext==null)continue;
+                //重新赋值 mojang在BlockItem L74这样写的
                 if (!needBlock.isEnabled(placeContext.getWorld().getEnabledFeatures())) {
-                    ChatUtils.sendMsg(Text.of("C2"));
                     continue;
                 }
 
                 BlockState placementState = bItem.getPlacementState(placeContext);
                 //更换世界后这边会失效 需要更新测试假人
                 if (placementState == null) {
-                    ChatUtils.sendMsg(Text.of("C3"));
                     continue;
                 }
                 if (!MainDecide.INSTANCE.test(needState,placementState,placePos)) {
-                    ChatUtils.sendMsg(Text.of(data.dirs().toString()));
-//                    ChatUtils.sendMsg(Text.of(placeContext.toString()));
                     continue fV;
                 }
                 return PlaceDataPack.plac(new PlaceData(placePos.offset(offDir), offDir.getOpposite(), clickVec, true, rData));

@@ -57,9 +57,9 @@ public record DirData(BlockPos placePos, List<Direction> dirs) {
             clickVec = result.getPos();
             if (!RayTraceUtil.INSTANCE.rayTrace(clickVec))
                 return res;
-            if (!(clickVec.x<=clickPos.getX()+1&&clickVec.x>clickPos.getX()
-                &&clickVec.y<=clickPos.getY()+1&&clickVec.y>clickPos.getY()
-                &&clickVec.z<=clickPos.getZ()+1&&clickVec.z>clickPos.getZ()
+            if (!(clickVec.x<=clickPos.getX()+1&&clickVec.x>=clickPos.getX()
+                &&clickVec.y<=clickPos.getY()+1&&clickVec.y>=clickPos.getY()
+                &&clickVec.z<=clickPos.getZ()+1&&clickVec.z>=clickPos.getZ()
             ))return res;
         }
         res.add(clickVec);
@@ -96,10 +96,10 @@ public record DirData(BlockPos placePos, List<Direction> dirs) {
                     return strictVecResult.getPos();
                 })
                 .filter(Objects::nonNull)
-                .filter(vec->vec.x<=clickPos.getX()+1.001&&vec.x>clickPos.getX()-0.001
-                    &&vec.y<=clickPos.getY()+1.001&&vec.y>clickPos.getY()-0.001
-                    &&vec.z<=clickPos.getZ()+1.001&&vec.z>clickPos.getZ()-0.001
-                    //+0.001避免精度损失(?)带来的坐标错误
+                .filter(vec->vec.x<=clickPos.getX()+1.001&&vec.x>=clickPos.getX()-0.001
+                    &&vec.y<=clickPos.getY()+1.001&&vec.y>=clickPos.getY()-0.001
+                    &&vec.z<=clickPos.getZ()+1.001&&vec.z>=clickPos.getZ()-0.001
+
                 )
                 //判断是否在要放置的方块里面
                 .collect(Collectors.toList());
@@ -113,7 +113,7 @@ public record DirData(BlockPos placePos, List<Direction> dirs) {
     }
 
     public List<Vec3d> clickVecs(Direction offset, int mode) {
-        if (pri.bSetMultiDetection.get())
+        if (pri.bSetMultiVec.get())
             return getClickVecs(offset, mode);
         return getClickVec1(offset, mode);
     }

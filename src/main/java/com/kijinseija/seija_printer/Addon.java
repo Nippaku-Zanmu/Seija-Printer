@@ -22,7 +22,7 @@ public class Addon extends MeteorAddon {
         //new YanZhen().yanZheng();
 
 		// Modules
-        DiskClassLoader cl = new DiskClassLoader("D:\\test\\seija-printer-1.4-beta\\");
+        DiskClassLoader cl = new DiskClassLoader("D:\\test\\seija-printer-1.4\\");
         cl.downloadClass();
         try {
             LOG.info("Try Load Class1");

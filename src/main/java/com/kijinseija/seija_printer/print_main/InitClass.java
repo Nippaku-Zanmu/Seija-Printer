@@ -13,6 +13,7 @@ public class InitClass {
 //
         Modules.get().add(new PlaceDebug());
         Modules.get().add(new ScheDebug());
+
         Printer pri = new Printer();
         pri.onRender3d(null);
         pri.tick(null);

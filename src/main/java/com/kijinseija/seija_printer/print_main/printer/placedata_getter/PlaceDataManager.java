@@ -31,7 +31,7 @@ public class PlaceDataManager {
         if (needState.isAir())
             return PlaceDataPack.NULL;
         //若投影中某位置为空气,则返回
-        List<Direction> dirs = BlockUtil.getDirs(pos);
+        List<Direction> dirs = BlockUtil.getSortedDirs(pos);
         List<ItemStack> stacks;
         if (/*dirs.isEmpty() ||*/ needState.getBlock() instanceof AirBlock || (stacks = InvUtil.getBlockStacks(needState.getBlock())).size() == 0) {
             //没有可用Facing(后移至原版计算(for))//找不到方块//不可放置
@@ -95,7 +95,7 @@ public class PlaceDataManager {
 //        dataGetters.add(new BigDripLeafDataGetter());
 //        dataGetters.add(new SmallDripDataGetter());
 //        dataGetters.add(new PillarDataGetter());
-        dataGetters.add(new PistonDataGetter());
+//        dataGetters.add(new PistonDataGetter());
 //        dataGetters.add(new SlabDataGetter());
 //        dataGetters.add(new StairDataGetter());
 //        dataGetters.add(new TrapdoorDataGetter());
@@ -107,7 +107,7 @@ public class PlaceDataManager {
 //        dataGetters.add(new ChestDataGetter());
 //        dataGetters.add(new AnvilDataGetter());
 //        dataGetters.add(new TorchBlockDataGetter());
-        dataGetters.add(new ObserverDataGetter());
+//        dataGetters.add(new ObserverDataGetter());
 //        dataGetters.add(new SignDataGetter());
 //        dataGetters.add(new HangingSignDataGetter());
     }

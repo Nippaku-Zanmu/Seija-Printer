@@ -11,6 +11,7 @@ import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceDataPac
 import com.kijinseija.seija_printer.print_main.printer.util.records.PosInfo;
 import com.kijinseija.seija_printer.settings.DirectionListSetting;
 import fi.dy.masa.litematica.data.DataManager;
+import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.gui.GuiTheme;
@@ -18,21 +19,22 @@ import meteordevelopment.meteorclient.gui.widgets.WWidget;
 import meteordevelopment.meteorclient.gui.widgets.containers.WVerticalList;
 import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
 import meteordevelopment.meteorclient.settings.*;
-import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.*;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.PointerBuffer;
+import org.lwjgl.system.MemoryUtil;
+import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -50,6 +52,7 @@ public class Printer extends LoaderAntiCrash {
 
     public Printer() {
         super(Addon.CATEGORY, "Seija-litematica-printer", "Automatically prints open schematics");
+        loadFileFilters();
         INSTANCE = this;
     }
 
@@ -119,18 +122,26 @@ public class Printer extends LoaderAntiCrash {
         .description("Doesn't place on faces which aren't in your direction.")
         .defaultValue(true)
         .build());
+    public final Setting<Boolean> bSetSortDir = sgACBypass.add(new BoolSetting.Builder()
+        .name("Sort Dir")
+        .description("Sort the direction according to the size of the projection on the screen")
+        .defaultValue(true)
+        .build());
 
     public final Setting<Boolean> bSetStrictVec = sgACBypass.add(new BoolSetting.Builder()
         .name("Strict ClickVec")
-        .visible(() -> !bSetAirPlace.get())
+        //.visible(() -> !bSetAirPlace.get())
         .defaultValue(true)
         .build());
+    public final boolean isStrictVecInte(){
+        return !bSetAirPlace.get();
+    }
     public final Setting<Boolean> bSetRandomOffset = sgACBypass.add(new BoolSetting.Builder()
-        .name("randomOffsetVec")
+        .name("RandomOffsetVec")
         .defaultValue(true)
         .build());
-    public final Setting<Boolean> bSetMultiDetection = sgACBypass.add(new BoolSetting.Builder()
-        .name("Multi-focus detection")
+    public final Setting<Boolean> bSetMultiVec = sgACBypass.add(new BoolSetting.Builder()
+        .name("Extra Vec Calc")
         .defaultValue(false)
         .build());
 
@@ -340,6 +351,10 @@ public class Printer extends LoaderAntiCrash {
         .visible(bSetRenderOutline::isVisible)
         .build()
     );
+    public final SettingGroup sgDebug = settings.createGroup("debug", false);
+    private final Setting<Boolean> bSetRunSpeed = sgDebug.add(new BoolSetting.Builder()
+        .name("RunSpeed").defaultValue(false).build());
+
     private final SettingGroup sgReplaceBlockFile = settings.createGroup("ReplaceBlock");
     private final Setting<String> sSetReplaceBlockFile =
         sgReplaceBlockFile.add(new StringSetting.Builder()
@@ -347,15 +362,40 @@ public class Printer extends LoaderAntiCrash {
             .defaultValue("D://a.txt")
             .build());
 
-
     @Override
     public WWidget getWidget(GuiTheme theme) {
         WVerticalList list = theme.verticalList();
+        WButton selectFile = list.add(theme.button("Select File")).widget();
+        selectFile.action = () -> {
+            String path = TinyFileDialogs.tinyfd_openFileDialog(
+                "Select File",
+                new File(MeteorClient.FOLDER, "BlockReplace.txt").getAbsolutePath(),
+                filters,
+                null,
+                false
+            );
 
+            if (path != null) {
+//                file = new File(path);
+//                fileName.set(file.getName());
+//                sSetReplaceBlockFile.set(path);
+                sSetReplaceBlockFile.parse(path);
+            }
+        };
+        //File Select
         WButton start = list.add(theme.button("Load!")).expandX().widget();
         start.action = () -> new Thread(() -> loadMap(sSetReplaceBlockFile.get())).start();
 
         return list;
+    }
+
+    private PointerBuffer filters;
+
+    private void loadFileFilters() {
+        filters = BufferUtils.createPointerBuffer(1);
+        ByteBuffer txtFilter = MemoryUtil.memASCII("*.txt");
+        filters.put(txtFilter);
+        filters.rewind();
     }
 
     private void loadMap(String file) {
@@ -431,7 +471,7 @@ public class Printer extends LoaderAntiCrash {
             //不在黑名单
             .filter(bp -> BlockUtil.isValidState(BlockReplaceUtils.INSTANCE.getScheState(bp), bp))
             //不是床头之类的不可放置方块
-            .filter(bp -> !SeijaUtil.intersectsWithEntity(new Box(bp), entity -> !entity.isSpectator() && !(entity instanceof ItemEntity) && !(entity instanceof ArmorStandEntity)))
+            //  .filter(bp -> !SeijaUtil.intersectsWithEntity(new Box(bp), entity -> !entity.isSpectator() && !(entity instanceof ItemEntity) && !(entity instanceof ArmorStandEntity)))
             //没被实体卡住
             .filter(bp -> SurfaceUtil.surfaceCheck(bp, iSetSurfaceSize.get()))
             //表面模式检测
@@ -480,7 +520,11 @@ public class Printer extends LoaderAntiCrash {
     @Override
     public void render3d(Render3DEvent event) {
         if (event == null || mc == null || mc.world == null || mc.player == null) return;
+        long timeStamp = System.currentTimeMillis();
         doPrint();
+        if (bSetRunSpeed.get())
+            ChatUtils.sendMsg(Text.of("CalcTime:"+(System.currentTimeMillis()-timeStamp)));
+
         RenderUtil.render(event);
     }
 //    @EventHandler

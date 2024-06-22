@@ -31,7 +31,7 @@ public class SlabFixer extends AbstractFixer {
         BlockState blockState = mc.world.getBlockState(pos);
         SlabType slabType = blockState.get(Properties.SLAB_TYPE);
 
-        List<Direction> dirs = new ArrayList<>(BlockUtil.getDirs(pos));
+        List<Direction> dirs = new ArrayList<>(BlockUtil.getSortedDirs(pos));
         DirData dirData = new DirData(pos, dirs);
 
         switch (slabType) {
@@ -70,25 +70,6 @@ public class SlabFixer extends AbstractFixer {
         }
         if (dataPack == null) {
             return CONTINUE;
-//            final Vec3d centerPos = pos.toCenterPos();
-//            switch (slabType) {
-//                case BOTTOM -> {
-//                    if ((!pri.bSetStrictDir.get()) || centerPos.getY() >= mc.player.getEyePos().getY() - 0.4) {
-//                        for (Vec3d clickVec : dirData.clickVecs(Direction.UP)) {
-//                            data = new PlaceData(pos, Direction.DOWN, clickVec, true, null);
-//
-//                        }
-//                    }
-//                }
-//                case TOP -> {
-//                    if ((!pri.bSetStrictDir.get()) || centerPos.getY() <= mc.player.getEyePos().getY() + 0.4)
-//                        for (Vec3d clickVec : dirData.clickVecs(Direction.DOWN)) {
-//                            data = new PlaceData(pos, Direction.UP, clickVec, true, null);
-//
-//                        }
-//
-//                }
-//            }
         }
 
         if (!InvUtil.switchBlock(needState.getBlock())) {
