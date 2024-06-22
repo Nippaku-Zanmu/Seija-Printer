@@ -1,10 +1,7 @@
 package com.kijinseija.seija_printer;
 
 
-import com.kijinseija.seija_printer.print_main.printer.PlaceDebug;
-import com.kijinseija.seija_printer.print_main.printer.Printer;
-import com.kijinseija.seija_printer.print_main.printer.RayTraceTest;
-import com.kijinseija.seija_printer.print_main.printer.ScheDebug;
+import com.kijinseija.seija_printer.loader.DiskClassLoader;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
 import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.modules.Modules;
@@ -12,6 +9,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.lang.reflect.Constructor;
 
 public class Addon extends MeteorAddon {
 	public static final Logger LOG = LogManager.getLogger();
@@ -23,11 +22,31 @@ public class Addon extends MeteorAddon {
         //new YanZhen().yanZheng();
 
 		// Modules
-		Modules.get().add(Printer.getINSTANCE());
-        Modules.get().add(new PlaceDebug());
-        Modules.get().add(new ScheDebug());
-        Modules.get().add(new RayTraceTest());
+        DiskClassLoader cl = new DiskClassLoader("D:\\test\\seija-printer-1.4\\");
+        cl.downloadClass();
+        try {
+            LOG.info("Try Load Class1");
+            Class aClass = cl.loadClass("com.kijinseija.seija_printer.print_main.InitClass");
+            LOG.info("Try Load Class2");
 
+            Constructor<?> constructor = aClass.getConstructor();
+            LOG.info("Try Load Class3");
+            Object o = constructor.newInstance();
+            //Method method = aClass.getMethod("initModules");
+            //method.invoke(o);
+           // new InitClass().initModules();
+        } catch (Exception e) {
+            LOG.error(e.getMessage());
+            throw new RuntimeException(e);
+        }
+
+//		Modules.get().add(Printer.getINSTANCE());
+//        Modules.get().add(new PlaceDebug());
+//        Modules.get().add(new ScheDebug());
+//        Modules.get().add(new RayTraceTest());
+////        Modules.get().add(new YanZhen());
+//        Modules.get().add(new SideTest());
+//        Modules.get().add(new SwapTest());
 	}
 
     @Override

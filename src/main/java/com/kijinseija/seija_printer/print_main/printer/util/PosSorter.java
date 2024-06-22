@@ -1,6 +1,6 @@
 package com.kijinseija.seija_printer.print_main.printer.util;
 
-import com.kijinseija.seija_printer.print_main.printer.Printer;
+import com.kijinseija.seija_printer.print_main.modules.Printer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 
@@ -20,7 +20,7 @@ public class PosSorter {
                     .equals(mc.player.getMainHandStack().getItem()) ? -1 : 1;
             }
             int angleVal ;
-            switch (pri.angleSortMode.get()){
+            switch (pri.eSetAngleSortMode.get()){
                 case LOW -> angleVal = sortAngle(pos1, pos2);
                 case HIGH -> angleVal = -sortAngle(pos1, pos2);
                 default -> angleVal = 0;
@@ -29,9 +29,9 @@ public class PosSorter {
             if (angleVal != 0) return angleVal;
             else {
                 int distanceVal;
-                switch (pri.distanceSortMode.get()) {
-                    case HIGH -> distanceVal = -Integer.compare((int) pos1.toCenterPos().distanceTo(mc.player.getEyePos()), Integer.valueOf((int) pos2.toCenterPos().distanceTo(mc.player.getEyePos())));
-                    case LOW -> distanceVal = Integer.compare((int) pos1.toCenterPos().distanceTo(mc.player.getEyePos()), Integer.valueOf((int) pos2.toCenterPos().distanceTo(mc.player.getEyePos())));
+                switch (pri.eSetDistanceSortMode.get()) {
+                    case HIGH -> distanceVal = -Integer.compare((int) pos1.toCenterPos().squaredDistanceTo(mc.player.getEyePos()), Integer.valueOf((int) pos2.toCenterPos().squaredDistanceTo(mc.player.getEyePos())));
+                    case LOW -> distanceVal = Integer.compare((int) pos1.toCenterPos().squaredDistanceTo(mc.player.getEyePos()), Integer.valueOf((int) pos2.toCenterPos().squaredDistanceTo(mc.player.getEyePos())));
                     default ->  distanceVal = 0;
                 }
                 return distanceVal;

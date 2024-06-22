@@ -1,7 +1,6 @@
-package com.kijinseija.seija_printer.print_main.printer;
+package com.kijinseija.seija_printer.print_main.modules;
 
 import com.kijinseija.seija_printer.Addon;
-import com.kijinseija.seija_printer.print_main.hwid.YanZhen;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
@@ -14,7 +13,7 @@ public class PlaceDebug extends Module {
 
     public PlaceDebug() {
         super(Addon.CATEGORY, "PlaceDebug", "Test");
-        new YanZhen().yanZheng();
+
     }
     @EventHandler
     public void onPacket(PacketEvent.Send send){

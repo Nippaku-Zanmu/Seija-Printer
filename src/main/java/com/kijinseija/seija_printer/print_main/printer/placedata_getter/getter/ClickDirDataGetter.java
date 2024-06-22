@@ -1,7 +1,7 @@
 package com.kijinseija.seija_printer.print_main.printer.placedata_getter.getter;
 
-import com.kijinseija.seija_printer.print_main.printer.util.DirData;
-import com.kijinseija.seija_printer.print_main.printer.util.PlaceData;
+import com.kijinseija.seija_printer.print_main.printer.util.records.DirData;
+import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
 import com.kijinseija.seija_printer.print_main.printer.placedata_getter.AbstractDataGetter;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.RodBlock;
@@ -10,8 +10,6 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
-
-import java.util.List;
 
 public class ClickDirDataGetter extends AbstractDataGetter {
     //方块朝向与点击朝向相同

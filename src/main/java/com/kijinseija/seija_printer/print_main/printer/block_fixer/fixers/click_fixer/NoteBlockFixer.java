@@ -10,6 +10,9 @@ import java.util.Objects;
 public class NoteBlockFixer extends AbstractClickFixer{
     @Override
     public boolean needFix(BlockPos pos, BlockState needState) {
+        if (!super.needFix(pos,needState)) {
+            return false;
+        }
         BlockState blockState = mc.world.getBlockState(pos);
         if (
             blockState.getBlock() instanceof NoteBlock &&needState.getBlock()==blockState.getBlock()) {

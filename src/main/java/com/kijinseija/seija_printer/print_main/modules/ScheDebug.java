@@ -1,4 +1,4 @@
-package com.kijinseija.seija_printer.print_main.printer;
+package com.kijinseija.seija_printer.print_main.modules;
 
 import com.kijinseija.seija_printer.Addon;
 import com.kijinseija.seija_printer.print_main.printer.util.BlockReplaceUtils;
@@ -21,6 +21,6 @@ public class ScheDebug extends Module {
 
     @Override
     public void onActivate() {
-        ChatUtils.sendMsg((Text) BlockReplaceUtils.INSTANCE.getScheState(posSetting.get()).getBlock());
+        ChatUtils.sendMsg(Text.of(BlockReplaceUtils.INSTANCE.getScheState(posSetting.get()).getBlock().toString()));
     }
 }

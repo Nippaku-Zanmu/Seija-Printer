@@ -1,11 +1,16 @@
 package com.kijinseija.seija_printer.print_main.printer.util;
 
-import com.kijinseija.seija_printer.print_main.printer.Printer;
+import com.kijinseija.seija_printer.print_main.modules.Printer;
+import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
+import com.kijinseija.seija_printer.print_main.printer.util.records.PosInfo;
 import meteordevelopment.meteorclient.utils.player.Rotations;
 import net.minecraft.block.*;
 import net.minecraft.block.enums.BedPart;
 import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
@@ -13,10 +18,7 @@ import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.util.math.random.CheckedRandom;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
@@ -25,16 +27,16 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class BlockUtil {
-    private static Printer pri = Printer.INSTANCE;
+    private static Printer pri = Printer.getINSTANCE();
     private static MinecraftClient mc = MinecraftClient.getInstance();
 
 
     public static List<Direction> getInteractDir(BlockPos pos) {
-        return canTorchFac(pos).stream()
+        return (pri.bSetStrictDir.get() ? canTorchFac(pos) : Arrays.asList(Direction.values())).stream()
             .filter(dir -> canPlaceIn(pos.offset(dir)))
-            .filter(dir -> mc.player.getY() - pos.toCenterPos().offset(dir, 0.5).y < pri.printingYDistance.get())
+            .filter(dir -> mc.player.getY() - pos.toCenterPos().offset(dir, 0.5).y < pri.dSetPrintingYDistance.get())
             //高度检测 针对于放置比自己低太多的方块
-            .filter(dir -> pos.toCenterPos().offset(dir, 0.5).distanceTo(mc.player.getEyePos()) <= pri.printingRange.get())
+            .filter(dir -> pos.toCenterPos().offset(dir, 0.5).distanceTo(mc.player.getEyePos()) <= pri.dSetPrintingRange.get())
             //距离检测
             .collect(Collectors.toList());
 
@@ -45,129 +47,122 @@ public class BlockUtil {
         BlockPos pos = data.pos();
         Direction dir = data.dir();
         Runnable r = () -> {
-            if (pri.packetPlace.get()) {
+            if (pri.bSetIllegalRotate.get() && data.exRotateData() != null) {
+                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.exRotateData().yaw(), (float) data.exRotateData().pitch(), mc.player.isOnGround()));
+            }//非法转头
+            if (pri.bSetPacketPlace.get()) {
                 mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, getHitRes(pos, dir, hitVec), SeijaUtil.getSequence()));
                 mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             } else {
                 mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, getHitRes(pos, dir, hitVec));
             }
-            pri.blackList.add(RenderHelper.getBlackInfo(pos));
-            pri.renderList.add(RenderHelper.getBlackInfo(pos));
+
+            PosInfo blackInfo = RenderHelper.getBlackInfo(pos, dir, hitVec, false);
+            pri.blackList.add(blackInfo);
+            RenderUtil.renderList.add(blackInfo);
         };
-        if (pri.packetRotate.get()) {
-            mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) SeijaUtil.getYaw(hitVec), (float) SeijaUtil.getPitch(hitVec), mc.player.isOnGround()));
-            r.run();
-        } else
-            Rotations.rotate(SeijaUtil.getYaw(hitVec), SeijaUtil.getPitch(hitVec), r);
+        if (pri.bSetRotate.get()) {
+            if (pri.bSetPacketRotate.get()) {
+                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) SeijaUtil.getYaw(hitVec), (float) SeijaUtil.getPitch(hitVec), mc.player.isOnGround()));
+                r.run();
+            } else
+                Rotations.rotate(SeijaUtil.getYaw(hitVec), SeijaUtil.getPitch(hitVec), r);
+        } else r.run();
+
+
+    }
+    public static List<Direction> getSortedDirs(BlockPos pos){
+        if (pri.bSetSortDir.get())
+            return DirSorter.sort(getDirs(pos),pos);
+        return getDirs(pos);
     }
 
     public static List<Direction> getDirs(BlockPos pos) {
-
+//        if (!mc.world.getBlockState(pos).isReplaceable()){
+//            return new ArrayList<>();
+//        }
         List<Direction> validDirs = getValidDirs(pos);
         return validDirs.stream()
-            .filter(dir -> {
-                BlockPos offset = pos.offset(dir);
-                BlockState bs = mc.world.getBlockState(offset);
-                if (pri.airPlace.get()) return true;
-                if (pri.liquidInt.get() && bs.getBlock() instanceof FluidBlock) return true;
-                return bs.isSolid();
-            })
-            .filter(dir -> mc.player.getY() - pos.toCenterPos().offset(dir, 0.5).y < pri.printingYDistance.get())
+//            .filter(dir -> {
+//                BlockPos offset = pos.offset(dir);
+//                BlockState bs = mc.world.getBlockState(offset);
+//                if (pri.bSetAirPlace.get()) return true;
+//                if (pri.bSetLiquidInt.get() && bs.getBlock() instanceof FluidBlock) return true;
+//                return !bs.isReplaceable();
+//            })
+            .filter(dir -> !mc.world.getBlockState(pos.offset(dir)).isReplaceable())
+            .filter(dir -> (mc.world.getBlockState(pos).isAir()) || !mc.world.getBlockState(pos).isSideSolid(mc.world, pos, dir, SideShapeType.FULL))
+            //方块自身阻挡检测
+            .filter(dir -> mc.player.getY() - pos.toCenterPos().offset(dir, 0.5).y < pri.dSetPrintingYDistance.get())
             //高度检测 针对于放置比自己低太多的方块
-            .filter(dir -> pri.sneak.get() || !isCanUseBlock(pos.offset(dir), mc.world.getBlockState(pos.offset(dir)), mc.world))
+            .filter(dir -> SeijaUtil.isSneak() || !isCanUseBlock(pos.offset(dir), mc.world.getBlockState(pos.offset(dir)), mc.world))
             //不可交互
-            .filter(dir -> pos.toCenterPos().offset(dir, 0.5).distanceTo(mc.player.getEyePos()) <= pri.printingRange.get())
+            .filter(dir -> pos.toCenterPos().offset(dir, 0.5).distanceTo(mc.player.getEyePos()) <= pri.dSetPrintingRange.get())
             //距离检测
             .collect(Collectors.toList());
     }
 
     public static void placeBlock(PlaceData data) {
-        BlockPos pos = data.pos();
+        final BlockPos pos = data.pos();
+
+
         Direction dir = data.dir();
         Vec3d hitVec = data.hitVec();
         Runnable r = () -> {
             boolean sneakToggle = false;
-            if (pri.sneak.get()) {
+            if (pri.bSetSneak.get()) {
                 if (!mc.player.isSneaking()) {
                     sneakToggle = true;
                     mc.player.setSneaking(true);
                     mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
                 }
             }
-            if (pri.packetPlace.get()) {
+            //非法转头
+            if (pri.bSetIllegalRotate.get() && data.exRotateData() != null) {
+                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.exRotateData().yaw(), (float) data.exRotateData().pitch(), mc.player.isOnGround()));
+            }
+            if (pri.bSetPacketPlace.get()) {
                 mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, getHitRes(pos, dir, hitVec), SeijaUtil.getSequence()));
                 mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
             } else {
                 mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, getHitRes(pos, dir, hitVec));
                 mc.player.swingHand(Hand.MAIN_HAND);
             }
+//            if (pri.illegalRotate.get() && data.exRotateData() != null) {
+//                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.exRotateData().yaw(), (float) data.exRotateData().pitch(), mc.player.isOnGround()));
+//            }
+
 
             if (sneakToggle) {
                 mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
                 mc.player.setSneaking(false);
             }
-            pri.blackList.add(RenderHelper.getBlackInfo(pos.offset(dir)));
-            pri.renderList.add(RenderHelper.getBlackInfo(pos.offset(dir)));
+            PosInfo blackInfo = RenderHelper.getBlackInfo(pos.offset(dir), dir, hitVec, true);
+            pri.blackList.add(blackInfo);
+            RenderUtil.renderList.add(blackInfo);
         };
-        if (pri.packetRotate.get()) {
-            mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) SeijaUtil.getYaw(hitVec), (float) SeijaUtil.getPitch(hitVec), mc.player.isOnGround()));
+        if (pri.bSetRotate.get()) {
+            if (pri.bSetPacketRotate.get()) {
+                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) SeijaUtil.getYaw(hitVec), (float) SeijaUtil.getPitch(hitVec), mc.player.isOnGround()));
+                r.run();
+            } else
+                Rotations.rotate(SeijaUtil.getYaw(hitVec), SeijaUtil.getPitch(hitVec), r);
+        } else {
             r.run();
-        } else
-            Rotations.rotate(SeijaUtil.getYaw(hitVec), SeijaUtil.getPitch(hitVec), r);
+        }
 
     }
 
     public static BlockHitResult getHitRes(BlockPos pos, Direction dir, Vec3d hitVec) {
-        Vec3d eyes = mc.player.getEyePos();
+        Vec3d eyes = PredictUtility.getPredPlayerVec().offset(Direction.UP, SeijaUtil.getEyeHeight());
         boolean inside = eyes.x > (double) pos.getX() && eyes.x < (double) (pos.getX() + 1) && eyes.y > (double) pos.getY() && eyes.y < (double) (pos.getY() + 1) && eyes.z > (double) pos.getZ() && eyes.z < (double) (pos.getZ() + 1);
         return new BlockHitResult(hitVec, dir, pos, inside);
-    }
-
-    public static Direction[] getEntityFacingOrder(float yaw, float pitch) {
-        Direction direction3;
-        float f = pitch * ((float) Math.PI / 180);
-        float g = -yaw * ((float) Math.PI / 180);
-        float h = MathHelper.sin(f);
-        float i = MathHelper.cos(f);
-        float j = MathHelper.sin(g);
-        float k = MathHelper.cos(g);
-        boolean bl = j > 0.0f;
-        boolean bl2 = h < 0.0f;
-        boolean bl3 = k > 0.0f;
-        float l = bl ? j : -j;
-        float m = bl2 ? -h : h;
-        float n = bl3 ? k : -k;
-        float o = l * i;
-        float p = n * i;
-        Direction direction = bl ? Direction.EAST : Direction.WEST;
-        Direction direction2 = bl2 ? Direction.UP : Direction.DOWN;
-        Direction direction4 = direction3 = bl3 ? Direction.SOUTH : Direction.NORTH;
-        if (l > n) {
-            if (m > o) {
-                return listClosest(direction2, direction, direction3);
-            }
-            if (p > m) {
-                return listClosest(direction, direction3, direction2);
-            }
-            return listClosest(direction, direction2, direction3);
-        }
-        if (m > p) {
-            return listClosest(direction2, direction3, direction);
-        }
-        if (o > m) {
-            return listClosest(direction3, direction, direction2);
-        }
-        return listClosest(direction3, direction2, direction);
-    }
-
-    private static Direction[] listClosest(Direction first, Direction second, Direction third) {
-        return new Direction[]{first, second, third, third.getOpposite(), second.getOpposite(), first.getOpposite()};
     }
 
     public static List<Direction> getValidDirs(BlockPos pos) {
         List<Direction> values = new ArrayList<>(List.of(Direction.values()));
 
-        if (pri.strictDir.get()) {
+        if (pri.bSetStrictDir.get()) {
             List<Direction> directions = canTorchFac(pos);
             for (Direction direction : directions) {
                 values.remove(direction);
@@ -219,21 +214,29 @@ public class BlockUtil {
 
     public static boolean isCanUseBlock(BlockPos p, BlockState state, World world) {
         Block block = state.getBlock();
-        return block instanceof AbstractRedstoneGateBlock
+//        if (true)return false;//test
+        return (block instanceof AbstractRedstoneGateBlock
             || block instanceof BlockWithEntity
+            ||block instanceof  ScaffoldingBlock
             || block instanceof DoorBlock
             || block instanceof TrapdoorBlock
             || block instanceof FenceGateBlock
-            || block instanceof WallMountedBlock;
-//        List<Direction> dirs = getValidDirs(p);
-//        if (dirs.isEmpty()) {
-//            return true;
-//        }
-//        Direction direction = dirs.get(0);
-//
-//        BlockHitResult hitRes = getHitRes(p.offset(direction), direction.getOpposite(), p.toCenterPos().offset(direction, 0.5));
-//
-//        return state.onUse(world, mc.player, Hand.MAIN_HAND, hitRes) != ActionResult.PASS;
+            || block instanceof WallMountedBlock
+            || block instanceof ChestBlock
+            || block instanceof AnvilBlock
+            || block instanceof CraftingTableBlock
+            || block instanceof LoomBlock
+            || block instanceof EnderChestBlock
+            || block instanceof EnchantingTableBlock
+            || block instanceof SmithingTableBlock
+            || block instanceof GrindstoneBlock
+            || block instanceof StonecutterBlock
+
+        )
+            || (state.createScreenHandlerFactory(world, p) != null)
+            //调用createScreenHandlerFactory检测对帧率影响极大
+            ;
+
     }
 
     public static boolean isValidState(BlockState needState, BlockPos pos) {
@@ -251,7 +254,7 @@ public class BlockUtil {
     private static Random random = new CheckedRandom(2335353);
 
     private static double getRandomOffset() {
-        return Printer.getINSTANCE().randomOffset.get() ?
+        return Printer.getINSTANCE().bSetRandomOffset.get() ?
             MathHelper.nextDouble(random, -0.15, 0.15) : 0;
     }
 
@@ -289,18 +292,11 @@ public class BlockUtil {
         directions.remove(dir.getOpposite());
         return directions;
     }
-
-    public static boolean surfaceCheck(BlockPos pos, int c) {
-        if (c == 0) return true;
-        Set<BlockPos> surface = getSurface(pos, c);
-        surface.remove(pos);
-        for (BlockPos blockPos : surface) {
-            if (!BlockReplaceUtils.INSTANCE.getScheState(blockPos).isSolid()) return true;
-        }
-        return false;
+    public static boolean isStuckPos(BlockPos pos){
+        return SeijaUtil.intersectsWithEntity(new Box(pos), entity -> !entity.isSpectator() && !(entity instanceof ItemEntity) && !(entity instanceof ArrowEntity));
     }
 
-//    public static Set<BlockPos> getSurface(BlockPos pos, int c) {
+    //    public static Set<BlockPos> getSurface(BlockPos pos, int c) {
 //        HashSet<BlockPos> pos1 = new LinkedHashSet<>();
 //        pos1.add(pos);
 //        for (int i = 0; i < c; i++) {
@@ -320,22 +316,6 @@ public class BlockUtil {
 //    }
 
 
-    public static Set<BlockPos> getSurface(BlockPos pos, int c) {
-        Set<BlockPos> result = new HashSet<>();
-        result.add(pos);
-        for (int i = 0; i < c; i++) {
-            result = getSurface(result);
-        }
-        return result;
-    }
-
-    private static Set<BlockPos> getSurface(Set<BlockPos> set) {
-        return set.stream()
-            .flatMap(blockPos -> Arrays.stream(Direction.values())
-                .map(blockPos::offset)
-                .toList().stream())
-            .collect(Collectors.toSet());
-    }
 }
 
 

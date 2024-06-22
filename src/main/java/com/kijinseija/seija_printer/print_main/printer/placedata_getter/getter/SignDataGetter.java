@@ -1,9 +1,11 @@
 package com.kijinseija.seija_printer.print_main.printer.placedata_getter.getter;
 
 import com.kijinseija.seija_printer.print_main.printer.placedata_getter.AbstractDataGetter;
-import com.kijinseija.seija_printer.print_main.printer.util.DirData;
-import com.kijinseija.seija_printer.print_main.printer.util.PlaceData;
+import com.kijinseija.seija_printer.print_main.printer.util.BlockRotDataGetter;
+import com.kijinseija.seija_printer.print_main.printer.util.records.DirData;
+import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
 import com.kijinseija.seija_printer.print_main.printer.util.SeijaUtil;
+import com.kijinseija.seija_printer.print_main.printer.util.records.RotationData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SignBlock;
@@ -13,8 +15,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.RotationPropertyHelper;
 import net.minecraft.util.math.Vec3d;
-
-import java.util.List;
 
 public class SignDataGetter extends AbstractDataGetter {
     @Override
@@ -31,11 +31,12 @@ public class SignDataGetter extends AbstractDataGetter {
             }
 
         } else if (needState.getBlock() instanceof SignBlock && dirData.dirs().contains(Direction.DOWN)) {
+            RotationData rotData = BlockRotDataGetter.getRotData(needState);
             Integer rotation = needState.get(Properties.ROTATION);
             for (Vec3d hitVec : dirData.clickVecs(Direction.DOWN)) {
 
-                if (RotationPropertyHelper.fromYaw((float) (SeijaUtil.getYaw(hitVec) + 180.0f)) == rotation) {
-                    return new PlaceData(pos.offset(Direction.DOWN), Direction.UP, hitVec, true, null);
+                if (RotationPropertyHelper.fromYaw((float) (SeijaUtil.getYaw(hitVec) + 180.0f)) == rotation||rotData!=null) {
+                    return new PlaceData(pos.offset(Direction.DOWN), Direction.UP, hitVec, true, rotData);
                 }
             }
         }

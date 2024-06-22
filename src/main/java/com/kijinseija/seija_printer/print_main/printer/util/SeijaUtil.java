@@ -1,7 +1,7 @@
 package com.kijinseija.seija_printer.print_main.printer.util;
 
 import com.kijinseija.seija_printer.mixin.ClientWorldAccessor;
-import com.kijinseija.seija_printer.print_main.printer.Printer;
+import com.kijinseija.seija_printer.print_main.modules.Printer;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.LongBidirectionalIterator;
 import it.unimi.dsi.fastutil.longs.LongSortedSet;
@@ -23,11 +23,16 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Predicate;
 
 public class SeijaUtil {
-    public static Printer pri = Printer.INSTANCE;
+    public static Printer pri = Printer.getINSTANCE();
     static MinecraftClient mc = MinecraftClient.getInstance();
-    public static  double getEyeHeight(){
+
+    public static boolean isSneak(){
+        return mc.player.isSneaking()||pri.bSetSneak.get();
+    }
+
+    public static double getEyeHeight() {
         double eyeHeight;
-        if (pri.sneak.get()) {
+        if (pri.bSetSneak.get()) {
 
             if (mc.player.getEyeHeight(mc.player.getPose()) < 1) {
                 eyeHeight = mc.player.getEyeHeight(mc.player.getPose());
@@ -122,4 +127,60 @@ public class SeijaUtil {
     }
 
 
+    public static Direction[] getEntityFacingOrder(float yaw, float pitch) {
+        Direction direction3;
+        float f = pitch * ((float) Math.PI / 180);
+        float g = -yaw * ((float) Math.PI / 180);
+        float h = MathHelper.sin(f);
+        float i = MathHelper.cos(f);
+        float j = MathHelper.sin(g);
+        float k = MathHelper.cos(g);
+        boolean bl = j > 0.0f;
+        boolean bl2 = h < 0.0f;
+        boolean bl3 = k > 0.0f;
+        float l = bl ? j : -j;
+        float m = bl2 ? -h : h;
+        float n = bl3 ? k : -k;
+        float o = l * i;
+        float p = n * i;
+        Direction direction = bl ? Direction.EAST : Direction.WEST;
+        Direction direction2 = bl2 ? Direction.UP : Direction.DOWN;
+        Direction direction4 = direction3 = bl3 ? Direction.SOUTH : Direction.NORTH;
+        if (l > n) {
+            if (m > o) {
+                return listClosest(direction2, direction, direction3);
+            }
+            if (p > m) {
+                return listClosest(direction, direction3, direction2);
+            }
+            return listClosest(direction, direction2, direction3);
+        }
+        if (m > p) {
+            return listClosest(direction2, direction3, direction);
+        }
+        if (o > m) {
+            return listClosest(direction3, direction, direction2);
+        }
+        return listClosest(direction3, direction2, direction);
+    }
+
+    private static Direction[] listClosest(Direction first, Direction second, Direction third) {
+        return new Direction[]{first, second, third, third.getOpposite(), second.getOpposite(), first.getOpposite()};
+    }
+
+    public static Direction[] getPlacementDirections(Vec3d clickVec, BlockPos placePos, Direction offsetDir) {
+        int i;
+        Direction[] directions = getEntityFacingOrder((float) getYaw(clickVec), (float) getPitch(clickVec));
+        if (BlockUtil.canPlaceIn(placePos.offset(offsetDir))) {
+            return directions;
+        }
+        Direction direction = offsetDir.getOpposite();
+        for (i = 0; i < directions.length && directions[i] != direction.getOpposite(); ++i) {
+        }
+        if (i > 0) {
+            System.arraycopy(directions, 0, directions, 1, i);
+            directions[0] = direction.getOpposite();
+        }
+        return directions;
+    }
 }
