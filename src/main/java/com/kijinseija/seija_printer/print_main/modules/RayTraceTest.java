@@ -86,7 +86,9 @@ public class RayTraceTest extends Module {
             return;
         }
 
-        double d = mc.interactionManager.getReachDistance();
+        //double d = mc.interactionManager.getReachDistance();
+        double d = Printer.getINSTANCE().dSetPrintingRange.get();
+        //121
         HitResult crosshairTarget = null;
 
         //crosshairTarget = entity2.raycast(d, 1, false);
@@ -103,14 +105,15 @@ public class RayTraceTest extends Module {
         boolean bl = false;
         int i = 3;
         double e = d;
-        if (mc.interactionManager.hasExtendedReach()) {
-            d = e = 6.0;
-        } else {
-            if (e > 3.0) {
-                bl = true;
-            }
-            d = e;
-        }
+//        if (mc.interactionManager.hasExtendedReach()) {
+//            d = e = 6.0;
+//        } else {
+//            if (e > 3.0) {
+//                bl = true;
+//            }
+//            d = e;
+//        }
+        //121
         e *= e;
 
         if (crosshairTarget != null) {

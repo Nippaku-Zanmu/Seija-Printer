@@ -78,6 +78,9 @@ public class BlockRotDataGetter {
         if (bs.getProperties().contains(Properties.ROTATION)) {
             return getVecFromRotProp2(bs.get(Properties.ROTATION));
         }
+        if (bs.getProperties().contains(Properties.ORIENTATION)){
+            return getRotateDataFromDir(bs.get(Properties.ORIENTATION).getFacing().getOpposite());
+        }
 
         return null;
     }

@@ -23,8 +23,8 @@ public class MainDecide {
     public static Property[] props = new Property[]{
         Properties.FACING, Properties.HORIZONTAL_FACING, Properties.BLOCK_HALF
         , Properties.DOOR_HINGE, Properties.AXIS, Properties.ATTACHMENT
-        , Properties.HOPPER_FACING, Properties.ROTATION, Properties.WALL_MOUNT_LOCATION
-        , Properties.CHEST_TYPE, Properties.SLAB_TYPE
+        , Properties.HOPPER_FACING, Properties.ROTATION, Properties.BLOCK_FACE
+        , Properties.CHEST_TYPE, Properties.SLAB_TYPE,Properties.ORIENTATION
     };
 
     public boolean test(BlockState needState, BlockState nowState, BlockPos placePos) {

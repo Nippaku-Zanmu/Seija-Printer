@@ -22,8 +22,8 @@
   ],
   "accessWidener":  "seija-printer.accesswidener",
   "depends": {
-    "java": ">=17",
-    "minecraft": "1.20.*",
+    "java": ">=21",
+    "minecraft": "1.21.*",
     "meteor-client": ">=0.5.0"
   }
 }

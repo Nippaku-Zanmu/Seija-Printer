@@ -47,7 +47,7 @@ public class InvUtil {
             Int2ObjectArrayMap stack = new Int2ObjectArrayMap();
             stack.put(slot, handler.getSlot(slot).getStack());
             MeteorClient.mc.getNetworkHandler().sendPacket((Packet) new ClickSlotC2SPacket(handler.syncId, handler.getRevision(), slot, hotBarSlot, SlotActionType.SWAP, mc.player.currentScreenHandler.getCursorStack().copy(), (Int2ObjectMap) stack));
-            ((IClientPlayerInteractionManager) ((MinecraftClient) MeteorClient.mc).interactionManager).syncSelected();
+            ((IClientPlayerInteractionManager) ((MinecraftClient) MeteorClient.mc).interactionManager).meteor$syncSelected();
             return true;
         }
         return false;

@@ -407,13 +407,14 @@ public class Printer extends LoaderAntiCrash {
             br.lines().forEach(s -> {
                 String[] sp1 = s.split(":");
                 if (sp1.length != 2) return;
-                Block rep = Registries.BLOCK.get(new Identifier(sp1[0]));
+                Block rep = Registries.BLOCK.get(Identifier.of(sp1[0]));
+                //121
                 if (blockCheck(rep)) return;
                 List<Block> repBlocks = new ArrayList<>();
                 String[] blocks = sp1[1].split(",");
 
                 for (String blockStr : blocks) {
-                    Block block = Registries.BLOCK.get(new Identifier(blockStr));
+                    Block block = Registries.BLOCK.get(Identifier.of(blockStr));
                     if (blockCheck(block)) return;
                     repBlocks.add(block);
                 }

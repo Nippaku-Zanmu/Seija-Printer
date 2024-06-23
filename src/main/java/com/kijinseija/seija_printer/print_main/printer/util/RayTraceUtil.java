@@ -78,14 +78,15 @@ public class RayTraceUtil {
         boolean bl = false;
         int i = 3;
         double e = d;
-        if (mc.interactionManager.hasExtendedReach()) {
-            d = e = 6.0;
-        } else {
-            if (e > 3.0) {
-                bl = true;
-            }
-            d = e;
-        }
+//        if (mc.interactionManager.hasExtendedReach()) {
+//            d = e = 6.0;
+//        } else {
+//            if (e > 3.0) {
+//                bl = true;
+//            }
+//            d = e;
+//        }
+        //121
         e *= e;
 
         if (crosshairTarget != null) {

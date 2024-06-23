@@ -8,7 +8,8 @@ import com.kijinseija.seija_printer.print_main.printer.util.SeijaUtil;
 import com.kijinseija.seija_printer.print_main.printer.util.records.RotationData;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.WallMountedBlock;
-import net.minecraft.block.enums.WallMountLocation;
+import net.minecraft.block.enums.BlockFace;
+
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -19,21 +20,21 @@ public class WallMountedDataGetter extends AbstractDataGetter {
     @Override
     public PlaceData getData(BlockState needState, DirData dirData) {
         BlockPos pos = dirData.placePos();
-        WallMountLocation wallMountLocation = needState.get(Properties.WALL_MOUNT_LOCATION);
+        BlockFace wallMountLocation = needState.get(Properties.BLOCK_FACE);
         RotationData rotData = BlockRotDataGetter.getRotData(needState);
 
         Direction needDir = needState.get(Properties.HORIZONTAL_FACING);
         for (Direction dir : dirData.dirs()) {
             for (Vec3d hitVec : dirData.clickVecs(dir)) {
-                if (wallMountLocation == WallMountLocation.WALL) {
+                if (wallMountLocation == BlockFace.WALL) {
                     if (needDir.getOpposite() == dir)
                         return new PlaceData(pos.offset(dir), dir.getOpposite(), hitVec, true, null);
                 } else if (needDir == Direction.fromRotation(SeijaUtil.getYaw(hitVec))) {
-                    if (wallMountLocation == WallMountLocation.FLOOR
+                    if (wallMountLocation == BlockFace.FLOOR
                         && dir == Direction.DOWN
                     )
                         return new PlaceData(pos.offset(dir), dir.getOpposite(), hitVec, true, null);
-                    else if (wallMountLocation == WallMountLocation.CEILING && dir == Direction.UP) {
+                    else if (wallMountLocation == BlockFace.CEILING && dir == Direction.UP) {
                         return new PlaceData(pos.offset(dir), dir.getOpposite(), hitVec, true, null);
                     }
                 }
