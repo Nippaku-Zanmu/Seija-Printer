@@ -15,6 +15,10 @@ import net.minecraft.util.math.Vec3d;
 import java.util.List;
 
 public class CampFireFixer extends AbstractFixer {
+    public CampFireFixer() {
+        super("CampFireFix");
+    }
+
     @Override
     public int fixBlock(BlockPos pos, BlockState needState) {
         List<Direction> interactDir = BlockUtil.getInteractDir(pos);

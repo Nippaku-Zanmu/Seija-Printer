@@ -23,6 +23,10 @@ import java.util.List;
 public class ScaffoldFixer extends AbstractFixer {
     private static final Printer pri = Printer.getINSTANCE();
 
+    public ScaffoldFixer() {
+        super("ScaffoldFix");
+    }
+
     @Override
     public int fixBlock(BlockPos pos, BlockState needState) {
         for (Direction off : Direction.values()) {

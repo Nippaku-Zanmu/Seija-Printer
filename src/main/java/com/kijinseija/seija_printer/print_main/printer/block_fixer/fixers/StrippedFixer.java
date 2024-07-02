@@ -15,6 +15,10 @@ import net.minecraft.util.math.Vec3d;
 import java.util.List;
 
 public class StrippedFixer extends AbstractFixer {
+    public StrippedFixer() {
+        super("LogFix");
+    }
+
     @Override
     public int fixBlock(BlockPos pos, BlockState needState) {
         List<Direction> interactDir = BlockUtil.getInteractDir(pos);

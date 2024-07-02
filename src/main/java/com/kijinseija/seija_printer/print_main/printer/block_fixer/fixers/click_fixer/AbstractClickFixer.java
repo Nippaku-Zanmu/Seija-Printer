@@ -4,6 +4,7 @@ import com.kijinseija.seija_printer.print_main.printer.block_fixer.AbstractFixer
 import com.kijinseija.seija_printer.print_main.printer.util.BlockUtil;
 import com.kijinseija.seija_printer.print_main.printer.util.records.DirDataI;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
+import meteordevelopment.meteorclient.settings.BoolSetting;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -12,6 +13,14 @@ import net.minecraft.util.math.Vec3d;
 import java.util.List;
 
 public abstract class AbstractClickFixer extends AbstractFixer {
+    public AbstractClickFixer(String name) {
+        super(name);
+    }
+    public AbstractClickFixer(BoolSetting setting){
+        super(setting);
+
+    }
+
     @Override
     public int fixBlock(BlockPos pos, BlockState needState) {
 

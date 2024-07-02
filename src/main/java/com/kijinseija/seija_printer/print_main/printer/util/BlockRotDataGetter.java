@@ -3,6 +3,7 @@ package com.kijinseija.seija_printer.print_main.printer.util;
 import com.kijinseija.seija_printer.print_main.modules.Printer;
 import com.kijinseija.seija_printer.print_main.printer.util.records.RotationData;
 import net.minecraft.block.*;
+import net.minecraft.block.enums.Orientation;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
@@ -78,8 +79,12 @@ public class BlockRotDataGetter {
         if (bs.getProperties().contains(Properties.ROTATION)) {
             return getVecFromRotProp2(bs.get(Properties.ROTATION));
         }
-        if (bs.getProperties().contains(Properties.ORIENTATION)){
-            return getRotateDataFromDir(bs.get(Properties.ORIENTATION).getFacing().getOpposite());
+        if (bs.getProperties().contains(Properties.ORIENTATION)) {
+
+            Orientation ori = bs.get(Properties.ORIENTATION);
+            if (ori.getFacing().getAxis() != Direction.Axis.Y)
+                return getRotateDataFromDir(ori.getFacing().getOpposite());
+            return new RotationData(getRotateDataFromDir(ori.getRotation().getOpposite()).yaw(), getRotateDataFromDir(ori.getFacing().getOpposite()).pitch());
         }
 
         return null;

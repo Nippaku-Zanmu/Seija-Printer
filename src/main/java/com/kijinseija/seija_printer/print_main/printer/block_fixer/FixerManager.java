@@ -3,13 +3,19 @@ package com.kijinseija.seija_printer.print_main.printer.block_fixer;
 import com.kijinseija.seija_printer.print_main.modules.Printer;
 import com.kijinseija.seija_printer.print_main.printer.block_fixer.fixers.*;
 import com.kijinseija.seija_printer.print_main.printer.block_fixer.fixers.click_fixer.*;
+import com.kijinseija.seija_printer.print_main.printer.extra_setting.ExtraSettingManager;
+import com.kijinseija.seija_printer.print_main.printer.extra_setting.HasExtraSetting;
+import meteordevelopment.meteorclient.settings.BoolSetting;
+import meteordevelopment.meteorclient.settings.Setting;
+import meteordevelopment.meteorclient.settings.SettingGroup;
+import meteordevelopment.meteorclient.settings.Settings;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class FixerManager {
+public class FixerManager implements HasExtraSetting {
 
     public static final FixerManager INSTANCE = new FixerManager();
 
@@ -21,28 +27,27 @@ public class FixerManager {
      * @return {@link boolean} 是否进行了修复操作
      */
     public int doFix(BlockPos pos, BlockState needState) {
-        if (Printer.getINSTANCE().bSetEnableBlockFixer.get())//是否启用了方块修复
-            try {
-                for (AbstractFixer fixer : fixers) {//遍历所有修复器
-                    if (fixer.needFix(pos, needState)) {
-                        //检测是否可以修复->是则进行修复
-                        //若进行了则返回真
-                        switch (fixer.fixBlock(pos, needState)){
-                            case AbstractFixer.SUCCESS : {
-                                return AbstractFixer.SUCCESS;
-                            }
-                            case AbstractFixer.CONTINUE : {
-                                continue;
-                            }
-                            case AbstractFixer.RETURN : {
-                                return AbstractFixer.RETURN;
-                            }
+        try {
+            for (AbstractFixer fixer : fixers) {//遍历所有修复器
+                if (fixer.isEnable()&&fixer.needFix(pos, needState)) {
+                    //检测是否可以修复->是则进行修复
+                    //若进行了则返回真
+                    switch (fixer.fixBlock(pos, needState)){
+                        case AbstractFixer.SUCCESS : {
+                            return AbstractFixer.SUCCESS;
+                        }
+                        case AbstractFixer.CONTINUE : {
+                            continue;
+                        }
+                        case AbstractFixer.RETURN : {
+                            return AbstractFixer.RETURN;
                         }
                     }
                 }
-            } catch (IllegalArgumentException ignored) {
-                //防小天才瞎几把玩方块替换
             }
+        } catch (IllegalArgumentException ignored) {
+            //防小天才瞎几把玩方块替换
+        }
 
         return AbstractFixer.CONTINUE;
     }
@@ -50,6 +55,10 @@ public class FixerManager {
     private List<AbstractFixer> fixers = new ArrayList<>();
 
     private FixerManager() {
+        regFixer();
+    }
+
+    private void regFixer(){
         //修复器注册表
         fixers.add(new ScaffoldFixer());
         fixers.add(new SlabFixer());
@@ -64,5 +73,14 @@ public class FixerManager {
         fixers.add(new NoteBlockFixer());
         fixers.add(new StrippedFixer());
         fixers.add(new RedStoneFixer());
+    }
+
+    @Override
+    public SettingGroup getSettingGroup(Settings sets) {
+        SettingGroup blockFixer = sets.createGroup("BlockFixer");
+        for (AbstractFixer fixer : fixers) {
+            blockFixer.add(fixer.bSetEnable);
+        }
+        return blockFixer;
     }
 }

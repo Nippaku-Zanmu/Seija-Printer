@@ -3,7 +3,7 @@ package com.kijinseija.seija_printer.print_main.modules;
 import com.kijinseija.seija_printer.Addon;
 import com.kijinseija.seija_printer.print_main.printer.util.PredictUtility;
 import com.kijinseija.seija_printer.print_main.printer.util.SeijaUtil;
-import com.kijinseija.seija_printer.settings.DirectionListSetting;
+import com.kijinseija.seija_printer.settings.impl.DirectionListSetting;
 import meteordevelopment.meteorclient.settings.DoubleSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;

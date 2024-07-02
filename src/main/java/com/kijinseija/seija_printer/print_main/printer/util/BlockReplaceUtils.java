@@ -23,10 +23,9 @@ public class BlockReplaceUtils {
     public BlockState getScheState(BlockPos pos) {
         return replaceState(SchematicWorldHandler.getSchematicWorld().getBlockState(pos), pos);
     }
-
-    public BlockState replaceState(BlockState state, BlockPos pos) {
-
-        BlockState repState = needBlockReplace(state, pos).getDefaultState();
+    private BlockState getScheStateBridege(BlockPos pos){
+        BlockState state = SchematicWorldHandler.getSchematicWorld().getBlockState(pos);
+        BlockState repState = needBlockReplace(state, pos,false).getDefaultState();
         try {
             for (Property property : state.getProperties()) {
                 repState = repState.with(property, state.get(property));
@@ -39,16 +38,33 @@ public class BlockReplaceUtils {
         return repState;
     }
 
-    private Block needBlockReplace(BlockState bs, BlockPos pos) {
+    public BlockState replaceState(BlockState state, BlockPos pos) {
+
+        BlockState repState = needBlockReplace(state, pos,true).getDefaultState();
+        try {
+            for (Property property : state.getProperties()) {
+                repState = repState.with(property, state.get(property));
+            }
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return repState;
+    }
+
+    private Block needBlockReplace(BlockState bs, BlockPos pos,boolean calcBridge) {
         List<Block> blocks = pri.replaceMap.get(bs.getBlock());
         if (blocks != null && blocks.size() != 0)
             for (Block b : blocks) {
                 if (InvUtils.find(Item.BLOCK_ITEMS.get(b)).found())
                     return b;
             }
-        Block bridgedBlockReplace = BlockReplaceUtils.INSTANCE.bridgeBlockReplace(bs, pos);
-        if (bridgedBlockReplace != null)
-            return bridgedBlockReplace;
+        if (calcBridge) {
+            Block bridgedBlockReplace = BlockReplaceUtils.INSTANCE.bridgeBlockReplace(bs, pos);
+            if (bridgedBlockReplace != null)
+                return bridgedBlockReplace;
+        }
 
 
         return bs.getBlock();
@@ -101,9 +117,10 @@ public class BlockReplaceUtils {
         {
             for (Direction direction : interactDir) {
                 if (pri.liSetBridgeDirs.get().contains(direction)//是可以用的方位
-                    && !BlockUtil.isCanPlaceInBlock(getScheState(pos.offset(direction)).getBlock())
+                    && !BlockUtil.isCanPlaceInBlock(getScheStateBridege(pos.offset(direction)).getBlock())
                     //被支持的方块是投影中是需要放置的方块
                     && BlockUtil.getDirs(pos.offset(direction)).isEmpty()//被支持的方块不能直接放置
+                    &&BlockUtil.canPlaceIn(pos.offset(direction))//被支持的方块还没被放置
                 ) {
                     //可用支撑
                     for (Block block : pri.liSetBridgeBlocks.get()) {

@@ -1,4 +1,4 @@
-package com.kijinseija.seija_printer.settings;
+package com.kijinseija.seija_printer.settings.impl;
 
 import meteordevelopment.meteorclient.gui.GuiTheme;
 import meteordevelopment.meteorclient.gui.WindowScreen;

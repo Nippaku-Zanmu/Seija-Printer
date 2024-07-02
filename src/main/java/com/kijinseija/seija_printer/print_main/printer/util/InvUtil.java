@@ -61,7 +61,9 @@ public class InvUtil {
         FindItemResult resHot = InvUtils.findInHotbar(p);
         if (resHot.found()) {
             InvUtils.swap(resHot.slot(), false);
-            return true;
+            if ((!pri.bSetAntiWrongBlock.get())||p.test(mc.player.getMainHandStack()))
+                return true;
+            return false;
         }
 
         FindItemResult res = InvUtils.find(p);

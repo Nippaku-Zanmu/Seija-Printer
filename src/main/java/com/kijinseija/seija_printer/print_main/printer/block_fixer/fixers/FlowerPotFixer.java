@@ -13,6 +13,10 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
 public class FlowerPotFixer extends AbstractFixer {
+    public FlowerPotFixer() {
+        super("FlowerPotFix");
+    }
+
     @Override
     public int fixBlock(BlockPos pos, BlockState needState) {
 

@@ -13,6 +13,10 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
 public class DirtFixer extends AbstractFixer {
+    public DirtFixer() {
+        super("DirtFix");
+    }
+
     @Override
     public int fixBlock(BlockPos pos, BlockState needState) {
 

@@ -6,6 +6,10 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 
 public class DaylightDetectorFixer extends AbstractClickFixer{
+    public DaylightDetectorFixer() {
+        super("DaylightDetectorFix");
+    }
+
     @Override
     public boolean needFix(BlockPos pos, BlockState needState) {
         if (!super.needFix(pos,needState)) {

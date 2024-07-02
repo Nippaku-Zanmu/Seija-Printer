@@ -5,6 +5,10 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 
 public class DoorFixer extends AbstractClickFixer {
+    public DoorFixer() {
+        super("DoorFix");
+    }
+
     @Override
     public boolean needFix(BlockPos pos, BlockState needState) {
         if (!super.needFix(pos,needState)) {

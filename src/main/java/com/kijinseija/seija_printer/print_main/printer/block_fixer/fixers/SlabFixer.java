@@ -24,6 +24,10 @@ import java.util.Collections;
 import java.util.List;
 
 public class SlabFixer extends AbstractFixer {
+    public SlabFixer() {
+        super("SlabFix");
+    }
+
     @Override
     public int fixBlock(BlockPos pos, BlockState needState) {
 

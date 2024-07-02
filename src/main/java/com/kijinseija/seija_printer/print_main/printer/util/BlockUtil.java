@@ -3,6 +3,7 @@ package com.kijinseija.seija_printer.print_main.printer.util;
 import com.kijinseija.seija_printer.print_main.modules.Printer;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PosInfo;
+import com.kijinseija.seija_printer.print_main.printer.util.records.RotationData;
 import meteordevelopment.meteorclient.utils.player.Rotations;
 import net.minecraft.block.*;
 import net.minecraft.block.enums.BedPart;
@@ -33,7 +34,7 @@ public class BlockUtil {
 
     public static List<Direction> getInteractDir(BlockPos pos) {
         return (pri.bSetStrictDir.get() ? canTorchFac(pos) : Arrays.asList(Direction.values())).stream()
-            .filter(dir -> canPlaceIn(pos.offset(dir)))
+            .filter(dir -> (!pri.bSetStrictDir.get()) || canPlaceIn(pos.offset(dir)))
             .filter(dir -> mc.player.getY() - pos.toCenterPos().offset(dir, 0.5).y < pri.dSetPrintingYDistance.get())
             //高度检测 针对于放置比自己低太多的方块
             .filter(dir -> pos.toCenterPos().offset(dir, 0.5).distanceTo(mc.player.getEyePos()) <= pri.dSetPrintingRange.get())
@@ -71,9 +72,10 @@ public class BlockUtil {
 
 
     }
-    public static List<Direction> getSortedDirs(BlockPos pos){
+
+    public static List<Direction> getSortedDirs(BlockPos pos) {
         if (pri.bSetSortDir.get())
-            return DirSorter.sort(getDirs(pos),pos);
+            return DirSorter.sort(getDirs(pos), pos);
         return getDirs(pos);
     }
 
@@ -91,6 +93,7 @@ public class BlockUtil {
 //                return !bs.isReplaceable();
 //            })
             .filter(dir -> !mc.world.getBlockState(pos.offset(dir)).isReplaceable())
+            //不可被替换
             .filter(dir -> (mc.world.getBlockState(pos).isAir()) || !mc.world.getBlockState(pos).isSideSolid(mc.world, pos, dir, SideShapeType.FULL))
             //方块自身阻挡检测
             .filter(dir -> mc.player.getY() - pos.toCenterPos().offset(dir, 0.5).y < pri.dSetPrintingYDistance.get())
@@ -118,9 +121,8 @@ public class BlockUtil {
                 }
             }
             //非法转头
-            if (pri.bSetIllegalRotate.get() && data.exRotateData() != null) {
-                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.exRotateData().yaw(), (float) data.exRotateData().pitch(), mc.player.isOnGround()));
-            }
+            illegalRotate(data.exRotateData());
+
             if (pri.bSetPacketPlace.get()) {
                 mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, getHitRes(pos, dir, hitVec), SeijaUtil.getSequence()));
                 mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
@@ -151,6 +153,19 @@ public class BlockUtil {
             r.run();
         }
 
+    }
+
+    public static void illegalRotate(RotationData data) {
+        if (pri.bSetIllegalRotate.get() && data != null) {
+            if (mc.isInSingleplayer()) {
+                mc.player.prevYaw = (float) data.yaw();
+                PlayerMoveC2SPacket packet = new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), (float) data.yaw(),
+                    (float) data.pitch(), mc.player.isOnGround());
+                mc.player.networkHandler.sendPacket(packet);
+            } else
+                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.yaw(), (float) data.pitch(), mc.player.isOnGround()));
+
+        }
     }
 
     public static BlockHitResult getHitRes(BlockPos pos, Direction dir, Vec3d hitVec) {
@@ -217,7 +232,7 @@ public class BlockUtil {
 //        if (true)return false;//test
         return (block instanceof AbstractRedstoneGateBlock
             || block instanceof BlockWithEntity
-            ||block instanceof  ScaffoldingBlock
+            || block instanceof ScaffoldingBlock
             || block instanceof DoorBlock
             || block instanceof TrapdoorBlock
             || block instanceof FenceGateBlock
@@ -292,7 +307,8 @@ public class BlockUtil {
         directions.remove(dir.getOpposite());
         return directions;
     }
-    public static boolean isStuckPos(BlockPos pos){
+
+    public static boolean isStuckPos(BlockPos pos) {
         return SeijaUtil.intersectsWithEntity(new Box(pos), entity -> !entity.isSpectator() && !(entity instanceof ItemEntity) && !(entity instanceof ArrowEntity));
     }
 

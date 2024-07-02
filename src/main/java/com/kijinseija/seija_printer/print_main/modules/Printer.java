@@ -4,12 +4,14 @@ import com.kijinseija.seija_printer.Addon;
 import com.kijinseija.seija_printer.loader.LoaderAntiCrash;
 import com.kijinseija.seija_printer.print_main.printer.block_fixer.AbstractFixer;
 import com.kijinseija.seija_printer.print_main.printer.block_fixer.FixerManager;
+import com.kijinseija.seija_printer.print_main.printer.extra_setting.ExtraSettingManager;
 import com.kijinseija.seija_printer.print_main.printer.placedata_getter.PlaceDataManager;
 import com.kijinseija.seija_printer.print_main.printer.placedata_getter.vanilla_precision_placer.FakePlacementContext;
 import com.kijinseija.seija_printer.print_main.printer.util.*;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceDataPack;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PosInfo;
-import com.kijinseija.seija_printer.settings.DirectionListSetting;
+import com.kijinseija.seija_printer.settings.impl.DirectionListSetting;
+import com.kijinseija.seija_printer.settings.impl.SettingsSetting;
 import fi.dy.masa.litematica.data.DataManager;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
@@ -50,7 +52,7 @@ public class Printer extends LoaderAntiCrash {
 
     private static Printer INSTANCE = new Printer();
 
-    public Printer() {
+    private Printer() {
         super(Addon.CATEGORY, "Seija-litematica-printer", "Automatically prints open schematics");
         loadFileFilters();
         INSTANCE = this;
@@ -273,9 +275,13 @@ public class Printer extends LoaderAntiCrash {
             .visible(bSetEnablePrecisionPlace::get)
             .defaultValue(true)
             .build());
-    public final Setting<Boolean> bSetEnableBlockFixer = sgAdvancedSettings.add(new BoolSetting.Builder()
-        .name("enableBlockFixer")
-        .defaultValue(true)
+//    public final Setting<Boolean> bSetEnableBlockFixer = sgAdvancedSettings.add(new BoolSetting.Builder()
+//        .name("enableBlockFixer")
+//        .defaultValue(true)
+//        .build());
+    public final Setting<Settings> setsSetExtraSetting = sgAdvancedSettings.add(new SettingsSetting.Builder()
+        .name("ExtraSetting")
+        .defaultValue(ExtraSettingManager.INSTANCE.getExtraSettings())
         .build());
 
 
@@ -379,7 +385,7 @@ public class Printer extends LoaderAntiCrash {
 //                file = new File(path);
 //                fileName.set(file.getName());
 //                sSetReplaceBlockFile.set(path);
-                sSetReplaceBlockFile.parse(path);
+                sSetReplaceBlockFile.set(path);
             }
         };
         //File Select

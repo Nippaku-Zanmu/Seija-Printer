@@ -14,10 +14,8 @@ public class InitClass {
         Modules.get().add(new PlaceDebug());
         Modules.get().add(new ScheDebug());
 
-        Printer pri = new Printer();
-        pri.onRender3d(null);
-        pri.tick(null);
-        Modules.get().add(pri);
+
+        Modules.get().add(Printer.getINSTANCE());
         Modules.get().add(new RayTraceTest());
 //            Modules.get().add(new YanZhen());
         Modules.get().add(new SideTest());

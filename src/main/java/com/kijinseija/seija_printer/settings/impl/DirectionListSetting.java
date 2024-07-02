@@ -1,4 +1,4 @@
-package com.kijinseija.seija_printer.settings;
+package com.kijinseija.seija_printer.settings.impl;
 
 import meteordevelopment.meteorclient.settings.IVisible;
 import meteordevelopment.meteorclient.settings.Setting;
@@ -65,6 +65,7 @@ public class DirectionListSetting extends Setting<List<Direction>> {
     }
 
     public static class Builder extends SettingBuilder<Builder, List<Direction>, DirectionListSetting> {
+
         public Builder() {
             super(new ArrayList<>(0));
         }

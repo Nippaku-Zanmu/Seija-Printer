@@ -7,6 +7,10 @@ import net.minecraft.util.math.BlockPos;
 import static net.minecraft.block.RedstoneWireBlock.*;
 
 public class RedStoneFixer extends AbstractClickFixer{
+    public RedStoneFixer() {
+        super("RedStondFix");
+    }
+
     @Override
     public boolean needFix(BlockPos pos, BlockState needState) {
         if (!super.needFix(pos,needState)) {
