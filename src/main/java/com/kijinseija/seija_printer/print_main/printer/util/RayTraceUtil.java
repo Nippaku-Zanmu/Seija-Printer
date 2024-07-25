@@ -10,6 +10,7 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 
 public class RayTraceUtil {
@@ -52,8 +53,11 @@ public class RayTraceUtil {
         float k = MathHelper.sin(f);
         return new Vec3d(i * j, -k, h * j);
     }
-    public boolean rayTrace(Vec3d target){
-        if (!(pri.bSetRayTrace.isVisible()&&pri.bSetRayTrace.get()))return true;
+    public boolean rayTrace(@Nullable BlockPos placePos,@Nullable Direction offsetDir,Vec3d target){
+        return rayTrace(placePos,offsetDir, target,pri.bSetRayTrace.isVisible()&&pri.bSetRayTrace.get(),pri.bSetIgnoreEntity.get(), pri.dSetPrintingRange.get());
+    }
+    public boolean rayTrace(@Nullable BlockPos interactPos,@Nullable Direction clickDir, Vec3d target, boolean raytrace, boolean ignoreEntity, double rayRange){
+        if (!(raytrace))return true;
 
         Entity entity2 = mc.getCameraEntity();
         if (entity2 == null) {
@@ -63,7 +67,7 @@ public class RayTraceUtil {
             return false;
         }
 
-        double d = pri.dSetPrintingRange.get();
+        double d =rayRange;
         HitResult crosshairTarget = null;
 
         //crosshairTarget = entity2.raycast(d, 1, false);
@@ -94,7 +98,7 @@ public class RayTraceUtil {
         }
 
 
-        if (!pri.bSetIgnoreEntity.get()){
+        if (!ignoreEntity){
             Box box = entity2.getBoundingBox().stretch(vec3d2.multiply(d)).expand(1.0, 1.0, 1.0);
             EntityHitResult entityHitResult = ProjectileUtil.raycast(entity2, vec3d, vec3d3, box, entity -> !entity.isSpectator() && entity.canHit(), e);
             if (entityHitResult != null) {
@@ -111,6 +115,10 @@ public class RayTraceUtil {
         if (crosshairTarget == null)return false;
         if (crosshairTarget.getType()!= HitResult.Type.BLOCK)return false;
         //ChatUtils.sendMsg(Text.of("pos:"+ crosshairTarget.getPos()+ " dis: "+target.distanceTo(crosshairTarget.getPos())));
-        return target.distanceTo(crosshairTarget.getPos())<=0.1;
+        if (clickDir==null||interactPos==null)
+            return  target.distanceTo(crosshairTarget.getPos())<=0.1;
+        return target.distanceTo(crosshairTarget.getPos())<=0.1
+            &&(!(crosshairTarget instanceof BlockHitResult bhr0) || bhr0.getSide() == clickDir)
+            &&(!(crosshairTarget instanceof BlockHitResult bhr) ||interactPos.equals(bhr.getBlockPos()));
     }
 }

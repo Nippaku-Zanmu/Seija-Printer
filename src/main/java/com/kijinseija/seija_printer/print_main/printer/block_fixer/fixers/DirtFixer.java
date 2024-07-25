@@ -21,15 +21,15 @@ public class DirtFixer extends AbstractFixer {
     public int fixBlock(BlockPos pos, BlockState needState) {
 
         DirDataI dirDataI = new DirDataI(pos, BlockUtil.getInteractDir(pos));
-        if (needState.getBlock() instanceof DirtPathBlock)
-            dirDataI.dirs().remove(Direction.DOWN);
+
+        dirDataI.dirs().remove(Direction.DOWN);
         for (Direction dir : dirDataI.dirs()) {
             for (Vec3d clickVec : dirDataI.clickVecs(dir)) {
                 if (InvUtil.switchItem(stack -> needState.getBlock() instanceof DirtPathBlock
                     ? stack.getItem() instanceof ShovelItem : stack.getItem() instanceof HoeItem)) {
-                    BlockUtil.interactBlock(new PlaceData(dirDataI.placePos(),dir,clickVec,true,null));
+                    BlockUtil.interactBlock(new PlaceData(dirDataI.placePos(), dir, clickVec, true, null));
                     return AbstractFixer.SUCCESS;
-                }else return AbstractFixer.RETURN;
+                } else return AbstractFixer.RETURN;
             }
         }
         return AbstractFixer.CONTINUE;
@@ -38,9 +38,9 @@ public class DirtFixer extends AbstractFixer {
     @Override
     public boolean needFix(BlockPos pos, BlockState needState) {
         Block block = mc.world.getBlockState(pos).getBlock();
-        if (needState.getBlock() instanceof DirtPathBlock &&!InvUtil.findItem(stack -> stack.getItem() instanceof ShovelItem))
+        if (needState.getBlock() instanceof DirtPathBlock && !InvUtil.findItem(stack -> stack.getItem() instanceof ShovelItem))
             return false;
-        if (needState.getBlock() instanceof FarmlandBlock &&!InvUtil.findItem(stack -> stack.getItem() instanceof HoeItem))
+        if (needState.getBlock() instanceof FarmlandBlock && !InvUtil.findItem(stack -> stack.getItem() instanceof HoeItem))
             return false;
         return ((needState.getBlock() instanceof DirtPathBlock || needState.getBlock() instanceof FarmlandBlock)
             && (block instanceof SpreadableBlock || block.equals(Blocks.DIRT)

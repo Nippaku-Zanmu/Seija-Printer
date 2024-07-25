@@ -24,6 +24,11 @@ public class FakePlacementContext extends ItemPlacementContext {
 
 
     private static final MinecraftClient mc = MinecraftClient.getInstance();
+
+    public static PlayerEntity getFakePlayer() {
+        return fakePlayer;
+    }
+
     private static PlayerEntity fakePlayer;
 
     //        ;= new PlayerEntity(mc.world, BlockPos.ORIGIN, 1, new GameProfile(UUID.fromString("66123666-1234-5432-6666-667563866600"), "PredictEntity339")){
@@ -113,7 +118,7 @@ public class FakePlacementContext extends ItemPlacementContext {
 
     public FakePlacementContext(PlayerEntity player, Hand hand, ItemStack stack, BlockHitResult hitResult) {
         super(player, hand, stack, hitResult);
-        updatePlayerEntity();
+        //updatePlayerEntity();
     }
 
     @Override

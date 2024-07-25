@@ -20,7 +20,8 @@ public class PlaceDebug extends Module {
         if (send.packet instanceof PlayerInteractBlockC2SPacket) {
             PlayerInteractBlockC2SPacket packet = (PlayerInteractBlockC2SPacket) send.packet;
             BlockHitResult bhr = packet.getBlockHitResult();
-            ChatUtils.sendMsg(Text.of(bhr.getBlockPos()+"  Side:"+bhr.getSide()+" Vec:"+bhr.getPos()));
+
+            ChatUtils.sendMsg(Text.of(bhr.getBlockPos()+"  Side:"+bhr.getSide()+" Vec:"+bhr.getPos()+"Type:"+bhr.getType()));
         }
     }
 }

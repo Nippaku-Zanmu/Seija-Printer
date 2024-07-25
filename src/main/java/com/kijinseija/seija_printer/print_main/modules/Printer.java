@@ -1,5 +1,6 @@
 package com.kijinseija.seija_printer.print_main.modules;
 
+import com.google.common.eventbus.Subscribe;
 import com.kijinseija.seija_printer.Addon;
 import com.kijinseija.seija_printer.loader.LoaderAntiCrash;
 import com.kijinseija.seija_printer.print_main.printer.block_fixer.AbstractFixer;
@@ -23,6 +24,7 @@ import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
+import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -45,17 +47,18 @@ import java.util.stream.Collectors;
 
 
 public class Printer extends LoaderAntiCrash {
-    //todo 切换智能排序
     public static Printer getINSTANCE() {
         return INSTANCE;
     }
 
-    private static Printer INSTANCE = new Printer();
+    public static final Printer INSTANCE = new Printer();
 
     private Printer() {
         super(Addon.CATEGORY, "Seija-litematica-printer", "Automatically prints open schematics");
         loadFileFilters();
-        INSTANCE = this;
+//        INSTANCE = this;
+
+
     }
 
     private final SettingGroup sgBasicCalc = settings.createGroup("BasicCalc");
@@ -135,9 +138,11 @@ public class Printer extends LoaderAntiCrash {
         //.visible(() -> !bSetAirPlace.get())
         .defaultValue(true)
         .build());
-    public final boolean isStrictVecInte(){
+
+    public final boolean isStrictVecInte() {
         return !bSetAirPlace.get();
     }
+
     public final Setting<Boolean> bSetRandomOffset = sgACBypass.add(new BoolSetting.Builder()
         .name("RandomOffsetVec")
         .defaultValue(true)
@@ -275,13 +280,13 @@ public class Printer extends LoaderAntiCrash {
             .visible(bSetEnablePrecisionPlace::get)
             .defaultValue(true)
             .build());
-//    public final Setting<Boolean> bSetEnableBlockFixer = sgAdvancedSettings.add(new BoolSetting.Builder()
+    //    public final Setting<Boolean> bSetEnableBlockFixer = sgAdvancedSettings.add(new BoolSetting.Builder()
 //        .name("enableBlockFixer")
 //        .defaultValue(true)
 //        .build());
     public final Setting<Settings> setsSetExtraSetting = sgAdvancedSettings.add(new SettingsSetting.Builder()
         .name("ExtraSetting")
-        .defaultValue(ExtraSettingManager.INSTANCE.getExtraSettings())
+        .defaultValue(ExtraSettingManager.getINSTANCE().getExtraSettings())
         .build());
 
 
@@ -490,7 +495,7 @@ public class Printer extends LoaderAntiCrash {
             if (placeCount >= iSetBlockPreTick.get()) return;
             BlockState needState = BlockReplaceUtils.INSTANCE.getScheState(blockPos);//获取需要的方块状态
             BlockState placeNeedState = BlockReplaceUtils.INSTANCE.normalReplaceState(needState);
-            PlaceDataPack placeDataPack = PlaceDataManager.getPlaceData(blockPos, placeNeedState);//获取放置数据
+            PlaceDataPack placeDataPack = PlaceDataManager.INSTANCE.getPlaceData(blockPos, placeNeedState);//获取放置数据
             if (placeDataPack.data().valid()) {//如果数据可用
                 if (!InvUtil.switchBlock(placeNeedState.getBlock())) {
                     timer.reset();
@@ -530,8 +535,7 @@ public class Printer extends LoaderAntiCrash {
         long timeStamp = System.currentTimeMillis();
         doPrint();
         if (bSetRunSpeed.get())
-            ChatUtils.sendMsg(Text.of("CalcTime:"+(System.currentTimeMillis()-timeStamp)));
-
+            ChatUtils.sendMsg(Text.of("CalcTime:" + (System.currentTimeMillis() - timeStamp)));
         RenderUtil.render(event);
     }
 //    @EventHandler

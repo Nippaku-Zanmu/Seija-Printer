@@ -11,7 +11,9 @@ import meteordevelopment.meteorclient.settings.Settings;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.block.SideShapeType;
+import net.minecraft.item.Item;
 import net.minecraft.text.Text;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -44,13 +46,18 @@ public class SideTest extends Module {
 
     @Override
     public void onActivate() {
-        HitResult crosshairTarget = mc.crosshairTarget;
-        if (crosshairTarget instanceof BlockHitResult) {
-            BlockPos blockPos = ((BlockHitResult) crosshairTarget).getBlockPos();
-            for (Direction dir : Direction.values()) {
-                BlockState blockState = mc.world.getBlockState(blockPos);
-                ChatUtils.sendMsg(Text.of(dir.name() + "::" + blockState.isSideSolid(mc.world, blockPos, dir, SideShapeType.FULL)));
-            }
-        }
+        ChatUtils.sendMsg(Text.of(""+ Item.BLOCK_ITEMS.get(Blocks.WATER)));
+//        HitResult crosshairTarget = mc.crosshairTarget;
+//        if (crosshairTarget instanceof BlockHitResult) {
+//            ChatUtils.sendMsg(Text.of(" "+ LiquidHelper.canPlaceLiquid(mc.player.getMainHandStack(),crosshairTarget.getPos()
+//            ,((BlockHitResult) crosshairTarget).getBlockPos().offset(((BlockHitResult) crosshairTarget).getSide()),
+//                ((BlockHitResult) crosshairTarget).getSide().getOpposite())));
+
+//            BlockPos blockPos = ((BlockHitResult) crosshairTarget).getBlockPos();
+//            for (Direction dir : Direction.values()) {
+//                BlockState blockState = mc.world.getBlockState(blockPos);
+//                ChatUtils.sendMsg(Text.of(dir.name() + "::" + blockState.isSideSolid(mc.world, blockPos, dir, SideShapeType.FULL)));
+
+
     }
 }

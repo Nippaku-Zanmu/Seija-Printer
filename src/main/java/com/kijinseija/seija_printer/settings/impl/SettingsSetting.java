@@ -49,7 +49,6 @@ public class SettingsSetting extends Setting<Settings> {
 
     @Override
     public NbtCompound save(NbtCompound tag) {
-        Addon.LOG.info("Val111" + value.toTag().asString());
         tag.put("settings", value.toTag());
         return tag;
     }
@@ -60,12 +59,8 @@ public class SettingsSetting extends Setting<Settings> {
         Settings settings = defaultValue;
         Addon.LOG.info("Def" + defaultValue.toTag().asString());
         if (settingsTag instanceof NbtCompound) {
-            Addon.LOG.info("Val222" + settingsTag.asString());
             settings.fromTag((NbtCompound) settingsTag);
-
         }
-        Addon.LOG.info("Val333" + settings.toTag().asString());
-
         return settings;
     }
 
@@ -78,9 +73,7 @@ public class SettingsSetting extends Setting<Settings> {
     public static class Builder extends SettingBuilder<Builder, Settings, SettingsSetting> {
 
         public Builder() {
-
             super(new Settings());
-            Addon.LOG.info("asdwad");
         }
 
         @Override

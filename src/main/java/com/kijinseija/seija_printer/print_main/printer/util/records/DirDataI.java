@@ -81,7 +81,7 @@ public record DirDataI(BlockPos placePos, List<Direction> dirs) {
             BlockHitResult result = RayTraceUtil.INSTANCE.getStrictVecResult(clickVec, offsetDir.getOpposite(), Printer.getINSTANCE().bSetLiquidInt.get(),1);
             if (result.getType() == HitResult.Type.MISS) return res;
             clickVec = result.getPos();
-            if (!RayTraceUtil.INSTANCE.rayTrace(clickVec))
+            if (!RayTraceUtil.INSTANCE.rayTrace(placePos,offsetDir,clickVec))
                 return res;
         }
         res.add(clickVec);
@@ -111,7 +111,7 @@ public record DirDataI(BlockPos placePos, List<Direction> dirs) {
                     if (strictVecResult.getType() == HitResult.Type.MISS) {
                         return null;
                     }
-                    if (!RayTraceUtil.INSTANCE.rayTrace(strictVecResult.getPos()))
+                    if (!RayTraceUtil.INSTANCE.rayTrace(placePos,offsetDir,strictVecResult.getPos()))
                         return null;
                     return strictVecResult.getPos();
                 })

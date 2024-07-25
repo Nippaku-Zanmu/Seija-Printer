@@ -1,6 +1,7 @@
 package com.kijinseija.seija_printer.print_main.printer.placedata_getter;
 
 import com.kijinseija.seija_printer.print_main.modules.Printer;
+import com.kijinseija.seija_printer.print_main.printer.extra_setting.HasExtraSetting;
 import com.kijinseija.seija_printer.print_main.printer.placedata_getter.vanilla_precision_placer.DataGetter;
 import com.kijinseija.seija_printer.print_main.printer.util.BlockUtil;
 import com.kijinseija.seija_printer.print_main.printer.util.InvUtil;
@@ -8,6 +9,8 @@ import com.kijinseija.seija_printer.print_main.printer.util.records.DirData;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
 import com.kijinseija.seija_printer.print_main.printer.placedata_getter.getter.*;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceDataPack;
+import meteordevelopment.meteorclient.settings.SettingGroup;
+import meteordevelopment.meteorclient.settings.Settings;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
@@ -17,14 +20,14 @@ import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class PlaceDataManager {
+public class PlaceDataManager implements HasExtraSetting {
     public static final PlaceDataManager INSTANCE = new PlaceDataManager();
-    private static final Printer pri = Printer.getINSTANCE();
     private static final MinecraftClient mc = MinecraftClient.getInstance();
 
-    public static PlaceDataPack getPlaceData(BlockPos pos, BlockState needState) {
+    public  PlaceDataPack getPlaceData(BlockPos pos, BlockState needState) {
         if (!mc.world.getBlockState(pos).isReplaceable())
             return PlaceDataPack.NULL;
         //若某位置已有不可被替换的方块 则返回
@@ -39,7 +42,7 @@ public class PlaceDataManager {
             return PlaceDataPack.NULL;
 
         }
-        return PlaceDataManager.INSTANCE.getPlaceData(pos, needState, dirs, stacks);
+        return getPlaceData(pos, needState, dirs, stacks);
     }
 
     /**
@@ -56,14 +59,13 @@ public class PlaceDataManager {
         //ChatUtils.sendMsg(Text.of("GetData2"));
 //        if (true)
 //            return DataGetter.getData(needState, new DirData(pos, dirs), stacks.get(0));
-
+        Printer pri = Printer.INSTANCE;
         if (pri.bSetEnablePrecisionPlace.get())//是否启用精准放置
             try {
                 for (AbstractDataGetter dataGetter : dataGetters) {
                     //遍历所有数据获取器,以求更加精准的放置数据
                     if (dataGetter.isSuitable(needState, pos)) {
                         //适合则进行数据获取
-                        //  ChatUtils.sendMsg(Text.of("RetData"));
                         return PlaceDataPack.plac(dataGetter.getData(needState, dirData));
                     }
                 }
@@ -89,6 +91,7 @@ public class PlaceDataManager {
 
     private PlaceDataManager() {
         //精准放置规则注册表
+        dataGetters.add(new BuckedDataGetter());
 //        dataGetters.add(new ClickDirDataGetter());
 //        dataGetters.add(new HFaceDirOppositeDataGetter());
 //        dataGetters.add(new RedStoneGateDataGetter());
@@ -110,5 +113,15 @@ public class PlaceDataManager {
 //        dataGetters.add(new ObserverDataGetter());
 //        dataGetters.add(new SignDataGetter());
 //        dataGetters.add(new HangingSignDataGetter());
+
+    }
+
+    @Override
+    public SettingGroup getSettingGroup(Settings settings) {
+        SettingGroup sgDatagetter = settings.createGroup("PlaceDataGetter");
+        for (AbstractDataGetter dataGetter : dataGetters) {
+            Arrays.stream(dataGetter.getSettings()).forEach(sgDatagetter::add);
+        }
+        return sgDatagetter;
     }
 }

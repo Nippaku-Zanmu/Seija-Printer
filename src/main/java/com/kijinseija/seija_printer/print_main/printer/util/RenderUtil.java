@@ -1,5 +1,6 @@
 package com.kijinseija.seija_printer.print_main.printer.util;
 
+import com.kijinseija.seija_printer.Addon;
 import com.kijinseija.seija_printer.print_main.modules.Printer;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PosInfo;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
@@ -30,7 +31,6 @@ public class RenderUtil {
     public static void render(Render3DEvent event) {
         updateRenderList();
         if (pri.eSetRenderMode.get() == Printer.RenderMode.ANIMATION && !renderList.isEmpty() && aniRenderSize != 0) {
-
             animationRender(event);
         } else if (pri.eSetRenderMode.get() == Printer.RenderMode.MULTI) {
             multiRender(event);
@@ -63,7 +63,6 @@ public class RenderUtil {
             Vec3d center = pi.clickVec();
             Vec3d c1 = pi.clickVec();
             Vec3d c2 = pi.clickVec();
-
             for (Direction.Axis ax : Direction.Axis.values()) {
                 if (ax.equals(dir.getAxis())) continue;
                 c1 = c1.offset(Direction.from(ax, Direction.AxisDirection.NEGATIVE), 0.15);
@@ -75,7 +74,6 @@ public class RenderUtil {
             Vec3d centerPos = pi.pos().toCenterPos();
             event.renderer.line(center.x,center.y,center.z, off.x, off.y, off.z,pi.isPlaceMode()?Color.WHITE:Color.BLACK);
             event.renderer.box(new Box(centerPos.add(0.05,0.05,0.05),centerPos.add(-0.05,-0.05,-0.05)),Color.ORANGE,pri.colSetOutLineColor.get(),ShapeMode.Both,1);
-
         });
     }
 

@@ -9,21 +9,23 @@ import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Predicate;
-
 
 
 public class InvUtil {
@@ -33,11 +35,11 @@ public class InvUtil {
     private static void invSwitch(int slot, int hotbarSlot) {
         switch (pri.eSetInvSwitchMode.get()) {
             case SWAP:
-                 invSwap(slot, hotbarSlot);
-                 break;
+                invSwap(slot, hotbarSlot);
+                break;
             case PICK:
-                 InvUtils.move().from(slot).to(hotbarSlot);
-                 break;
+                InvUtils.move().from(slot).to(hotbarSlot);
+                break;
         }
     }
 
@@ -54,23 +56,34 @@ public class InvUtil {
     }
 
     public static boolean switchBlock(Block b) {
-        return switchItem(stack -> stack.getItem().equals(Item.BLOCK_ITEMS.get(b)));
+        return switchItem(stack -> stack.getItem().equals(getItemFormBlock(b)),b);
+    }
+    public static boolean switchItem(Predicate<ItemStack> p){
+        return switchItem(p,null);
     }
 
-    public static boolean switchItem(Predicate<ItemStack> p) {
+    public static boolean switchItem(Predicate<ItemStack> p,Block b) {
         FindItemResult resHot = InvUtils.findInHotbar(p);
         if (resHot.found()) {
             InvUtils.swap(resHot.slot(), false);
-            if ((!pri.bSetAntiWrongBlock.get())||p.test(mc.player.getMainHandStack()))
+            if ((!pri.bSetAntiWrongBlock.get()) || p.test(mc.player.getMainHandStack()))
                 return true;
             return false;
         }
+        if (isCreativeMode()&&b!=null) {
 
-        FindItemResult res = InvUtils.find(p);
-        if (!res.found()) return false;
+            mc.player.getInventory().addPickBlock(mc.player.getStackInHand(Hand.MAIN_HAND));
+            mc.interactionManager.clickCreativeStack(new ItemStack(b,1),
+                36 + getSlot());
+
+        } else {
+            FindItemResult res = InvUtils.find(p);
+            if (!res.found()) return false;
 //        invSwap(res.slot(), getInvSwapSlot());
-        invSwitch(res.slot(),getInvSwapSlot());
-        //InvUtils.move().from(res.slot()).to(mc.player.getInventory().selectedSlot);
+            invSwitch(res.slot(), getInvSwapSlot());
+            //InvUtils.move().from(res.slot()).to(mc.player.getInventory().selectedSlot);
+
+        }
         if (pri.bSetAntiWrongBlock.get() || pri.bSetIndirectInvSwap.get())
             return false;
         return true;
@@ -120,13 +133,17 @@ public class InvUtil {
 
     public static boolean findBlock(Block b) {
 
-        return findItem(stack -> stack.getItem().equals(Item.BLOCK_ITEMS.get(b)));
+        return findItem(stack -> stack.getItem().equals(getItemFormBlock(b))) || isCreativeMode();
     }
 
     public static LinkedList<ItemStack> getBlockStacks(Block b) {
         final LinkedList<ItemStack> stacks = new LinkedList<>();
+        if (isCreativeMode()){
+            stacks.add(new ItemStack(b,1));
+            return stacks;
+        }
         findItem(stack -> {
-            boolean equals = stack.getItem().equals(Item.BLOCK_ITEMS.get(b));
+            boolean equals = stack.getItem().equals(getItemFormBlock(b));
             if (equals) {
                 stacks.add(stack);
             }
@@ -137,5 +154,16 @@ public class InvUtil {
 
     public static boolean findItem(Predicate<ItemStack> p) {
         return InvUtils.find(p).found();
+    }
+
+    public static Item getItemFormBlock(Block b) {
+        if (b.equals(Blocks.WATER)) return Items.WATER_BUCKET;
+        if (b.equals(Blocks.LAVA)) return Items.LAVA_BUCKET;
+        if (b.equals(Blocks.POWDER_SNOW)) return Items.POWDER_SNOW_BUCKET;
+        return Item.BLOCK_ITEMS.get(b);
+    }
+
+    public static boolean isCreativeMode() {
+        return mc.player.getAbilities().creativeMode;
     }
 }

@@ -1,5 +1,6 @@
 package com.kijinseija.seija_printer.loader;
 
+import com.kijinseija.seija_printer.Addon;
 import com.kijinseija.seija_printer.print_main.printer.util.RenderHelper;
 import com.kijinseija.seija_printer.print_main.printer.util.RenderUtil;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;

@@ -3,6 +3,7 @@ package com.kijinseija.seija_printer.print_main.printer.placedata_getter;
 import com.kijinseija.seija_printer.print_main.printer.util.records.DirData;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
 import com.kijinseija.seija_printer.print_main.modules.Printer;
+import meteordevelopment.meteorclient.settings.Setting;
 import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 
@@ -26,4 +27,7 @@ public abstract class AbstractDataGetter {
      * @return {@link boolean}是否适用于此精准放置数据获取器
      */
     public abstract boolean isSuitable(BlockState needState,BlockPos pos);
+    public Setting[] getSettings(){
+        return new Setting[]{};
+    };
 }

@@ -12,6 +12,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
+import net.minecraft.item.BucketItem;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 import net.minecraft.network.packet.c2s.play.HandSwingC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
@@ -45,7 +46,7 @@ public class BlockUtil {
 
     public static void interactBlock(PlaceData data) {
         Vec3d hitVec = data.hitVec();
-        BlockPos pos = data.pos();
+        final BlockPos.Mutable pos = new BlockPos.Mutable(data.pos().getX(), data.pos().getY(), data.pos().getZ());
         Direction dir = data.dir();
         Runnable r = () -> {
             if (pri.bSetIllegalRotate.get() && data.exRotateData() != null) {
@@ -106,11 +107,13 @@ public class BlockUtil {
     }
 
     public static void placeBlock(PlaceData data) {
-        final BlockPos pos = data.pos();
+        final BlockPos.Mutable pos = new BlockPos.Mutable(data.pos().getX(), data.pos().getY(), data.pos().getZ());
 
 
         Direction dir = data.dir();
         Vec3d hitVec = data.hitVec();
+        final boolean isBucket = mc.player.getMainHandStack().getItem() instanceof BucketItem;
+
         Runnable r = () -> {
             boolean sneakToggle = false;
             if (pri.bSetSneak.get()) {
@@ -122,7 +125,9 @@ public class BlockUtil {
             }
             //非法转头
             illegalRotate(data.exRotateData());
-
+            if (isBucket) {
+                mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
+            }
             if (pri.bSetPacketPlace.get()) {
                 mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, getHitRes(pos, dir, hitVec), SeijaUtil.getSequence()));
                 mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
@@ -130,6 +135,7 @@ public class BlockUtil {
                 mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, getHitRes(pos, dir, hitVec));
                 mc.player.swingHand(Hand.MAIN_HAND);
             }
+
 //            if (pri.illegalRotate.get() && data.exRotateData() != null) {
 //                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.exRotateData().yaw(), (float) data.exRotateData().pitch(), mc.player.isOnGround()));
 //            }
@@ -143,7 +149,7 @@ public class BlockUtil {
             pri.blackList.add(blackInfo);
             RenderUtil.renderList.add(blackInfo);
         };
-        if (pri.bSetRotate.get()) {
+        if (pri.bSetRotate.get() || isBucket) {
             if (pri.bSetPacketRotate.get()) {
                 mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) SeijaUtil.getYaw(hitVec), (float) SeijaUtil.getPitch(hitVec), mc.player.isOnGround()));
                 r.run();
@@ -227,30 +233,50 @@ public class BlockUtil {
         return blocks;
     }
 
+    public static List<Class<? extends Block>> canUseBlcks = new ArrayList<>(Arrays.asList(
+        AbstractChestBlock.class, AbstractFurnaceBlock.class, CraftingTableBlock.class,
+        LeverBlock.class,
+        DoorBlock.class, TrapdoorBlock.class, BedBlock.class, RedstoneWireBlock.class,
+        ScaffoldingBlock.class,
+        HopperBlock.class, EnchantingTableBlock.class, NoteBlock.class, JukeboxBlock.class,
+        CakeBlock.class,
+        FenceGateBlock.class, BrewingStandBlock.class, DragonEggBlock.class, CommandBlock.class,
+        BeaconBlock.class, AnvilBlock.class, ComparatorBlock.class, RepeaterBlock.class,
+        DropperBlock.class, DispenserBlock.class, ShulkerBoxBlock.class, LecternBlock.class,
+        FlowerPotBlock.class, BarrelBlock.class, BellBlock.class, SmithingTableBlock.class,
+        LoomBlock.class, CartographyTableBlock.class, GrindstoneBlock.class,
+        StonecutterBlock.class, AbstractSignBlock.class, AbstractCandleBlock.class));
+
     public static boolean isCanUseBlock(BlockPos p, BlockState state, World world) {
         Block block = state.getBlock();
+        for (Class<? extends Block> canUseBlck : canUseBlcks) {
+            if (canUseBlck.isInstance(block)) {
+                return true;
+            }
+        }
+        return state.createScreenHandlerFactory(world, p) != null;
 //        if (true)return false;//test
-        return (block instanceof AbstractRedstoneGateBlock
-            || block instanceof BlockWithEntity
-            || block instanceof ScaffoldingBlock
-            || block instanceof DoorBlock
-            || block instanceof TrapdoorBlock
-            || block instanceof FenceGateBlock
-            || block instanceof WallMountedBlock
-            || block instanceof ChestBlock
-            || block instanceof AnvilBlock
-            || block instanceof CraftingTableBlock
-            || block instanceof LoomBlock
-            || block instanceof EnderChestBlock
-            || block instanceof EnchantingTableBlock
-            || block instanceof SmithingTableBlock
-            || block instanceof GrindstoneBlock
-            || block instanceof StonecutterBlock
+//        return (block instanceof AbstractRedstoneGateBlock
+//            || block instanceof BlockWithEntity
+//            || block instanceof ScaffoldingBlock
+//            || block instanceof DoorBlock
+//            || block instanceof TrapdoorBlock
+//            || block instanceof FenceGateBlock
+//            || block instanceof WallMountedBlock
+//            || block instanceof ChestBlock
+//            || block instanceof AnvilBlock
+//            || block instanceof CraftingTableBlock
+//            || block instanceof LoomBlock
+//            || block instanceof EnderChestBlock
+//            || block instanceof EnchantingTableBlock
+//            || block instanceof SmithingTableBlock
+//            || block instanceof GrindstoneBlock
+//            || block instanceof StonecutterBlock
+//
+//        )
+//            || (state.createScreenHandlerFactory(world, p) != null)
+        //调用createScreenHandlerFactory检测对帧率影响极大
 
-        )
-            || (state.createScreenHandlerFactory(world, p) != null)
-            //调用createScreenHandlerFactory检测对帧率影响极大
-            ;
 
     }
 

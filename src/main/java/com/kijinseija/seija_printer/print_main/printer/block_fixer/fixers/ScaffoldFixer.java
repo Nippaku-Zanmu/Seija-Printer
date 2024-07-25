@@ -21,7 +21,7 @@ import net.minecraft.util.math.Vec3d;
 import java.util.List;
 
 public class ScaffoldFixer extends AbstractFixer {
-    private static final Printer pri = Printer.getINSTANCE();
+
 
     public ScaffoldFixer() {
         super("ScaffoldFix");
