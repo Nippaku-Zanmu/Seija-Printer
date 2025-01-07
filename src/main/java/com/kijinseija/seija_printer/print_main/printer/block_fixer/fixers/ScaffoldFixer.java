@@ -43,16 +43,18 @@ public class ScaffoldFixer extends AbstractFixer {
                 for (Vec3d clickVec : dataI.clickVecs(Direction.UP)) {
 
                     PlaceData interactData = PlaceData.NULL;
-                    if (pri.bSetIllegalRotate.get()) {
+                    if (pri().bSetIllegalRotate.get()) {
                         interactData = new PlaceData(helperPos, Direction.UP, clickVec, true, BlockRotDataGetter.getRotateDataFromDir(off.getOpposite()));
-                    } else if (Direction.fromRotation(SeijaUtil.getYaw(clickVec)) == off.getOpposite()) {
+                    } else if (Direction.fromHorizontalDegrees(SeijaUtil.getYaw(clickVec)) == off.getOpposite())
+                        //1.21 Direction.fromRotation
+                    {
                         interactData = new PlaceData(helperPos, Direction.UP, clickVec, true, null);
                     }
                     if (interactData.valid()){
                         if (InvUtil.switchBlock(Blocks.SCAFFOLDING)) {
                             BlockUtil.interactBlock(interactData);
                             PosInfo blackInfo = new PosInfo(pos, off, clickVec, false, System.currentTimeMillis(), Color.BLACK);
-                            pri.blackList.add(blackInfo);
+                            pri().blackList.add(blackInfo);
                             return SUCCESS;
                         }else return RETURN;
                     }
@@ -66,7 +68,7 @@ public class ScaffoldFixer extends AbstractFixer {
                         if (InvUtil.switchBlock(Blocks.SCAFFOLDING)) {
                             BlockUtil.interactBlock(interactData);
                             PosInfo blackInfo = new PosInfo(pos, off, clickVec, false, System.currentTimeMillis(), Color.BLACK);
-                            pri.blackList.add(blackInfo);
+                            pri().blackList.add(blackInfo);
                             return SUCCESS;
                         }else return RETURN;
                     }

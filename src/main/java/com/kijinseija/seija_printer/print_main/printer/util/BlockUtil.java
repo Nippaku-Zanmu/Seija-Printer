@@ -50,7 +50,7 @@ public class BlockUtil {
         Direction dir = data.dir();
         Runnable r = () -> {
             if (pri.bSetIllegalRotate.get() && data.exRotateData() != null) {
-                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.exRotateData().yaw(), (float) data.exRotateData().pitch(), mc.player.isOnGround()));
+                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.exRotateData().yaw(), (float) data.exRotateData().pitch(), mc.player.isOnGround(),mc.player.horizontalCollision));
             }//非法转头
             if (pri.bSetPacketPlace.get()) {
                 mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, getHitRes(pos, dir, hitVec), SeijaUtil.getSequence()));
@@ -65,7 +65,7 @@ public class BlockUtil {
         };
         if (pri.bSetRotate.get()) {
             if (pri.bSetPacketRotate.get()) {
-                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) SeijaUtil.getYaw(hitVec), (float) SeijaUtil.getPitch(hitVec), mc.player.isOnGround()));
+                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) SeijaUtil.getYaw(hitVec), (float) SeijaUtil.getPitch(hitVec), mc.player.isOnGround(),mc.player.horizontalCollision));
                 r.run();
             } else
                 Rotations.rotate(SeijaUtil.getYaw(hitVec), SeijaUtil.getPitch(hitVec), r);
@@ -151,7 +151,7 @@ public class BlockUtil {
         };
         if (pri.bSetRotate.get() || isBucket) {
             if (pri.bSetPacketRotate.get()) {
-                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) SeijaUtil.getYaw(hitVec), (float) SeijaUtil.getPitch(hitVec), mc.player.isOnGround()));
+                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) SeijaUtil.getYaw(hitVec), (float) SeijaUtil.getPitch(hitVec), mc.player.isOnGround(),mc.player.horizontalCollision));
                 r.run();
             } else
                 Rotations.rotate(SeijaUtil.getYaw(hitVec), SeijaUtil.getPitch(hitVec), r);
@@ -166,10 +166,10 @@ public class BlockUtil {
             if (mc.isInSingleplayer()) {
                 mc.player.prevYaw = (float) data.yaw();
                 PlayerMoveC2SPacket packet = new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), (float) data.yaw(),
-                    (float) data.pitch(), mc.player.isOnGround());
+                    (float) data.pitch(), mc.player.isOnGround(),mc.player.horizontalCollision);
                 mc.player.networkHandler.sendPacket(packet);
             } else
-                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.yaw(), (float) data.pitch(), mc.player.isOnGround()));
+                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.yaw(), (float) data.pitch(), mc.player.isOnGround(),mc.player.horizontalCollision));
 
         }
     }

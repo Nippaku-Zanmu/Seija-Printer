@@ -45,7 +45,7 @@ public class InvUtil {
 
     private static boolean invSwap(int slot, int hotBarSlot) {
         if (slot >= 0) {
-            ScreenHandler handler = ((MinecraftClient) MeteorClient.mc).player.currentScreenHandler;
+            ScreenHandler handler = mc.player.currentScreenHandler;
             Int2ObjectArrayMap stack = new Int2ObjectArrayMap();
             stack.put(slot, handler.getSlot(slot).getStack());
             MeteorClient.mc.getNetworkHandler().sendPacket((Packet) new ClickSlotC2SPacket(handler.syncId, handler.getRevision(), slot, hotBarSlot, SlotActionType.SWAP, mc.player.currentScreenHandler.getCursorStack().copy(), (Int2ObjectMap) stack));
@@ -72,7 +72,7 @@ public class InvUtil {
         }
         if (isCreativeMode()&&b!=null) {
 
-            mc.player.getInventory().addPickBlock(mc.player.getStackInHand(Hand.MAIN_HAND));
+           // mc.player.getInventory().(mc.player.getStackInHand(Hand.MAIN_HAND));
             mc.interactionManager.clickCreativeStack(new ItemStack(b,1),
                 36 + getSlot());
 

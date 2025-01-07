@@ -19,7 +19,10 @@ public abstract class AbstractFixer {
     }
 
 
-    public Printer pri = Printer.getINSTANCE();
+    public Printer pri(){
+        return Printer.getINSTANCE();
+    }
+
     public BoolSetting bSetEnable;
 
     /**
