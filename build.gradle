@@ -2,7 +2,7 @@
 //file:noinspection GrDeprecatedAPIUsage
 plugins {
 
-    id "fabric-loom" version "1.8-SNAPSHOT"
+    id "fabric-loom" version "1.9-SNAPSHOT"
     id 'maven-publish'
 }
 
@@ -15,7 +15,7 @@ group = project.maven_group
 
 
 repositories {
-    jcenter()
+//    jcenter()
 
     maven {
         name = "jitpack"
@@ -41,6 +41,8 @@ repositories {
     }
 //    flatDir { dirs 'D://hack/SeijaLib' }
     maven { url 'file:///D://hack/SeijaLib'}
+
+    mavenCentral()
 }
 loom {
     accessWidenerPath = file("src/main/resources/seija-printer.accesswidener")
@@ -84,4 +86,33 @@ processResources {
 
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding("UTF-8")
+}
+
+tasks {
+    processResources {
+        def propertyMap = [
+            "version"   : project.version,
+            "mc_version": project.minecraft_version,
+        ]
+
+        filesMatching("fabric.mod.json") {
+            expand(propertyMap)
+        }
+    }
+
+    jar {
+//        from("LICENSE") {
+//            rename { "${it}_${project.base.archivesBaseName}" }
+//        }
+    }
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        it.options.encoding = "UTF-8"
+        it.options.release = 21
+    }
 }
