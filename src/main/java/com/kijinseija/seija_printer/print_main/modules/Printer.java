@@ -343,7 +343,7 @@ public class Printer extends LoaderAntiCrash {
     );
 
     public final Setting<SettingColor> colSetFillColor = sgRendering.add(new ColorSetting.Builder()
-        .name("colour")
+        .name("fill-color")
         .description("The cubes colour.")
         .defaultValue(new SettingColor(95, 190, 100))
         .visible(bSetRenderFill::isVisible)
@@ -356,7 +356,7 @@ public class Printer extends LoaderAntiCrash {
         .build()
     );
     public final Setting<SettingColor> colSetOutLineColor = sgRendering.add(new ColorSetting.Builder()
-        .name("outLine")
+        .name("outLine-color")
         .description("The cubes outline colour.")
         .defaultValue(new SettingColor(95, 190, 255))
         .visible(bSetRenderOutline::isVisible)

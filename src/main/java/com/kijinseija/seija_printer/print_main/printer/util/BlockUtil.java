@@ -75,9 +75,10 @@ public class BlockUtil {
     }
 
     public static List<Direction> getSortedDirs(BlockPos pos) {
-        if (pri.bSetSortDir.get())
-            return DirSorter.sort(getDirs(pos), pos);
-        return getDirs(pos);
+        return pri.bSetSortDir.get()?DirSorter.sort(getDirs(pos), pos):getDirs(pos);
+//        if ()
+//            return ;
+//        return ;
     }
 
     public static List<Direction> getDirs(BlockPos pos) {
