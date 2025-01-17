@@ -15,27 +15,27 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ *  方块替换计算
+ *  用于计算投影中某位置方块状态应该替换为啥样的
+ */
 public class BlockReplaceUtils {
     public static final BlockReplaceUtils INSTANCE = new BlockReplaceUtils();
     static MinecraftClient mc = MinecraftClient.getInstance();
     Printer pri = Printer.getINSTANCE();
 
+
+    /**
+     * 桥模式时计算周围方块是否需要支持时使用
+     *
+     * @param pos pos
+     * @return {@link BlockState}
+     * @see BlockState
+     */
+
+
     public BlockState getScheState(BlockPos pos) {
         return replaceState(SchematicWorldHandler.getSchematicWorld().getBlockState(pos), pos);
-    }
-    private BlockState getScheStateBridege(BlockPos pos){
-        BlockState state = SchematicWorldHandler.getSchematicWorld().getBlockState(pos);
-        BlockState repState = needBlockReplace(state, pos,false).getDefaultState();
-        try {
-            for (Property property : state.getProperties()) {
-                repState = repState.with(property, state.get(property));
-            }
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return repState;
     }
 
     public BlockState replaceState(BlockState state, BlockPos pos) {
@@ -117,7 +117,7 @@ public class BlockReplaceUtils {
         {
             for (Direction direction : interactDir) {
                 if (pri.liSetBridgeDirs.get().contains(direction)//是可以用的方位
-                    && !BlockUtil.isCanPlaceInBlock(getScheStateBridege(pos.offset(direction)).getBlock())
+                    && !BlockUtil.isCanPlaceInBlock(getScheStateBridegeMode(pos.offset(direction)).getBlock())
                     //被支持的方块是投影中是需要放置的方块
                     && BlockUtil.getDirs(pos.offset(direction)).isEmpty()//被支持的方块不能直接放置
                     &&BlockUtil.canPlaceIn(pos.offset(direction))//被支持的方块还没被放置
@@ -134,8 +134,27 @@ public class BlockReplaceUtils {
         return null;
     }
 
-    public final Map<Block, Block> strippedMap = new HashMap<>();
+    private BlockState getScheStateBridegeMode(BlockPos pos){
+        BlockState state = SchematicWorldHandler.getSchematicWorld().getBlockState(pos);
+        BlockState repState = needBlockReplace(state, pos,false).getDefaultState();
+        try {
+            for (Property property : state.getProperties()) {
+                repState = repState.with(property, state.get(property));
+            }
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return repState;
+    }
 
+
+
+
+
+    public final Map<Block, Block> strippedMap = new HashMap<>();
+    //把mc的Map反过来 方便查询
     private void initMap() {
         for (Map.Entry<Block, Block> blockBlockEntry : AxeItem.STRIPPED_BLOCKS.entrySet()) {
             strippedMap.put(blockBlockEntry.getValue(), blockBlockEntry.getKey());

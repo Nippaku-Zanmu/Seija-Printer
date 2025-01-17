@@ -1,6 +1,7 @@
 package com.kijinseija.seija_printer.print_main.printer.util;
 
 import com.kijinseija.seija_printer.print_main.modules.Printer;
+import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
@@ -30,7 +31,9 @@ public class SurfaceUtil {
         }
         surface.remove(pos);
         for (BlockPos blockPos : surface) {
-            if (!BlockReplaceUtils.INSTANCE.getScheState(blockPos).isSolid()) return true;
+
+            if ((!BlockReplaceUtils.INSTANCE.getScheState(blockPos).isSolid())
+                ||BlockReplaceUtils.INSTANCE.getScheState(blockPos).isFullCube(SchematicWorldHandler.getSchematicWorld(),blockPos)) return true;
         }
         return false;
     }

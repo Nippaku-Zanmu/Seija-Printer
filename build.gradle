@@ -26,10 +26,7 @@ repositories {
     maven { url = "https://www.cursemaven.com" }
     maven { url = "https://masa.dy.fi/maven" }
 
-    maven {
-        name = "meteor-maven"
-        url = "https://maven.meteordev.org/releases"
-    }
+
 
     maven {
         name = "Meteor Dev Releases"
@@ -57,8 +54,8 @@ dependencies {
     // Meteor(1.20.1)
 //    modImplementation "meteordevelopment:meteor-client:${project.meteor_version}"
     //Meteor(1.21)
-    modImplementation files('D:\\hack\\SeijaLib\\meteor-client-0.6.0-2229.jar')
-
+//    modImplementation files('D:\\hack\\SeijaLib\\meteor-client-0.6.0-2229.jar')
+    modImplementation "meteordevelopment:meteor-client:${project.minecraft_version}-SNAPSHOT"
 
     //modImplementation "baritone:fabric:${project.minecraft_version}-SNAPSHOT"
 
