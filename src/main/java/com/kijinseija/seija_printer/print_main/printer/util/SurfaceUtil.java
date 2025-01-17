@@ -33,7 +33,7 @@ public class SurfaceUtil {
         for (BlockPos blockPos : surface) {
 
             if ((!BlockReplaceUtils.INSTANCE.getScheState(blockPos).isSolid())
-                ||BlockReplaceUtils.INSTANCE.getScheState(blockPos).isFullCube(SchematicWorldHandler.getSchematicWorld(),blockPos)) return true;
+                ||(!BlockReplaceUtils.INSTANCE.getScheState(blockPos).isFullCube(SchematicWorldHandler.getSchematicWorld(),blockPos))) return true;
         }
         return false;
     }
