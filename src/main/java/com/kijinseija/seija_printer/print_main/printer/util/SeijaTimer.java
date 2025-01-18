@@ -2,6 +2,15 @@ package com.kijinseija.seija_printer.print_main.printer.util;
 
 
 public class SeijaTimer {
+    private long time = -1L;
+    private Runnable onReset;
+    public SeijaTimer(Runnable onReset){
+        this.onReset = onReset;
+    }
+    public SeijaTimer() {
+
+    }
+
     public long getMsTime() {
         return time;
     }
@@ -10,7 +19,7 @@ public class SeijaTimer {
         return time;
     }
 
-    private long time = -1L;
+
 
     public boolean passedS(double s) {
         return this.getMs(System.currentTimeMillis() - this.time) >= (long) (s * 1000.0);
@@ -40,6 +49,7 @@ public class SeijaTimer {
 
     public SeijaTimer reset() {
         this.time = System.currentTimeMillis();
+        if (onReset!=null)onReset.run();
         return this;
     }
 

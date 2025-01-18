@@ -1,6 +1,5 @@
 package com.kijinseija.seija_printer.print_main.modules;
 
-import com.google.common.eventbus.Subscribe;
 import com.kijinseija.seija_printer.Addon;
 import com.kijinseija.seija_printer.loader.LoaderAntiCrash;
 import com.kijinseija.seija_printer.print_main.printer.block_fixer.AbstractFixer;
@@ -12,19 +11,24 @@ import com.kijinseija.seija_printer.print_main.printer.util.*;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceDataPack;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PosInfo;
 import com.kijinseija.seija_printer.settings.impl.DirectionListSetting;
+import com.kijinseija.seija_printer.settings.impl.DoubleRangeSetting;
 import com.kijinseija.seija_printer.settings.impl.SettingsSetting;
+import com.kijinseija.seija_printer.settings.obj.DoubleRange;
+import com.kijinseija.seija_printer.settings.widgets.input.WDoubleRangeEdit;
+import com.kijinseija.seija_printer.settings.widgets.input.WIntRangeEdit;
 import fi.dy.masa.litematica.data.DataManager;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.gui.GuiTheme;
+import meteordevelopment.meteorclient.gui.utils.Cell;
 import meteordevelopment.meteorclient.gui.widgets.WWidget;
 import meteordevelopment.meteorclient.gui.widgets.containers.WVerticalList;
+import meteordevelopment.meteorclient.gui.widgets.input.WSlider;
 import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
-import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -67,15 +71,15 @@ public class Printer extends LoaderAntiCrash {
         .description("The block place range.")
         .defaultValue(4.7)
         .min(0).sliderMin(0)
-        .sliderMax(6)
+        .max(16).sliderMax(6)
         .build()
     );
-    public final Setting<Double> dSetPrintingYDistance = sgBasicCalc.add(new DoubleSetting.Builder()
-        .name("PrintingYDistance")
+    public final Setting<DoubleRange> dRangeSetPrintingYRange = sgBasicCalc.add(new DoubleRangeSetting.Builder()
+        .name("PrintingYRange")
         .description("Maximum depth.")
-        .defaultValue(2.5)
-        .min(0).sliderMin(0)
-        .sliderMax(6)
+        .defaultValue(-3,4)
+            .range(-16,16)
+            .sliderRange(-6,6)
         .build()
     );
     public final Setting<Double> dSetAntiReplaceTime = sgBasicCalc.add(new DoubleSetting.Builder()
@@ -86,10 +90,10 @@ public class Printer extends LoaderAntiCrash {
         .sliderMax(1000)
         .build()
     );
-    private final Setting<Integer> iSetPrintingDelay = sgBasicCalc.add(new IntSetting.Builder()
+    private final Setting<DoubleRange> dRangeSetPrintingDelay = sgBasicCalc.add(new DoubleRangeSetting.Builder()
         .name("PrintingDelay")
         .description("Delay between printing blocks in ticks.")
-        .defaultValue(51)
+        .defaultValue(100,150)
         .min(0).sliderMin(0)
         .max(10000).sliderMax(1000)
         .build()
@@ -376,6 +380,18 @@ public class Printer extends LoaderAntiCrash {
     @Override
     public WWidget getWidget(GuiTheme theme) {
         WVerticalList list = theme.verticalList();
+
+//        Cell<WSlider> add = list.add(theme.slider(10, 1, 2000));
+//        add.widget().minWidth = 200;
+//        WDoubleRangeEdit widget = new WDoubleRangeEdit(10, 20, 0, 100,0,100,3,false);
+//        widget.theme = theme;
+//        widget.minWidth = 200;
+//        list.add(widget);
+//        WIntRangeEdit widget1 = new WIntRangeEdit(10, 20, 0, 100,0,100,3,false);
+//        widget1.theme = theme;
+//        widget1.minWidth = 200;
+//        list.add(widget1);
+        //test
         WButton selectFile = list.add(theme.button("Select File")).widget();
         selectFile.action = () -> {
             String path = TinyFileDialogs.tinyfd_openFileDialog(
@@ -451,7 +467,7 @@ public class Printer extends LoaderAntiCrash {
     public final HashMap<Block, List<Block>> replaceMap = new HashMap<>();
 
 
-    SeijaTimer timer = new SeijaTimer();
+    SeijaTimer timer = new SeijaTimer(()->dRangeSetPrintingDelay.get().nextRandom());
     public final List<PosInfo> blackList = Collections.synchronizedList(new ArrayList<>());
 
     private boolean isInBlackList(BlockPos pos) {
@@ -468,7 +484,7 @@ public class Printer extends LoaderAntiCrash {
 
 
     public void doPrint() {
-        if (!timer.passed(iSetPrintingDelay.get())) return;
+        if (!timer.passed(dRangeSetPrintingDelay.get().getCurrentRandom())) return;
         if (mc.player == null || mc.world == null) return;
         //刷掉过时的黑名单方块
         blackList.removeIf(b -> System.currentTimeMillis() - b.timestamp() > dSetAntiReplaceTime.get());

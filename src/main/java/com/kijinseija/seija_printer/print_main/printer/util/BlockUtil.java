@@ -10,7 +10,6 @@ import net.minecraft.block.enums.BedPart;
 import net.minecraft.block.enums.DoubleBlockHalf;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.decoration.ArmorStandEntity;
 import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.BucketItem;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
@@ -36,7 +35,7 @@ public class BlockUtil {
     public static List<Direction> getInteractDir(BlockPos pos) {
         return (pri.bSetStrictDir.get() ? canTorchFac(pos) : Arrays.asList(Direction.values())).stream()
             .filter(dir -> (!pri.bSetStrictDir.get()) || canPlaceIn(pos.offset(dir)))
-            .filter(dir -> mc.player.getY() - pos.toCenterPos().offset(dir, 0.5).y < pri.dSetPrintingYDistance.get())
+            .filter(dir ->pri.dRangeSetPrintingYRange.get().isInRange(pos.toCenterPos().offset(dir, 0.5).y-mc.player.getY())  )
             //高度检测 针对于放置比自己低太多的方块
             .filter(dir -> pos.toCenterPos().offset(dir, 0.5).distanceTo(mc.player.getEyePos()) <= pri.dSetPrintingRange.get())
             //距离检测
@@ -98,7 +97,7 @@ public class BlockUtil {
             //不可被替换
             .filter(dir -> (mc.world.getBlockState(pos).isAir()) || !mc.world.getBlockState(pos).isSideSolid(mc.world, pos, dir, SideShapeType.FULL))
             //方块自身阻挡检测
-            .filter(dir -> mc.player.getY() - pos.toCenterPos().offset(dir, 0.5).y < pri.dSetPrintingYDistance.get())
+            .filter(dir -> pri.dRangeSetPrintingYRange.get().isInRange(pos.toCenterPos().offset(dir, 0.5).y-mc.player.getY()))
             //高度检测 针对于放置比自己低太多的方块
             .filter(dir -> SeijaUtil.isSneak() || !isCanUseBlock(pos.offset(dir), mc.world.getBlockState(pos.offset(dir)), mc.world))
             //不可交互
