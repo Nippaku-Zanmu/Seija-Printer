@@ -38,14 +38,16 @@ public class BuckedDataGetter extends AbstractDataGetter {
     @Override
     public boolean isSuitable(BlockState needState, BlockPos pos) {
         Block block = needState.getBlock();
-        return (((block instanceof FluidBlock )
+        BlockState worldState = mc.world.getBlockState(pos);
+        return (((block instanceof FluidBlock)
             && ((bSetEnableWater.get() && block.equals(Blocks.WATER))
             || (bSetEnableLava.get() && block.equals(Blocks.LAVA)))
             && (needState.get(Properties.LEVEL_15) == 0))
 //            ||((bSetEnablePowderSnow.get()
 //            && block.equals(Blocks.POWDER_SNOW)))
-            )
-            && mc.world.getBlockState(pos).getBlock() instanceof AirBlock;
+        )
+            && (worldState.getBlock() instanceof AirBlock//空气直接放
+            || (worldState.getBlock().equals(block) && worldState.get(Properties.LEVEL_15) > 0));//同液体非源头
     }
 
     private final Setting<Boolean> bSetEnableLava = new BoolSetting.Builder().name("EnableLavaPlace")

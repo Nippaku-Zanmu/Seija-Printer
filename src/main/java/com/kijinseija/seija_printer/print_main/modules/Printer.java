@@ -380,18 +380,6 @@ public class Printer extends LoaderAntiCrash {
     @Override
     public WWidget getWidget(GuiTheme theme) {
         WVerticalList list = theme.verticalList();
-
-//        Cell<WSlider> add = list.add(theme.slider(10, 1, 2000));
-//        add.widget().minWidth = 200;
-//        WDoubleRangeEdit widget = new WDoubleRangeEdit(10, 20, 0, 100,0,100,3,false);
-//        widget.theme = theme;
-//        widget.minWidth = 200;
-//        list.add(widget);
-//        WIntRangeEdit widget1 = new WIntRangeEdit(10, 20, 0, 100,0,100,3,false);
-//        widget1.theme = theme;
-//        widget1.minWidth = 200;
-//        list.add(widget1);
-        //test
         WButton selectFile = list.add(theme.button("Select File")).widget();
         selectFile.action = () -> {
             String path = TinyFileDialogs.tinyfd_openFileDialog(
