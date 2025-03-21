@@ -6,6 +6,8 @@ import com.kijinseija.seija_printer.settings.obj.DoubleRange;
 import meteordevelopment.meteorclient.gui.themes.meteor.MeteorGuiTheme;
 import meteordevelopment.meteorclient.gui.widgets.containers.WHorizontalList;
 import meteordevelopment.meteorclient.gui.widgets.input.WTextBox;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
+import net.minecraft.text.Text;
 
 import java.util.Locale;
 
@@ -65,7 +67,7 @@ public class WDoubleRangeEdit extends WHorizontalList {
             else if (textBoxMin.get().equals("-.")) valueMin = 0;
             else {
                 try {
-                    valueMin = Double.parseDouble(textBoxMax.get());
+                    valueMin = Double.parseDouble(textBoxMin.get());
                 } catch (NumberFormatException ignored) {
                 }
             }
@@ -75,7 +77,6 @@ public class WDoubleRangeEdit extends WHorizontalList {
 //            if (valueMin < min) valueMin = min;
 //            else if (valueMin > max) valueMin = max;
             valueMin = Math.clamp(valueMin, min, valueMax);
-
             if (valueMin != preValidationValue) textBoxMin.set(valueString(valueMin));
             if (slider != null) slider.setMin(valueMin);
 

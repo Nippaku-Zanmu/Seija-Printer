@@ -10,43 +10,24 @@ import com.kijinseija.seija_printer.print_main.printer.placedata_getter.vanilla_
 import com.kijinseija.seija_printer.print_main.printer.util.*;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceDataPack;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PosInfo;
+import com.kijinseija.seija_printer.settings.impl.BlockReplaceSetting;
 import com.kijinseija.seija_printer.settings.impl.DirectionListSetting;
 import com.kijinseija.seija_printer.settings.impl.DoubleRangeSetting;
 import com.kijinseija.seija_printer.settings.impl.SettingsSetting;
 import com.kijinseija.seija_printer.settings.obj.DoubleRange;
-import com.kijinseija.seija_printer.settings.widgets.input.WDoubleRangeEdit;
-import com.kijinseija.seija_printer.settings.widgets.input.WIntRangeEdit;
 import fi.dy.masa.litematica.data.DataManager;
-import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
-import meteordevelopment.meteorclient.gui.GuiTheme;
-import meteordevelopment.meteorclient.gui.utils.Cell;
-import meteordevelopment.meteorclient.gui.widgets.WWidget;
-import meteordevelopment.meteorclient.gui.widgets.containers.WVerticalList;
-import meteordevelopment.meteorclient.gui.widgets.input.WSlider;
-import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.registry.Registries;
 import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.*;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.PointerBuffer;
-import org.lwjgl.system.MemoryUtil;
-import org.lwjgl.util.tinyfd.TinyFileDialogs;
 
-import java.io.*;
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -59,10 +40,7 @@ public class Printer extends LoaderAntiCrash {
 
     private Printer() {
         super(Addon.CATEGORY, "Seija-litematica-printer", "Automatically prints open schematics");
-        loadFileFilters();
 //        INSTANCE = this;
-
-
     }
 
     private final SettingGroup sgBasicCalc = settings.createGroup("BasicCalc");
@@ -77,9 +55,9 @@ public class Printer extends LoaderAntiCrash {
     public final Setting<DoubleRange> dRangeSetPrintingYRange = sgBasicCalc.add(new DoubleRangeSetting.Builder()
         .name("PrintingYRange")
         .description("Maximum depth.")
-        .defaultValue(-3,4)
-            .range(-16,16)
-            .sliderRange(-6,6)
+        .defaultValue(-3, 4)
+        .range(-16, 16)
+        .sliderRange(-6, 6)
         .build()
     );
     public final Setting<Double> dSetAntiReplaceTime = sgBasicCalc.add(new DoubleSetting.Builder()
@@ -93,7 +71,7 @@ public class Printer extends LoaderAntiCrash {
     private final Setting<DoubleRange> dRangeSetPrintingDelay = sgBasicCalc.add(new DoubleRangeSetting.Builder()
         .name("PrintingDelay")
         .description("Delay between printing blocks in ticks.")
-        .defaultValue(100,150)
+        .defaultValue(100, 150)
         .min(0).sliderMin(0)
         .max(10000).sliderMax(1000)
         .build()
@@ -370,92 +348,106 @@ public class Printer extends LoaderAntiCrash {
     private final Setting<Boolean> bSetRunSpeed = sgDebug.add(new BoolSetting.Builder()
         .name("RunSpeed").defaultValue(false).build());
 
-    private final SettingGroup sgReplaceBlockFile = settings.createGroup("ReplaceBlock");
-    private final Setting<String> sSetReplaceBlockFile =
-        sgReplaceBlockFile.add(new StringSetting.Builder()
-            .name("replaceBlockFile")
-            .defaultValue("D://a.txt")
+    private final SettingGroup sgReplaceBlockMapping = settings.createGroup("ReplaceBlock");
+    private final Setting<Boolean> bSetEnableReplace = sgReplaceBlockMapping.add(
+        new BoolSetting.Builder().name("enableReplace")
+            .defaultValue(true)
+            .build()
+    );
+    private final Setting<HashMap<List<Block>, List<Block>>> rSetReplaceMap =
+        sgReplaceBlockMapping.add(new BlockReplaceSetting.Builder()
+            .name("replace-block-mapping")
             .build());
 
-    @Override
-    public WWidget getWidget(GuiTheme theme) {
-        WVerticalList list = theme.verticalList();
-        WButton selectFile = list.add(theme.button("Select File")).widget();
-        selectFile.action = () -> {
-            String path = TinyFileDialogs.tinyfd_openFileDialog(
-                "Select File",
-                new File(MeteorClient.FOLDER, "BlockReplace.txt").getAbsolutePath(),
-                filters,
-                null,
-                false
-            );
+    public HashMap<List<Block>, List<Block>> getBlockReplaceMapping() {
+        if (bSetEnableReplace.get()) return rSetReplaceMap.get();
+        return new HashMap<>();
+    }
+//    private final Setting<String> sSetReplaceBlockFile =
+//        sgReplaceBlockFile.add(new StringSetting.Builder()
+//            .name("replaceBlockFile")
+//            .defaultValue("D://a.txt")
+//            .build());
 
-            if (path != null) {
-//                file = new File(path);
-//                fileName.set(file.getName());
+//    @Override
+//    public WWidget getWidget(GuiTheme theme) {
+//        WVerticalList list = theme.verticalList();
+//        WButton selectFile = list.add(theme.button("Select File")).widget();
+//        selectFile.action = () -> {
+//            String path = TinyFileDialogs.tinyfd_openFileDialog(
+//                "Select File",
+//                new File(MeteorClient.FOLDER, "BlockReplace.txt").getAbsolutePath(),
+//                filters,
+//                null,
+//                false
+//            );
+//
+//            if (path != null) {
+////                file = new File(path);
+////                fileName.set(file.getName());
+////                sSetReplaceBlockFile.set(path);
 //                sSetReplaceBlockFile.set(path);
-                sSetReplaceBlockFile.set(path);
-            }
-        };
-        //File Select
-        WButton start = list.add(theme.button("Load!")).expandX().widget();
-        start.action = () -> new Thread(() -> loadMap(sSetReplaceBlockFile.get())).start();
+//            }
+//        };
+//        //File Select
+//        WButton start = list.add(theme.button("Load!")).expandX().widget();
+//        start.action = () -> new Thread(() -> loadMap(sSetReplaceBlockFile.get())).start();
+//
+//        return list;
+//    }
+//
+//    private PointerBuffer filters;
+//
+//    private void loadFileFilters() {
+//        filters = BufferUtils.createPointerBuffer(1);
+//        ByteBuffer txtFilter = MemoryUtil.memASCII("*.txt");
+//        filters.put(txtFilter);
+//        filters.rewind();
+//    }
 
-        return list;
-    }
+//    private void loadMap(String file) {
+//        BufferedReader br = null;
+//        try {
+//
+//            br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+//            replaceMap.clear();
+//            br.lines().forEach(s -> {
+//                String[] sp1 = s.split(":");
+//                if (sp1.length != 2) return;
+//                Block rep = Registries.BLOCK.get(Identifier.of(sp1[0]));
+//                //121
+//                if (blockCheck(rep)) return;
+//                List<Block> repBlocks = new ArrayList<>();
+//                String[] blocks = sp1[1].split(",");
+//
+//                for (String blockStr : blocks) {
+//                    Block block = Registries.BLOCK.get(Identifier.of(blockStr));
+//                    if (blockCheck(block)) return;
+//                    repBlocks.add(block);
+//                }
+//                replaceMap.put(rep, repBlocks);
+//            });
+//
+//        } catch (FileNotFoundException e) {
+//            ChatUtils.sendMsg(Text.of("Error"));
+//        } finally {
+//            try {
+//                if (br != null)
+//                    br.close();
+//            } catch (IOException ignored) {
+//
+//            }
+//        }
+//    }
 
-    private PointerBuffer filters;
-
-    private void loadFileFilters() {
-        filters = BufferUtils.createPointerBuffer(1);
-        ByteBuffer txtFilter = MemoryUtil.memASCII("*.txt");
-        filters.put(txtFilter);
-        filters.rewind();
-    }
-
-    private void loadMap(String file) {
-        BufferedReader br = null;
-        try {
-
-            br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-            replaceMap.clear();
-            br.lines().forEach(s -> {
-                String[] sp1 = s.split(":");
-                if (sp1.length != 2) return;
-                Block rep = Registries.BLOCK.get(Identifier.of(sp1[0]));
-                //121
-                if (blockCheck(rep)) return;
-                List<Block> repBlocks = new ArrayList<>();
-                String[] blocks = sp1[1].split(",");
-
-                for (String blockStr : blocks) {
-                    Block block = Registries.BLOCK.get(Identifier.of(blockStr));
-                    if (blockCheck(block)) return;
-                    repBlocks.add(block);
-                }
-                replaceMap.put(rep, repBlocks);
-            });
-
-        } catch (FileNotFoundException e) {
-            ChatUtils.sendMsg(Text.of("Error"));
-        } finally {
-            try {
-                if (br != null)
-                    br.close();
-            } catch (IOException ignored) {
-
-            }
-        }
-    }
-
-    public boolean blockCheck(Block b) {
-        return (b == null || b == Blocks.AIR);
-    }
-
-    public final HashMap<Block, List<Block>> replaceMap = new HashMap<>();
+//    public boolean blockCheck(Block b) {
+//        return (b == null || b == Blocks.AIR);
+//    }
+//
+//    public final HashMap<Block, List<Block>> replaceMap = new HashMap<>();
 
 
-    SeijaTimer timer = new SeijaTimer(()->dRangeSetPrintingDelay.get().nextRandom());
+    SeijaTimer timer = new SeijaTimer(() -> dRangeSetPrintingDelay.get().nextRandom());
     public final List<PosInfo> blackList = Collections.synchronizedList(new ArrayList<>());
 
     private boolean isInBlackList(BlockPos pos) {

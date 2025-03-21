@@ -42,6 +42,7 @@ public class PrinterSettings {
         factories.put(DirectionListSetting.class, (table, setting) -> dirSettingW(table, (DirectionListSetting) setting));
         factories.put(SettingsSetting.class, (table, setting) -> settingsW(table, (SettingsSetting) setting));
         factories.put(DoubleRangeSetting.class, (table, setting) -> doubleRangeW(table, (DoubleRangeSetting) setting));
+        factories.put(BlockReplaceSetting.class,(table, setting)->blockReplaceW(table, (BlockReplaceSetting) setting));
     }
 
 
@@ -77,6 +78,14 @@ public class PrinterSettings {
         else edit.action = action;
 
         reset(table, setting, () -> edit.set(setting.get()));
+    }
+
+    private void blockReplaceW(WTable table, BlockReplaceSetting setting){
+        WButton button = table.add(theme.button("Select")).expandCellX().widget();
+        button.action = () -> mc.setScreen(new BlockReplaceSettingScreen(theme, setting));
+
+        WButton reset = table.add(theme.button(GuiRenderer.RESET)).widget();
+        reset.action = setting::reset;
     }
 
     private void reset(WContainer c, Setting<?> setting, Runnable action) {

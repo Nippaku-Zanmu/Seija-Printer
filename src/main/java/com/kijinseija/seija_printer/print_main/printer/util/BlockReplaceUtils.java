@@ -54,8 +54,12 @@ public class BlockReplaceUtils {
     }
 
     private Block needBlockReplace(BlockState bs, BlockPos pos,boolean calcBridge) {
-        List<Block> blocks = pri.replaceMap.get(bs.getBlock());
-        if (blocks != null && blocks.size() != 0)
+        List<Block> blocks = null;
+        for (Map.Entry<List<Block>, List<Block>> entry : pri.getBlockReplaceMapping().entrySet()) {
+            if (entry.getKey().contains(bs.getBlock()))
+                blocks = entry.getValue();
+        }
+        if (blocks != null && !blocks.isEmpty())
             for (Block b : blocks) {
                 if (InvUtils.find(Item.BLOCK_ITEMS.get(b)).found())
                     return b;
