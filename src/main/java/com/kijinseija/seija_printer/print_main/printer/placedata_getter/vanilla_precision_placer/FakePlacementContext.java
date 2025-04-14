@@ -16,6 +16,8 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.GameMode;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
@@ -44,17 +46,16 @@ public class FakePlacementContext extends ItemPlacementContext {
     public static void updatePlayerEntity() {
         fakePlayer = new PlayerEntity(mc.world, BlockPos.ORIGIN, 1, new GameProfile(UUID.fromString("66123666-1234-5432-6666-667563866600"), "PredictEntity339")) {
 
-            public boolean isSpectator() {
-                return false;
-            }
 
-            public boolean isCreative() {
-                return false;
-            }
 
             @Override
             public void tick() {
 
+            }
+
+            @Override
+            public @NotNull GameMode getGameMode() {
+                return GameMode.SURVIVAL;
             }
 
         };
@@ -65,9 +66,10 @@ public class FakePlacementContext extends ItemPlacementContext {
         e.setPitch(pitch);
         e.setHeadYaw(yaw);
         e.setBodyYaw(yaw);
-        e.prevHeadYaw = yaw;
-        e.prevYaw = yaw;
-        e.prevPitch = pitch;
+
+        e.lastHeadYaw = yaw;
+        e.lastYaw = yaw;
+        e.lastPitch = pitch;
 
     }
 

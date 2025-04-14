@@ -57,7 +57,7 @@ public class DoubleRangeSetting extends Setting<DoubleRange> {
 
     @Override
     public DoubleRange load(NbtCompound tag) {
-        DoubleRange doubleRange = new DoubleRange(tag.getDouble("value1"),tag.getDouble("value2"));
+        DoubleRange doubleRange = new DoubleRange(tag.getDouble("value1").orElse(0d),tag.getDouble("value2").orElse(0d));
         set(doubleRange);
         return get();
     }

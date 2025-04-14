@@ -11,6 +11,7 @@ import meteordevelopment.meteorclient.utils.player.InvUtils;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
@@ -35,7 +36,8 @@ public class InvUtil {
     private static void invSwitch(int slot, int hotbarSlot) {
         switch (pri.eSetInvSwitchMode.get()) {
             case SWAP:
-                invSwap(slot, hotbarSlot);
+//                invSwap(slot, hotbarSlot);
+                InvUtils.quickSwap().fromId(hotbarSlot).to(slot);
                 break;
             case PICK:
                 InvUtils.move().from(slot).to(hotbarSlot);
@@ -43,17 +45,18 @@ public class InvUtil {
         }
     }
 
-    private static boolean invSwap(int slot, int hotBarSlot) {
-        if (slot >= 0) {
-            ScreenHandler handler = mc.player.currentScreenHandler;
-            Int2ObjectArrayMap stack = new Int2ObjectArrayMap();
-            stack.put(slot, handler.getSlot(slot).getStack());
-            MeteorClient.mc.getNetworkHandler().sendPacket((Packet) new ClickSlotC2SPacket(handler.syncId, handler.getRevision(), slot, hotBarSlot, SlotActionType.SWAP, mc.player.currentScreenHandler.getCursorStack().copy(), (Int2ObjectMap) stack));
-            ((IClientPlayerInteractionManager) ((MinecraftClient) MeteorClient.mc).interactionManager).meteor$syncSelected();
-            return true;
-        }
-        return false;
-    }
+//    private static boolean invSwap(int slot, int hotBarSlot) {
+//        if (slot >= 0) {
+//            ScreenHandler handler = mc.player.currentScreenHandler;
+//            Int2ObjectArrayMap stack = new Int2ObjectArrayMap();
+//            stack.put(slot, handler.getSlot(slot).getStack());
+//            MeteorClient.mc.getNetworkHandler().sendPacket((Packet) new ClickSlotC2SPacket(handler.syncId, handler.getRevision(), slot, hotBarSlot, SlotActionType.SWAP, mc.player.currentScreenHandler.getCursorStack().copy(), (Int2ObjectMap) stack));
+//            mc.interactionManager.clickSlot(handler.syncId,slot,);
+//            ((IClientPlayerInteractionManager) ((MinecraftClient) MeteorClient.mc).interactionManager).meteor$syncSelected();
+//            return true;
+//        }
+//        return false;
+//    }
 
     public static boolean switchBlock(Block b) {
         return switchItem(stack -> stack.getItem().equals(getItemFormBlock(b)),b);
@@ -90,7 +93,7 @@ public class InvUtil {
     }
 
     public static int getInvSwapSlot() {
-        int selSlot = mc.player.getInventory().selectedSlot;
+        int selSlot = mc.player.getInventory().getSelectedSlot();
         if (pri.bSetIndirectInvSwap.get()) {
             return getSlot();
         }
@@ -102,7 +105,7 @@ public class InvUtil {
 
     public static int getSlot() {
         List<Integer> usefulSlots = getUsefulSlots();
-        int selSlot = mc.player.getInventory().selectedSlot;
+        int selSlot = mc.player.getInventory().getSelectedSlot();
         if (usefulSlots.size() > 1) usefulSlots.remove(Integer.valueOf(selSlot));
         if (usefulSlots.size() > 0) {
             if (i >= usefulSlots.size()) i = 0;

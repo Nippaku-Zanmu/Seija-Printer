@@ -164,7 +164,7 @@ public class BlockUtil {
     public static void illegalRotate(RotationData data) {
         if (pri.bSetIllegalRotate.get() && data != null) {
             if (mc.isInSingleplayer()) {
-                mc.player.prevYaw = (float) data.yaw();
+                mc.player.lastYaw = (float) data.yaw();
                 PlayerMoveC2SPacket packet = new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), (float) data.yaw(),
                     (float) data.pitch(), mc.player.isOnGround(),mc.player.horizontalCollision);
                 mc.player.networkHandler.sendPacket(packet);

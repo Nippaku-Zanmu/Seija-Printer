@@ -2,7 +2,7 @@
 //file:noinspection GrDeprecatedAPIUsage
 plugins {
 
-    id "fabric-loom" version "1.9-SNAPSHOT"
+    id "fabric-loom" version "1.10-SNAPSHOT"
     id 'maven-publish'
 }
 
@@ -11,7 +11,6 @@ sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
 archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
-
 
 
 repositories {
@@ -25,9 +24,7 @@ repositories {
 
     maven { url = "https://www.cursemaven.com" }
     maven { url = "https://masa.dy.fi/maven" }
-
-
-
+    maven { url = "https://maven.terraformersmc.com/releases/" }
     maven {
         name = "Meteor Dev Releases"
         url = "https://maven.meteordev.org/releases"
@@ -37,7 +34,7 @@ repositories {
         url = "https://maven.meteordev.org/snapshots"
     }
 //    flatDir { dirs 'D://hack/SeijaLib' }
-    maven { url 'file:///D://hack/SeijaLib'}
+    maven { url 'file:///D://hack/SeijaLib' }
 
     mavenCentral()
 }
@@ -51,24 +48,14 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 
-    // Meteor(1.20.1)
-//    modImplementation "meteordevelopment:meteor-client:${project.meteor_version}"
     //Meteor(1.21)
 //    modImplementation files('D:\\hack\\SeijaLib\\meteor-client-0.6.0-2229.jar')
     modImplementation "meteordevelopment:meteor-client:${project.minecraft_version}-SNAPSHOT"
 
-    //modImplementation "baritone:fabric:${project.minecraft_version}-SNAPSHOT"
 
-    //Download https://maven.meteordev.org/snapshots/meteordevelopment/meteor-client/0.5.4-SNAPSHOT/maven-metadata.xml, took 434 ms (0 B)
-    //Download https://maven.meteordev.org/snapshots/meteordevelopment/meteor-client/0.5.4-SNAPSHOT/meteor-client-0.5.4-20230723.170226-4.jar, took 3 s 318 ms (4.97 MB)
-    //Download https://maven.meteordev.org/snapshots/meteordevelopment/meteor-client/0.5.4-SNAPSHOT/meteor-client-0.5.4-20230723.170226-4-sources.jar, took 2 s 268 ms (1.69 MB)
-
-    //litematica(1.20.1)
-//    modImplementation "curse.maven:litematica-${project.litematica_projectid}:${project.litematica_fileid}"
-//    modImplementation "fi.dy.masa.malilib:malilib-fabric-1.20.1:${project.malilib_version}"
     //litematica 1.21
-    modImplementation "com.github.sakura-ryoko:malilib:${project.malilib_id}"
-    modImplementation "com.github.sakura-ryoko:litematica:${project.litematica_id}"
+    modImplementation "com.github.sakura-ryoko:malilib:${project.malilib_version}"
+    modImplementation "com.github.sakura-ryoko:litematica:${project.litematica_version}"
 
 
 }

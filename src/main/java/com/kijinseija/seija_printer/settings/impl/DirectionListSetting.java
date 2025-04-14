@@ -23,7 +23,7 @@ public class DirectionListSetting extends Setting<List<Direction>> {
         String[] values = str.split(",");
         List<Direction> dirs = new ArrayList<>(values.length);
         for (String s : values) {
-            Direction dir = Direction.byName(s);
+            Direction dir = Direction.byId(s);
             if (dir != null) dirs.add(dir);
         }
         return dirs;
@@ -43,7 +43,7 @@ public class DirectionListSetting extends Setting<List<Direction>> {
     public NbtCompound save(NbtCompound tag) {
         NbtList valueTag = new NbtList();
         for (Direction dir : get()) {
-            valueTag.add(NbtString.of(dir.getName()));
+            valueTag.add(NbtString.of(dir.getId()));
         }
         tag.put("value", valueTag);
 
@@ -54,9 +54,9 @@ public class DirectionListSetting extends Setting<List<Direction>> {
     public List<Direction> load(NbtCompound tag) {
         get().clear();
 
-        NbtList valueTag = tag.getList("value", 8);
+        NbtList valueTag = tag.getListOrEmpty("value");
         for (NbtElement tagI : valueTag) {
-            Direction dir = Direction.byName(tagI.asString());
+            Direction dir = Direction.byId(tagI.asString().orElse(null));
             if (dir != null)
                 get().add(dir);
         }

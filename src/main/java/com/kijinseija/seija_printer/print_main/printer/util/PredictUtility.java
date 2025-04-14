@@ -10,6 +10,8 @@ import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.GameMode;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.UUID;
 
@@ -18,9 +20,9 @@ public class PredictUtility {
     public static PlayerEntity predictPlayer(PlayerEntity entity, int ticks) {
         if (ticks<=0)return entity;
         Vec3d posVec = new Vec3d(entity.getX(), entity.getY(), entity.getZ());
-        double motionX = entity.getX() - entity.prevX;
-        double motionY = entity.getY() - entity.prevY;
-        double motionZ = entity.getZ() - entity.prevZ;
+        double motionX = entity.getX() - entity.lastX;
+        double motionY = entity.getY() - entity.lastY;
+        double motionZ = entity.getZ() - entity.lastZ;
         for (int i = 0; i < ticks; ++i) {
             if (!mc.world.isAir(BlockPos.ofFloored(posVec.add(0.0, motionY, 0.0)))) {
                 motionY = 0.0;
@@ -42,9 +44,9 @@ public class PredictUtility {
     public static Vec3d predictPlayerVec(PlayerEntity entity, int ticks) {
         //if (ticks<=0)return entity;
         Vec3d posVec = new Vec3d(entity.getX(), entity.getY(), entity.getZ());
-        double motionX = entity.getX() - entity.prevX;
-        double motionY = entity.getY() - entity.prevY;
-        double motionZ = entity.getZ() - entity.prevZ;
+        double motionX = entity.getX() - entity.lastX;
+        double motionY = entity.getY() - entity.lastY;
+        double motionZ = entity.getZ() - entity.lastZ;
         for (int i = 0; i < ticks; ++i) {
             if (!mc.world.isAir(BlockPos.ofFloored(posVec.add(0.0, motionY, 0.0)))) {
                 motionY = 0.0;
@@ -64,27 +66,25 @@ public class PredictUtility {
     public static PlayerEntity equipAndReturn(PlayerEntity original, Vec3d posVec) {
         PlayerEntity copyEntity = new PlayerEntity(mc.world, original.getBlockPos(), original.getYaw(), new GameProfile(UUID.fromString("66123666-1234-5432-6666-667563866600"), "PredictEntity339")){
 
-            public boolean isSpectator() {
-                return false;
-            }
 
-            public boolean isCreative() {
-                return false;
+            @Override
+            public GameMode getGameMode() {
+                return GameMode.SURVIVAL;
             }
         };
         copyEntity.setPosition(posVec);
         copyEntity.setHealth(original.getHealth());
-        copyEntity.prevX = original.prevX;
-        copyEntity.prevZ = original.prevZ;
-        copyEntity.prevY = original.prevY;
+        copyEntity.lastX = original.lastX;
+        copyEntity.lastZ = original.lastZ;
+        copyEntity.lastY = original.lastY;
         copyEntity.getInventory().clone(original.getInventory());
         copyEntity.setYaw(original.getYaw());
         copyEntity.setPitch(original.getPitch());
-        copyEntity.prevYaw = original.prevYaw;
+        copyEntity.lastYaw = original.lastYaw;
         copyEntity.headYaw = original.headYaw;
         copyEntity.bodyYaw = original.bodyYaw;
-        copyEntity.prevHeadYaw = original.prevHeadYaw;
-        copyEntity.prevPitch = original.prevPitch;
+        copyEntity.lastHeadYaw = original.lastHeadYaw;
+        copyEntity.lastPitch = original.lastPitch;
         for (StatusEffectInstance se : original.getStatusEffects()) {
             copyEntity.addStatusEffect(se);
         }

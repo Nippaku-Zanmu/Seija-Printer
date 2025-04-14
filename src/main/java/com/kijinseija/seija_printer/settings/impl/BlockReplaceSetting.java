@@ -22,7 +22,7 @@ public class BlockReplaceSetting extends Setting<HashMap<List<Block>, List<Block
 
     @Override
     protected void resetImpl() {
-        value = new HashMap<>(defaultValue);
+        value = new LinkedHashMap<>(defaultValue);
     }
 
     @Override
@@ -73,19 +73,21 @@ public class BlockReplaceSetting extends Setting<HashMap<List<Block>, List<Block
     @Override
     protected HashMap<List<Block>, List<Block>> load(NbtCompound tag) {
         get().clear();
-        NbtList entryListTag = tag.getList("value", NbtElement.COMPOUND_TYPE);
+        NbtList entryListTag = tag.getListOrEmpty("value");
+
         for (int i = 0; i < entryListTag.size(); i++) {
-            NbtCompound entryTag = entryListTag.getCompound(i);
-            NbtList keyBlocksTag = entryTag.getList("keyBlocks", 8);
+            NbtCompound entryTag = entryListTag.getCompound(i).orElse(null);
+            if (entryTag==null)continue;
+            NbtList keyBlocksTag = entryTag.getListOrEmpty("keyBlocks");
             ArrayList<Block> keyList = new ArrayList<>();
             for (NbtElement tagI : keyBlocksTag) {
-                Block block = Registries.BLOCK.get(Identifier.of(tagI.asString()));
+                Block block = Registries.BLOCK.get(Identifier.of(tagI.asString().orElse("")));
                 keyList.add(block);
             }
-            NbtList valBlocksTag = entryTag.getList("valBlocks", 8);
+            NbtList valBlocksTag = entryTag.getListOrEmpty("valBlocks");
             ArrayList<Block> valList = new ArrayList<>();
             for (NbtElement tagI : valBlocksTag) {
-                Block block = Registries.BLOCK.get(Identifier.of(tagI.asString()));
+                Block block = Registries.BLOCK.get(Identifier.of(tagI.asString().orElse("")));
                 valList.add(block);
             }
             get().put(keyList, valList);
@@ -94,14 +96,14 @@ public class BlockReplaceSetting extends Setting<HashMap<List<Block>, List<Block
         return get();
     }
 
-    public static class Builder extends SettingBuilder<BlockReplaceSetting.Builder, HashMap<List<Block>, List<Block>>, BlockReplaceSetting>{
+    public static class Builder extends SettingBuilder<BlockReplaceSetting.Builder, HashMap<List<Block>, List<Block>>, BlockReplaceSetting> {
         public Builder() {
-            super(new HashMap<>());
+            super(new LinkedHashMap<>());
         }
 
         @Override
         public BlockReplaceSetting build() {
-            return new BlockReplaceSetting(name,description,new LinkedHashMap<>(defaultValue), onChanged, onModuleActivated, visible);
+            return new BlockReplaceSetting(name, description, new LinkedHashMap<>(defaultValue), onChanged, onModuleActivated, visible);
         }
 
 

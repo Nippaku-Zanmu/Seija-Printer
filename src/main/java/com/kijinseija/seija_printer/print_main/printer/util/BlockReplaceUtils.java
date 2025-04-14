@@ -4,7 +4,6 @@ import com.kijinseija.seija_printer.print_main.modules.Printer;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import net.minecraft.block.*;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.Item;
 import net.minecraft.state.property.Property;
@@ -16,12 +15,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *  方块替换计算
- *  用于计算投影中某位置方块状态应该替换为啥样的
+ * 方块替换计算
+ * 用于计算投影中某位置方块状态应该替换为啥样的
  */
 public class BlockReplaceUtils {
     public static final BlockReplaceUtils INSTANCE = new BlockReplaceUtils();
-    static MinecraftClient mc = MinecraftClient.getInstance();
     Printer pri = Printer.getINSTANCE();
 
 
@@ -40,20 +38,18 @@ public class BlockReplaceUtils {
 
     public BlockState replaceState(BlockState state, BlockPos pos) {
 
-        BlockState repState = needBlockReplace(state, pos,true).getDefaultState();
+        BlockState repState = needBlockReplace(state, pos, true).getDefaultState();
         try {
             for (Property property : state.getProperties()) {
                 repState = repState.with(property, state.get(property));
             }
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
+
         }
         return repState;
     }
 
-    private Block needBlockReplace(BlockState bs, BlockPos pos,boolean calcBridge) {
+    private Block needBlockReplace(BlockState bs, BlockPos pos, boolean calcBridge) {
         List<Block> blocks = null;
         for (Map.Entry<List<Block>, List<Block>> entry : pri.getBlockReplaceMapping().entrySet()) {
             if (entry.getKey().contains(bs.getBlock()))
@@ -70,9 +66,10 @@ public class BlockReplaceUtils {
                 return bridgedBlockReplace;
         }
 
-
-        return bs.getBlock();
+        if (blocks == null || blocks.isEmpty()) return bs.getBlock();
+        return blocks.getFirst();
     }
+
     public BlockState normalReplaceState(BlockState state) {
 
         Block replaceBlock = normalReplaceBlock(state);
@@ -82,10 +79,8 @@ public class BlockReplaceUtils {
             for (Property property : state.getProperties()) {
                 repState = repState.with(property, state.get(property));
             }
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (Exception e) {
-            e.printStackTrace();
+        } catch (Exception ignored) {
+
         }
         return repState;
     }
@@ -124,7 +119,7 @@ public class BlockReplaceUtils {
                     && !BlockUtil.isCanPlaceInBlock(getScheStateBridegeMode(pos.offset(direction)).getBlock())
                     //被支持的方块是投影中是需要放置的方块
                     && BlockUtil.getDirs(pos.offset(direction)).isEmpty()//被支持的方块不能直接放置
-                    &&BlockUtil.canPlaceIn(pos.offset(direction))//被支持的方块还没被放置
+                    && BlockUtil.canPlaceIn(pos.offset(direction))//被支持的方块还没被放置
                 ) {
                     //可用支撑
                     for (Block block : pri.liSetBridgeBlocks.get()) {
@@ -138,9 +133,9 @@ public class BlockReplaceUtils {
         return null;
     }
 
-    private BlockState getScheStateBridegeMode(BlockPos pos){
+    private BlockState getScheStateBridegeMode(BlockPos pos) {
         BlockState state = SchematicWorldHandler.getSchematicWorld().getBlockState(pos);
-        BlockState repState = needBlockReplace(state, pos,false).getDefaultState();
+        BlockState repState = needBlockReplace(state, pos, false).getDefaultState();
         try {
             for (Property property : state.getProperties()) {
                 repState = repState.with(property, state.get(property));
@@ -154,10 +149,8 @@ public class BlockReplaceUtils {
     }
 
 
-
-
-
     public final Map<Block, Block> strippedMap = new HashMap<>();
+
     //把mc的Map反过来 方便查询
     private void initMap() {
         for (Map.Entry<Block, Block> blockBlockEntry : AxeItem.STRIPPED_BLOCKS.entrySet()) {
