@@ -50,7 +50,7 @@ public class WDoubleRangeEdit extends WHorizontalList {
             add(theme.button("+")).widget().action = () -> setButtonMin(get()[0] + 1);
             add(theme.button("-")).widget().action = () -> setButtonMin(get()[0] - 1);
         } else
-            slider = add(PrinterSettings.getINSTANCE().rangeSlider(valueMin, valueMax, sliderMin, sliderMax)).minWidth(small ? 200 - 100 - spacing : 175).centerY().expandX().widget();
+            slider = add(PrinterSettings.getINSTANCE().rangeSlider(theme,valueMin, valueMax, sliderMin, sliderMax)).minWidth(small ? 200 - 100 - spacing : 175).centerY().expandX().widget();
 
         textBoxMax = add(theme.textBox(valueString(valueMax), this::filterMax)).minWidth(50).widget();
         if (noSlider) {

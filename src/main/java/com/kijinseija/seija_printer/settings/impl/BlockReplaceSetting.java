@@ -16,7 +16,7 @@ import java.util.function.Consumer;
 public class BlockReplaceSetting extends Setting<HashMap<List<Block>, List<Block>>> {
 
 
-    public BlockReplaceSetting(String name, String description, HashMap<List<Block>, List<Block>> defaultValue, Consumer<HashMap<List<Block>, List<Block>>> onChanged, Consumer<Setting<HashMap<List<Block>, List<Block>>>> onModuleActivated, IVisible visible) {
+    private BlockReplaceSetting(String name, String description, HashMap<List<Block>, List<Block>> defaultValue, Consumer<HashMap<List<Block>, List<Block>>> onChanged, Consumer<Setting<HashMap<List<Block>, List<Block>>>> onModuleActivated, IVisible visible) {
         super(name, description, defaultValue, onChanged, onModuleActivated, visible);
     }
 

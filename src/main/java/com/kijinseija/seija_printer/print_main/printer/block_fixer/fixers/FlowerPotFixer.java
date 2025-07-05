@@ -29,7 +29,7 @@ public class FlowerPotFixer extends AbstractFixer {
                     if (!InvUtil.switchBlock(((FlowerPotBlock) needState.getBlock()).getContent())) {
                         return RETURN;
                     }
-                    BlockUtil.interactBlock(new PlaceData(dirDataI.placePos(),dir,clickVec,true,null));
+                    BlockUtil.interactBlock(PlaceData.newInstance(dirDataI.placePos(),dir,clickVec,true,null));
                     return SUCCESS;
                 }
             }

@@ -78,7 +78,7 @@ public class PlaceDataManager implements HasExtraSetting {
         }
         for (Direction dir : dirData.dirs()) {
             for (Vec3d hitVec : dirData.clickVecs(dir)) {
-                return PlaceDataPack.plac(new PlaceData(pos.offset(dir), dir.getOpposite()
+                return PlaceDataPack.plac( PlaceData.newInstance(pos.offset(dir), dir.getOpposite()
                     , hitVec, true, null));
             }
         }

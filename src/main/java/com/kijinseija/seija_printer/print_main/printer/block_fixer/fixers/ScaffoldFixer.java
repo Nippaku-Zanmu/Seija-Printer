@@ -44,11 +44,11 @@ public class ScaffoldFixer extends AbstractFixer {
 
                     PlaceData interactData = PlaceData.NULL;
                     if (pri().bSetIllegalRotate.get()) {
-                        interactData = new PlaceData(helperPos, Direction.UP, clickVec, true, BlockRotDataGetter.getRotateDataFromDir(off.getOpposite()));
+                        interactData = PlaceData.newInstance(helperPos, Direction.UP, clickVec, true, BlockRotDataGetter.getRotateDataFromDir(off.getOpposite()));
                     } else if (Direction.fromHorizontalDegrees(SeijaUtil.getYaw(clickVec)) == off.getOpposite())
                         //1.21 Direction.fromRotation
                     {
-                        interactData = new PlaceData(helperPos, Direction.UP, clickVec, true, null);
+                        interactData = PlaceData.newInstance(helperPos, Direction.UP, clickVec, true, null);
                     }
                     if (interactData.valid()){
                         if (InvUtil.switchBlock(Blocks.SCAFFOLDING)) {
@@ -64,7 +64,7 @@ public class ScaffoldFixer extends AbstractFixer {
                 DirDataI dataI = new DirDataI(helperPos, dirs);
                 for (Direction clickDir : dirs) {
                     for (Vec3d clickVec : dataI.clickVecs(clickDir)) {
-                        PlaceData interactData =  new PlaceData(helperPos, clickDir, clickVec, true, null);
+                        PlaceData interactData =  PlaceData.newInstance(helperPos, clickDir, clickVec, true, null);
                         if (InvUtil.switchBlock(Blocks.SCAFFOLDING)) {
                             BlockUtil.interactBlock(interactData);
                             PosInfo blackInfo = new PosInfo(pos, off, clickVec, false, System.currentTimeMillis(), Color.BLACK);

@@ -28,7 +28,7 @@ public class BuckedDataGetter extends AbstractDataGetter {
             }
             for (Vec3d clickVec : dirData.clickVecs(offsetDir, new DirData.DirDataConfig().setRaytrace(true).setStrictVec(true))) {
 
-                return new PlaceData(placePos.offset(offsetDir), offsetDir.getOpposite(), clickVec, true
+                return  PlaceData.newInstance(placePos.offset(offsetDir), offsetDir.getOpposite(), clickVec, true
                     , (Printer.getINSTANCE().bSetRotate.get() ? null : RotationData.fromVec(clickVec)));
             }
         }

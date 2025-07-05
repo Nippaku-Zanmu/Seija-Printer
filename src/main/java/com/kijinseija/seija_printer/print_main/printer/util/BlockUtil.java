@@ -48,19 +48,21 @@ public class BlockUtil {
         final BlockPos.Mutable pos = new BlockPos.Mutable(data.pos().getX(), data.pos().getY(), data.pos().getZ());
         Direction dir = data.dir();
         Runnable r = () -> {
-            if (pri.bSetIllegalRotate.get() && data.exRotateData() != null) {
-                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.exRotateData().yaw(), (float) data.exRotateData().pitch(), mc.player.isOnGround(),mc.player.horizontalCollision));
-            }//非法转头
-            if (pri.bSetPacketPlace.get()) {
-                mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, getHitRes(pos, dir, hitVec), SeijaUtil.getSequence()));
-                mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-            } else {
-                mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, getHitRes(pos, dir, hitVec));
-            }
+            if (data.test()==null||data.test().getAsBoolean()) {
+                if (pri.bSetIllegalRotate.get() && data.exRotateData() != null) {
+                    mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.exRotateData().yaw(), (float) data.exRotateData().pitch(), mc.player.isOnGround(), mc.player.horizontalCollision));
+                }//非法转头
+                if (pri.bSetPacketPlace.get()) {
+                    mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, getHitRes(pos, dir, hitVec), SeijaUtil.getSequence()));
+                    mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+                } else {
+                    mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, getHitRes(pos, dir, hitVec));
+                }
 
-            PosInfo blackInfo = RenderHelper.getBlackInfo(pos, dir, hitVec, false);
-            pri.blackList.add(blackInfo);
-            RenderUtil.renderList.add(blackInfo);
+                PosInfo blackInfo = RenderHelper.getBlackInfo(pos, dir, hitVec, false);
+                pri.blackList.add(blackInfo);
+                RenderUtil.renderList.add(blackInfo);
+            }
         };
         if (pri.bSetRotate.get()) {
             if (pri.bSetPacketRotate.get()) {
@@ -120,20 +122,25 @@ public class BlockUtil {
                 if (!mc.player.isSneaking()) {
                     sneakToggle = true;
                     mc.player.setSneaking(true);
-                    mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
+//                    mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
                 }
             }
-            //非法转头
-            illegalRotate(data.exRotateData());
-            if (isBucket) {
-                mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
-            }
-            if (pri.bSetPacketPlace.get()) {
-                mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, getHitRes(pos, dir, hitVec), SeijaUtil.getSequence()));
-                mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-            } else {
-                mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, getHitRes(pos, dir, hitVec));
-                mc.player.swingHand(Hand.MAIN_HAND);
+            if (data.test()==null||data.test().getAsBoolean()) {
+                //非法转头
+                illegalRotate(data.exRotateData());
+                if (isBucket) {
+                    mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
+                }
+                if (pri.bSetPacketPlace.get()) {
+                    mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, getHitRes(pos, dir, hitVec), SeijaUtil.getSequence()));
+                    mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+                } else {
+                    mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, getHitRes(pos, dir, hitVec));
+                    mc.player.swingHand(Hand.MAIN_HAND);
+                }
+                PosInfo blackInfo = RenderHelper.getBlackInfo(pos.offset(dir), dir, hitVec, true);
+                pri.blackList.add(blackInfo);
+                RenderUtil.renderList.add(blackInfo);
             }
 
 //            if (pri.illegalRotate.get() && data.exRotateData() != null) {
@@ -142,12 +149,10 @@ public class BlockUtil {
 
 
             if (sneakToggle) {
-                mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
+//                mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
                 mc.player.setSneaking(false);
             }
-            PosInfo blackInfo = RenderHelper.getBlackInfo(pos.offset(dir), dir, hitVec, true);
-            pri.blackList.add(blackInfo);
-            RenderUtil.renderList.add(blackInfo);
+
         };
         if (pri.bSetRotate.get() || isBucket) {
             if (pri.bSetPacketRotate.get()) {

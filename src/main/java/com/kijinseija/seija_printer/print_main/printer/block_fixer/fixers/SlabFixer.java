@@ -58,7 +58,7 @@ public class SlabFixer extends AbstractFixer {
             if (dir.getAxis() == Direction.Axis.Y) {
                 DirDataI dataI = new DirDataI(pos, Collections.singletonList(dir));
                 for (Vec3d clickVec : dataI.clickVecs(dir, 0)) {
-                    dataPack = PlaceDataPack.inte(new PlaceData(pos, dir
+                    dataPack = PlaceDataPack.inte( PlaceData.newInstance(pos, dir
                         , clickVec, true, null));
                     break;
                 }
@@ -66,7 +66,7 @@ public class SlabFixer extends AbstractFixer {
             }
 
             for (Vec3d clickVec : dirData.clickVecs(dir, slabType == SlabType.BOTTOM ? 1 : 2)) {
-                dataPack = PlaceDataPack.plac(new PlaceData(pos.offset(dir), dir.getOpposite()
+                dataPack = PlaceDataPack.plac( PlaceData.newInstance(pos.offset(dir), dir.getOpposite()
                     , clickVec, true, null));
                 break;
             }

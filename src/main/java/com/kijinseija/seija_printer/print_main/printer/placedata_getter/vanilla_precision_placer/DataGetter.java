@@ -6,15 +6,20 @@ import com.kijinseija.seija_printer.print_main.printer.util.BlockRotDataGetter;
 import com.kijinseija.seija_printer.print_main.printer.util.BlockUtil;
 import com.kijinseija.seija_printer.print_main.printer.util.InvUtil;
 import com.kijinseija.seija_printer.print_main.printer.util.records.*;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.block.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+
+import java.util.function.BooleanSupplier;
 
 public class DataGetter {
 
@@ -30,6 +35,8 @@ public class DataGetter {
         }
         return getDataInt(needState, data, stack);
     }
+
+
 
     private static PlaceDataPack getDataInt(BlockState needState, DirData d, ItemStack stack) {
         DirDataI data = new DirDataI(d.placePos(), BlockUtil.getInteractDir(d.placePos()));
@@ -58,7 +65,7 @@ public class DataGetter {
                 } catch (ClassCastException ignore) {
                     return PlaceDataPack.NULL;
                 }
-                Block needBlock = bItem.getBlock();
+                final Block needBlock = bItem.getBlock();
                 placeContext = bItem.getPlacementContext(placeContext);
                 //重新赋值 mojang在BlockItem L74这样写的
                 if (placeContext == null) continue;
@@ -75,7 +82,17 @@ public class DataGetter {
                 if (!MainDecide.INSTANCE.test(needState, placementState, placePos)) {
                     continue fV;
                 }
-                return PlaceDataPack.inte(new PlaceData(placePos, offDir, clickVec, true, rData));
+                BooleanSupplier verify = ()->{
+                    FakePlacementContext contextVerify = BlockStateVerify.getContextVerify(clickVec, placePos, offDir, stack, rData);
+                    if (contextVerify.getBlockPos().equals(placePos)&&contextVerify.getSide().equals(offDir)){
+                        BlockState currentState = BlockStateVerify.genBlockState(contextVerify,needBlock);
+                        return MainDecide.INSTANCE.test(needState, currentState, placePos);
+                    }
+                    ChatUtils.sendMsg(Text.of("RDir "+contextVerify.getSide()+"TDir: "+offDir.getOpposite()));
+                    ChatUtils.sendMsg(Text.of("RPos "+contextVerify.getBlockPos()+"TPos: "+placePos.offset(offDir)));
+                    return false;
+                };
+                return PlaceDataPack.inte(new PlaceData(placePos, offDir, clickVec, true, rData,verify));
             }
         }
         return PlaceDataPack.NULL;
@@ -132,7 +149,22 @@ public class DataGetter {
                 if (!MainDecide.INSTANCE.test(needState, placementState, placePos)) {
                     continue fV;
                 }
-                return PlaceDataPack.plac(new PlaceData(placePos.offset(offDir), offDir.getOpposite(), clickVec, true, rData));
+                BooleanSupplier verify = ()->{
+                    FakePlacementContext contextVerify = BlockStateVerify.getContextVerify(clickVec, placePos.offset(offDir), offDir.getOpposite(), stack, rData);
+                    if (contextVerify.getBlockPos().equals(placePos)&&contextVerify.getSide().equals(offDir.getOpposite())){
+                        BlockState currentState = BlockStateVerify.genBlockState(contextVerify,needBlock);
+                        return MainDecide.INSTANCE.test(needState, currentState, placePos);
+                    }
+
+                    return false;
+                };
+//                BooleanSupplier verify = ()->{
+//                    BlockState currentState = genBlockState(needBlock,placePos.offset(offDir),clickVec, offDir.getOpposite()
+//                        ,rData==null?new RotationData(mc.player.getYaw(),mc.player.getPitch()):rData
+//                        ,stack);
+//                    return MainDecide.INSTANCE.test(needState, currentState, placePos);
+//                };
+                return PlaceDataPack.plac(new PlaceData(placePos.offset(offDir), offDir.getOpposite(), clickVec, true, rData,verify));
             }
         }
         return PlaceDataPack.NULL;

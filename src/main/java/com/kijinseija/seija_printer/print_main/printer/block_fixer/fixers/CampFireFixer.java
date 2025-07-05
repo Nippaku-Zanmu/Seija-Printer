@@ -29,7 +29,7 @@ public class CampFireFixer extends AbstractFixer {
         for (Direction dir : dirDataI.dirs()) {
             for (Vec3d clickVec : dirDataI.clickVecs(dir)) {
                 if (InvUtil.switchItem(stack -> stack.getItem()instanceof ShovelItem)) {
-                    BlockUtil.interactBlock(new PlaceData(dirDataI.placePos(),dir,clickVec,true,null));
+                    BlockUtil.interactBlock(PlaceData.newInstance(dirDataI.placePos(),dir,clickVec,true,null));
                     return SUCCESS;
                 }else return RETURN;
             }
