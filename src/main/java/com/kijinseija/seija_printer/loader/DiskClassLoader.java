@@ -1,13 +1,11 @@
 package com.kijinseija.seija_printer.loader;
 
 import com.kijinseija.seija_printer.Addon;
-import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -15,7 +13,7 @@ import java.util.zip.ZipInputStream;
 
 public class DiskClassLoader extends ClassLoader {
     private final HashMap<String, byte[]> classMap = new HashMap<>();
-    private String mLibPath;
+   // private String mLibPath;
 
 
     public final void downloadClass() {
@@ -24,7 +22,7 @@ public class DiskClassLoader extends ClassLoader {
         try {
             socket = new Socket("127.0.0.1", 7766);
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream(), StandardCharsets.UTF_8));
-            bw.write(new YanZhen().getHWID());
+            bw.write(new VerifyUtil().getHWID());
             bw.newLine();
             bw.flush();
             ZipInputStream zis = new ZipInputStream(new BufferedInputStream(socket.getInputStream()));
@@ -61,11 +59,11 @@ public class DiskClassLoader extends ClassLoader {
     }
 
 
-    public DiskClassLoader(String path) {
+    public DiskClassLoader() {
         super(Modules.get().getClass().getClassLoader());
         //使用依赖mod的classLoader 避免加载类的问题
         // TODO Auto-generated constructor stub
-        mLibPath = path;
+        //mLibPath = path;
     }
 
 //    @Override

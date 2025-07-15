@@ -25,7 +25,7 @@ public class FlowerPotFixer extends AbstractFixer {
 
         if (InvUtil.findBlock(((FlowerPotBlock) needState.getBlock()).getContent())){
             for (Direction dir : dirDataI.dirs()) {
-                for (Vec3d clickVec : dirDataI.clickVecs(dir)) {
+                for (Vec3d clickVec : dirDataI.clickVecsInte(dir)) {
                     if (!InvUtil.switchBlock(((FlowerPotBlock) needState.getBlock()).getContent())) {
                         return RETURN;
                     }

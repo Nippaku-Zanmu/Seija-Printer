@@ -13,8 +13,6 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -52,7 +50,7 @@ public class DataGetter {
         fD:
         for (Direction offDir : data.dirs()) {
             fV:
-            for (Vec3d clickVec : data.clickVecs(offDir)) {
+            for (Vec3d clickVec : data.clickVecsInte(offDir)) {
                 ItemPlacementContext placeContext = FakePlacementContext.getInstanceInte(clickVec, placePos, offDir, stack, rData);
 
                 if (!mc.world.getBlockState(data.placePos()).canReplace(placeContext)) {
@@ -158,15 +156,11 @@ public class DataGetter {
 
                     return false;
                 };
-//                BooleanSupplier verify = ()->{
-//                    BlockState currentState = genBlockState(needBlock,placePos.offset(offDir),clickVec, offDir.getOpposite()
-//                        ,rData==null?new RotationData(mc.player.getYaw(),mc.player.getPitch()):rData
-//                        ,stack);
-//                    return MainDecide.INSTANCE.test(needState, currentState, placePos);
-//                };
+
                 return PlaceDataPack.plac(new PlaceData(placePos.offset(offDir), offDir.getOpposite(), clickVec, true, rData,verify));
             }
         }
         return PlaceDataPack.NULL;
     }
+
 }

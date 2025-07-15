@@ -7,19 +7,16 @@ import com.kijinseija.seija_printer.print_main.printer.util.InvUtil;
 import com.kijinseija.seija_printer.print_main.printer.util.records.DirDataI;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceDataPack;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.enums.SlabType;
 import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -57,7 +54,7 @@ public class SlabFixer extends AbstractFixer {
             ) continue;
             if (dir.getAxis() == Direction.Axis.Y) {
                 DirDataI dataI = new DirDataI(pos, Collections.singletonList(dir));
-                for (Vec3d clickVec : dataI.clickVecs(dir, 0)) {
+                for (Vec3d clickVec : dataI.clickVecsInte(dir, 0)) {
                     dataPack = PlaceDataPack.inte( PlaceData.newInstance(pos, dir
                         , clickVec, true, null));
                     break;

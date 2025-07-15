@@ -36,19 +36,23 @@ public class BlockStateVerify {
         } else {
             setRotate(fakePlayer, (float) rdata.yaw(), (float) rdata.pitch());
         }
-        rdata = new RotationData( mc.player.getYaw(), mc.player.getPitch());
-        fakePlayer.setSwimming(mc.player.isSwimming());
-        if (mc.player.isGliding()) {
-            fakePlayer.startGliding();
-        }else fakePlayer.stopGliding();
+        rdata = new RotationData(mc.player.getYaw(), mc.player.getPitch());
+//        fakePlayer.setSwimming(mc.player.isSwimming());
+//        if (mc.player.isGliding()) {
+//            fakePlayer.startGliding();
+//        }else fakePlayer.stopGliding();
+        FakePlacementContext.setMovementMode(fakePlayer);
         fakePlayer.setSneaking(SeijaUtil.isSneak());
 
-        BlockHitResult hitRes =pri().bSetRayTrace.get()? RayTraceUtil.INSTANCE.rayHitRes(fakePlayer.getEyePos(), rdata, pri().bSetIgnoreEntity.get(), pri().dSetPrintingRange.get())
-            : BlockUtil.getHitRes(placePos, offsetDir, clickVec);;
+
+        BlockHitResult hitRes = (pri().bSetRayTrace.get() && pri().bSetRayTrace.isVisible()) ? RayTraceUtil.INSTANCE.rayHitRes(fakePlayer.getEyePos(), rdata, pri().bSetIgnoreEntity.get(), pri().dSetPrintingRange.get())
+            : BlockUtil.getHitRes(placePos, offsetDir, clickVec);
+
         return new FakePlacementContext(fakePlayer, Hand.MAIN_HAND, stack, hitRes);
     }
+
     //用于后检测
-    protected static BlockState genBlockState(ItemPlacementContext placeContext,Block b){
+    protected static BlockState genBlockState(ItemPlacementContext placeContext, Block b) {
 
         if (!placeContext.canPlace()) {
             return null;
@@ -56,7 +60,7 @@ public class BlockStateVerify {
         BlockItem bItem;
         try {
             bItem = (BlockItem) InvUtil.getItemFormBlock(b);
-            if (bItem==null)return null;
+            if (bItem == null) return null;
         } catch (ClassCastException ignore) {
             return null;
         }

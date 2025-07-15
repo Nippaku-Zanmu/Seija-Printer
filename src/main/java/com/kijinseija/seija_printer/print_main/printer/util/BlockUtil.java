@@ -71,8 +71,6 @@ public class BlockUtil {
             } else
                 Rotations.rotate(SeijaUtil.getYaw(hitVec), SeijaUtil.getPitch(hitVec), r);
         } else r.run();
-
-
     }
 
     public static List<Direction> getSortedDirs(BlockPos pos) {
@@ -122,7 +120,6 @@ public class BlockUtil {
                 if (!mc.player.isSneaking()) {
                     sneakToggle = true;
                     mc.player.setSneaking(true);
-//                    mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
                 }
             }
             if (data.test()==null||data.test().getAsBoolean()) {
@@ -142,14 +139,7 @@ public class BlockUtil {
                 pri.blackList.add(blackInfo);
                 RenderUtil.renderList.add(blackInfo);
             }
-
-//            if (pri.illegalRotate.get() && data.exRotateData() != null) {
-//                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.exRotateData().yaw(), (float) data.exRotateData().pitch(), mc.player.isOnGround()));
-//            }
-
-
             if (sneakToggle) {
-//                mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
                 mc.player.setSneaking(false);
             }
 

@@ -30,8 +30,8 @@ public record DirDataI(BlockPos placePos, List<Direction> dirs) {
 //        }
 //        return centerVec.offset(offsetDir, 0.5);
 //    }
-    public List<Vec3d> getClickVec1(Direction offsetDir) {
-        return getClickVec1(offsetDir, 0);
+    public List<Vec3d> getClickVecInte1(Direction offsetDir) {
+        return getClickVecInte1(offsetDir, 0);
 //        ArrayList<Vec3d> res = new ArrayList<>();
 ////        if (i >= dirs.size() - 1) return null;
 ////        Direction offsetDir = dirs.get(i);
@@ -49,33 +49,30 @@ public record DirDataI(BlockPos placePos, List<Direction> dirs) {
 //        return res;
     }
 
-    public Vec3d getClickVec(Direction offsetDir) {
+    public Vec3d getClickVecInte(Direction offsetDir) {
         //if (i >= dirs.size() - 1) return null;
         Vec3d centerVec = placePos.toCenterPos();
         //Direction offsetDir = dirs.get(i);
         return centerVec.offset(offsetDir, pri.bSetStrictVec.get()&&pri.isStrictVecInte()?0.501:0.5);
     }
 
-    public List<Vec3d> getClickVecs(final Direction offsetDir) {
-        return getClickVecs(offsetDir, 0);
+    public List<Vec3d> getClickVecsInte(final Direction offsetDir) {
+        return getClickVecsInte(offsetDir, 0);
     }
 
 
-    public List<Vec3d> getClickVec1(Direction offsetDir, int mode) {
+    public List<Vec3d> getClickVecInte1(Direction offsetDir, int mode) {
         ArrayList<Vec3d> res = new ArrayList<>();
 
         Vec3d clickVec = placePos.toCenterPos().offset(offsetDir, pri.bSetStrictVec.get()&&pri.isStrictVecInte()?0.501:0.5);
         if (pri.bSetRandomOffset.get())
             clickVec = BlockUtil.randomOffsetVec(clickVec, offsetDir);
         if (offsetDir.getAxis() != Direction.Axis.Y)
-            switch (mode) {
-                case 1:
-                    clickVec = clickVec.offset(Direction.UP, 0.2);
-                    break;
-                case 2:
-                    clickVec = clickVec.offset(Direction.DOWN, 0.2);
-
-            }
+            clickVec = switch (mode) {
+                case 1 -> clickVec.offset(Direction.UP, 0.2);
+                case 2 -> clickVec.offset(Direction.DOWN, 0.2);
+                default -> clickVec;
+            };
 
         if (pri.bSetStrictVec.get()&&pri.isStrictVecInte()) {
             BlockHitResult result = RayTraceUtil.INSTANCE.getStrictVecResult(clickVec, offsetDir.getOpposite(), Printer.getINSTANCE().bSetLiquidInt.get(),1);
@@ -89,12 +86,12 @@ public record DirDataI(BlockPos placePos, List<Direction> dirs) {
     }
 
     //mode 1 上半 2 下半
-    public List<Vec3d> getClickVecs(final Direction offsetDir, int mode) {
+    public List<Vec3d> getClickVecsInte(final Direction offsetDir, int mode) {
         List<Vec3d> vecList = new LinkedList<>();
         //装可用的Vec
         //final Direction offsetDir = dirs.get(i);//偏移方向
 
-        Vec3d clickVec = getClickVec(offsetDir);//基础的中心Vec
+        Vec3d clickVec = getClickVecInte(offsetDir);//基础的中心Vec
         if (pri.bSetRandomOffset.get()) {//随机offset 用于bypass
             vecList.add(BlockUtil.randomOffsetVec(clickVec, offsetDir));
         } else
@@ -128,13 +125,13 @@ public record DirDataI(BlockPos placePos, List<Direction> dirs) {
 
     }
 
-    public List<Vec3d> clickVecs(Direction offset) {
-        return clickVecs(offset,0);
+    public List<Vec3d> clickVecsInte(Direction offset) {
+        return clickVecsInte(offset,0);
     }
 
-    public List<Vec3d> clickVecs(Direction offset, int mode) {
+    public List<Vec3d> clickVecsInte(Direction offset, int mode) {
         if (pri.bSetMultiVec.get())
-            return getClickVecs(offset,mode);
-        return getClickVec1(offset, mode);
+            return getClickVecsInte(offset,mode);
+        return getClickVecInte1(offset, mode);
     }
 }

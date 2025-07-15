@@ -24,7 +24,7 @@ public class DirtFixer extends AbstractFixer {
 
         dirDataI.dirs().remove(Direction.DOWN);
         for (Direction dir : dirDataI.dirs()) {
-            for (Vec3d clickVec : dirDataI.clickVecs(dir)) {
+            for (Vec3d clickVec : dirDataI.clickVecsInte(dir)) {
                 if (InvUtil.switchItem(stack -> needState.getBlock() instanceof DirtPathBlock
                     ? stack.getItem() instanceof ShovelItem : stack.getItem() instanceof HoeItem)) {
                     BlockUtil.interactBlock(PlaceData.newInstance(dirDataI.placePos(), dir, clickVec, true, null));

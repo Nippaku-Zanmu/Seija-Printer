@@ -2,14 +2,19 @@ package com.kijinseija.seija_printer.print_main.printer.placedata_getter.getter;
 
 import com.kijinseija.seija_printer.print_main.modules.Printer;
 import com.kijinseija.seija_printer.print_main.printer.placedata_getter.AbstractDataGetter;
+import com.kijinseija.seija_printer.print_main.printer.util.RayTraceUtil;
 import com.kijinseija.seija_printer.print_main.printer.util.records.DirData;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
 import com.kijinseija.seija_printer.print_main.printer.util.records.RotationData;
 import meteordevelopment.meteorclient.settings.BoolSetting;
 import meteordevelopment.meteorclient.settings.Setting;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.block.*;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.state.property.Properties;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
@@ -27,9 +32,19 @@ public class BuckedDataGetter extends AbstractDataGetter {
                 continue;
             }
             for (Vec3d clickVec : dirData.clickVecs(offsetDir, new DirData.DirDataConfig().setRaytrace(true).setStrictVec(true))) {
+                return new PlaceData(placePos.offset(offsetDir), offsetDir.getOpposite(), clickVec, true,
+                    (Printer.getINSTANCE().bSetRotate.get() ? null : RotationData.fromVec(clickVec)), () -> {
+                    BlockHitResult blockHitResult = RayTraceUtil.INSTANCE.rayHitRes
+                        (mc.player.getEyePos(), new RotationData(mc.player.getYaw(),
+                                mc.player.getPitch()), false,
+                            mc.player.getAttributeValue(EntityAttributes.BLOCK_INTERACTION_RANGE));
+//                    ChatUtils.info(blockHitResult.getType() + "  " + blockHitResult.getBlockPos());
+//                    ChatUtils.info();
+                    return blockHitResult.getType().equals(HitResult.Type.BLOCK) && blockHitResult.getBlockPos().equals(placePos.offset(offsetDir));
 
-                return  PlaceData.newInstance(placePos.offset(offsetDir), offsetDir.getOpposite(), clickVec, true
-                    , (Printer.getINSTANCE().bSetRotate.get() ? null : RotationData.fromVec(clickVec)));
+                });
+//                return  PlaceData.newInstance(placePos.offset(offsetDir), offsetDir.getOpposite(), clickVec, true
+//                    , (Printer.getINSTANCE().bSetRotate.get() ? null : RotationData.fromVec(clickVec)));
             }
         }
         return PlaceData.NULL;

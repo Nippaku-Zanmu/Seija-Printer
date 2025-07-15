@@ -1,6 +1,5 @@
 package com.kijinseija.seija_printer.print_main.printer.block_fixer.fixers;
 
-import com.kijinseija.seija_printer.print_main.modules.Printer;
 import com.kijinseija.seija_printer.print_main.printer.block_fixer.AbstractFixer;
 import com.kijinseija.seija_printer.print_main.printer.util.BlockRotDataGetter;
 import com.kijinseija.seija_printer.print_main.printer.util.BlockUtil;
@@ -40,7 +39,7 @@ public class ScaffoldFixer extends AbstractFixer {
                 if (!dirs.contains(Direction.UP)) continue;
                 DirDataI dataI = new DirDataI(helperPos, dirs);
 
-                for (Vec3d clickVec : dataI.clickVecs(Direction.UP)) {
+                for (Vec3d clickVec : dataI.clickVecsInte(Direction.UP)) {
 
                     PlaceData interactData = PlaceData.NULL;
                     if (pri().bSetIllegalRotate.get()) {
@@ -63,7 +62,7 @@ public class ScaffoldFixer extends AbstractFixer {
                 dirs.remove(Direction.UP);
                 DirDataI dataI = new DirDataI(helperPos, dirs);
                 for (Direction clickDir : dirs) {
-                    for (Vec3d clickVec : dataI.clickVecs(clickDir)) {
+                    for (Vec3d clickVec : dataI.clickVecsInte(clickDir)) {
                         PlaceData interactData =  PlaceData.newInstance(helperPos, clickDir, clickVec, true, null);
                         if (InvUtil.switchBlock(Blocks.SCAFFOLDING)) {
                             BlockUtil.interactBlock(interactData);

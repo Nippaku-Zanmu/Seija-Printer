@@ -27,7 +27,7 @@ public abstract class AbstractClickFixer extends AbstractFixer {
 //        BlockUtil.interactBlock(pos,interactDir.get(0));
         DirDataI dirDataI = new DirDataI(pos, BlockUtil.getInteractDir(pos));
         for (Direction dir : dirDataI.dirs()) {
-            for (Vec3d clickVec : dirDataI.clickVecs(dir)) {
+            for (Vec3d clickVec : dirDataI.clickVecsInte(dir)) {
                 BlockUtil.interactBlock(PlaceData.newInstance(dirDataI.placePos(),dir,clickVec,true,null));
                 return AbstractFixer.SUCCESS;
             }

@@ -25,7 +25,7 @@ public class StrippedFixer extends AbstractFixer {
         DirDataI dirDataI = new DirDataI(pos, interactDir);
         if (InvUtil.findItem(stack -> stack.getItem() instanceof AxeItem)) {
             for (Direction dir : interactDir) {
-                for (Vec3d clickVec : dirDataI.clickVecs(dir)) {
+                for (Vec3d clickVec : dirDataI.clickVecsInte(dir)) {
                     if (InvUtil.switchItem(stack -> stack.getItem() instanceof AxeItem)) {
                         BlockUtil.interactBlock(PlaceData.newInstance(dirDataI.placePos(),dir,clickVec,true,null));
                         return SUCCESS;
