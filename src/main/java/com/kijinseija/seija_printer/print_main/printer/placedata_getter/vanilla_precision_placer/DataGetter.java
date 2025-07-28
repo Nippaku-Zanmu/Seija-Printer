@@ -6,6 +6,7 @@ import com.kijinseija.seija_printer.print_main.printer.util.BlockRotDataGetter;
 import com.kijinseija.seija_printer.print_main.printer.util.BlockUtil;
 import com.kijinseija.seija_printer.print_main.printer.util.InvUtil;
 import com.kijinseija.seija_printer.print_main.printer.util.records.*;
+import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.block.*;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.item.BlockItem;
@@ -15,6 +16,8 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+
+import java.util.function.BooleanSupplier;
 
 public class DataGetter {
 
@@ -32,13 +35,6 @@ public class DataGetter {
         return getd(needState, data, stack,true);
     }
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    private static PlaceDataPack getDataInt(BlockState needState, DirData d, ItemStack stack) {
-        DirDataI data = new DirDataI(d.placePos(), BlockUtil.getInteractDir(d.placePos()));
-=======
-=======
->>>>>>> Stashed changes
     /**
      * getd
      *
@@ -135,10 +131,6 @@ public class DataGetter {
     }
 
     private static PlaceDataPack getDataInt(BlockState needState, DirData data, ItemStack stack) {
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
         BlockPos placePos = data.placePos();
         if (needState.getBlock().equals(mc.world.getBlockState(placePos).getBlock())) {
             return PlaceDataPack.NULL;
@@ -151,7 +143,7 @@ public class DataGetter {
         fD:
         for (Direction offDir : data.dirs()) {
             fV:
-            for (Vec3d clickVec : data.clickVecs(offDir)) {
+            for (Vec3d clickVec : data.clickVecsInte(offDir)) {
                 ItemPlacementContext placeContext = FakePlacementContext.getInstanceInte(clickVec, placePos, offDir, stack, rData);
 
                 if (!mc.world.getBlockState(data.placePos()).canReplace(placeContext)) {
@@ -164,7 +156,7 @@ public class DataGetter {
                 } catch (ClassCastException ignore) {
                     return PlaceDataPack.NULL;
                 }
-                Block needBlock = bItem.getBlock();
+                final Block needBlock = bItem.getBlock();
                 placeContext = bItem.getPlacementContext(placeContext);
                 //重新赋值 mojang在BlockItem L74这样写的
                 if (placeContext == null) continue;
@@ -181,12 +173,6 @@ public class DataGetter {
                 if (!MainDecide.INSTANCE.test(needState, placementState, placePos)) {
                     continue fV;
                 }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-                return PlaceDataPack.inte(new PlaceData(placePos, offDir, clickVec, true, rData));
-=======
-=======
->>>>>>> Stashed changes
                 BooleanSupplier verify = () -> {
                     FakePlacementContext contextVerify = BlockStateVerify.getContextVerify(clickVec, placePos, offDir, stack, rData);
                     if (contextVerify.getBlockPos().equals(placePos) && contextVerify.getSide().equals(offDir)) {
@@ -198,10 +184,6 @@ public class DataGetter {
                     return false;
                 };
                 return PlaceDataPack.inte(new PlaceData(placePos, offDir, clickVec, true, rData, verify));
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
             }
         }
         return PlaceDataPack.NULL;
@@ -259,12 +241,6 @@ public class DataGetter {
                 if (!MainDecide.INSTANCE.test(needState, placementState, placePos)) {
                     continue fV;
                 }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-                return PlaceDataPack.plac(new PlaceData(placePos.offset(offDir), offDir.getOpposite(), clickVec, true, rData));
-=======
-=======
->>>>>>> Stashed changes
                 BooleanSupplier verify = () -> {
                     FakePlacementContext contextVerify = BlockStateVerify.getContextVerify(clickVec, placePos.offset(offDir), offDir.getOpposite(), stack, rData);
                     if (contextVerify.getBlockPos().equals(placePos) && contextVerify.getSide().equals(offDir.getOpposite())) {
@@ -276,12 +252,9 @@ public class DataGetter {
                 };
 
                 return PlaceDataPack.plac(new PlaceData(placePos.offset(offDir), offDir.getOpposite(), clickVec, true, rData, verify));
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
             }
         }
         return PlaceDataPack.NULL;
     }
+
 }

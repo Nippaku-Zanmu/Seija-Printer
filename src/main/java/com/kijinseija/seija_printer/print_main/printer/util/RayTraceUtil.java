@@ -1,6 +1,7 @@
 package com.kijinseija.seija_printer.print_main.printer.util;
 
 import com.kijinseija.seija_printer.print_main.modules.Printer;
+import com.kijinseija.seija_printer.print_main.printer.util.records.RotationData;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ProjectileUtil;
@@ -59,7 +60,7 @@ public class RayTraceUtil {
     public boolean rayTrace(@Nullable BlockPos interactPos,@Nullable Direction clickDir, Vec3d target, boolean raytrace, boolean ignoreEntity, double rayRange){
         if (!(raytrace))return true;
 
-        Entity entity2 = mc.getCameraEntity();
+        Entity entity2 = mc.player;
         if (entity2 == null) {
             return false;
         }
@@ -120,5 +121,68 @@ public class RayTraceUtil {
         return target.distanceTo(crosshairTarget.getPos())<=0.1
             &&(!(crosshairTarget instanceof BlockHitResult bhr0) || bhr0.getSide() == clickDir)
             &&(!(crosshairTarget instanceof BlockHitResult bhr) ||interactPos.equals(bhr.getBlockPos()));
+    }
+    public BlockHitResult rayHitRes(Vec3d start, RotationData rotate, boolean ignoreEntity, double rayRange){
+
+
+        Entity entity2 = mc.player;
+        if (entity2 == null) {
+            return null;
+        }
+        if (mc.world == null) {
+            return null;
+        }
+
+        double d =rayRange;
+        HitResult crosshairTarget = null;
+
+        //crosshairTarget = entity2.raycast(d, 1, false);
+
+        Vec3d vec3d2 = getRotationVector((float) rotate.pitch(), (float) rotate.yaw());//entity2.getRotationVec(1.0f);
+        Vec3d vec3d3 = start.add(vec3d2.x * d, vec3d2.y * d, vec3d2.z * d);
+
+        crosshairTarget =  mc.world.raycast(new RaycastContext(start, vec3d3, RaycastContext.ShapeType.OUTLINE, false ? RaycastContext.FluidHandling.ANY : RaycastContext.FluidHandling.NONE, entity2));
+
+
+        boolean bl = false;
+        int i = 3;
+        double e = d;
+//        if (mc.interactionManager.hasExtendedReach()) {
+//            d = e = 6.0;
+//        } else {
+//            if (e > 3.0) {
+//                bl = true;
+//            }
+//            d = e;
+//        }
+        //121
+        e *= e;
+
+        if (crosshairTarget != null) {
+            e = crosshairTarget.getPos().squaredDistanceTo(start);
+        }
+
+
+        if (!ignoreEntity){
+            Box box = entity2.getBoundingBox().stretch(vec3d2.multiply(d)).expand(1.0, 1.0, 1.0);
+            EntityHitResult entityHitResult = ProjectileUtil.raycast(entity2, start, vec3d3, box, entity -> !entity.isSpectator() && entity.canHit(), e);
+            if (entityHitResult != null) {
+                Vec3d vec3d4 = entityHitResult.getPos();
+                double g = start.squaredDistanceTo(vec3d4);
+                if (bl && g > 9.0) {
+                    crosshairTarget = BlockHitResult.createMissed(vec3d4, Direction.getFacing(vec3d2.x, vec3d2.y, vec3d2.z), BlockPos.ofFloored(vec3d4));
+                } else if (g < e || crosshairTarget == null) {
+                    crosshairTarget = entityHitResult;
+                }
+            }
+        }
+
+        if (crosshairTarget == null)return null;
+        if (crosshairTarget instanceof BlockHitResult) {
+            return (BlockHitResult) crosshairTarget;
+        }
+        return null;
+        //ChatUtils.sendMsg(Text.of("pos:"+ crosshairTarget.getPos()+ " dis: "+target.distanceTo(crosshairTarget.getPos())));
+
     }
 }

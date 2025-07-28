@@ -57,24 +57,6 @@ public class BlockUtil {
 
 
         Runnable r = () -> {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-            if (pri.bSetIllegalRotate.get() && data.exRotateData() != null) {
-                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.exRotateData().yaw(), (float) data.exRotateData().pitch(), mc.player.isOnGround(),mc.player.horizontalCollision));
-            }//非法转头
-            if (pri.bSetPacketPlace.get()) {
-                mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, getHitRes(pos, dir, hitVec), SeijaUtil.getSequence()));
-                mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-            } else {
-                mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, getHitRes(pos, dir, hitVec));
-            }
-
-            PosInfo blackInfo = RenderHelper.getBlackInfo(pos, dir, hitVec, false);
-            pri.blackList.add(blackInfo);
-            RenderUtil.renderList.add(blackInfo);
-=======
-=======
->>>>>>> Stashed changes
             boolean sneakToggle = false;
             if (isPlaceMode && pri.bSetSneak.get()) {
                 if (!mc.player.isSneaking()) {
@@ -107,10 +89,6 @@ public class BlockUtil {
                 mc.player.setSneaking(false);
             }
 
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
         };
         if (pri.bSetRotate.get() || isBucket) {
             tasks.add(new RotationTask(null,RotationData.fromVec(hitVec)));
@@ -175,13 +153,6 @@ public class BlockUtil {
                 r.run();
             } else
                 Rotations.rotate(SeijaUtil.getYaw(hitVec), SeijaUtil.getPitch(hitVec), r);
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        } else r.run();
-
-=======
-=======
->>>>>>> Stashed changes
         } else {
             r.run();
         }
@@ -267,10 +238,6 @@ public class BlockUtil {
 //        } else {
 //            r.run();
 //        }
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
     }
 
@@ -304,81 +271,9 @@ public class BlockUtil {
             .collect(Collectors.toList());
     }
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-    public static void placeBlock(PlaceData data) {
-        final BlockPos.Mutable pos = new BlockPos.Mutable(data.pos().getX(), data.pos().getY(), data.pos().getZ());
-
-
-        Direction dir = data.dir();
-        Vec3d hitVec = data.hitVec();
-        final boolean isBucket = mc.player.getMainHandStack().getItem() instanceof BucketItem;
-
-        Runnable r = () -> {
-            boolean sneakToggle = false;
-            if (pri.bSetSneak.get()) {
-                if (!mc.player.isSneaking()) {
-                    sneakToggle = true;
-                    mc.player.setSneaking(true);
-                    mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.PRESS_SHIFT_KEY));
-                }
-            }
-            //非法转头
-            illegalRotate(data.exRotateData());
-            if (isBucket) {
-                mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
-            }
-            if (pri.bSetPacketPlace.get()) {
-                mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, getHitRes(pos, dir, hitVec), SeijaUtil.getSequence()));
-                mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
-            } else {
-                mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, getHitRes(pos, dir, hitVec));
-                mc.player.swingHand(Hand.MAIN_HAND);
-            }
-
-//            if (pri.illegalRotate.get() && data.exRotateData() != null) {
-//                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.exRotateData().yaw(), (float) data.exRotateData().pitch(), mc.player.isOnGround()));
-//            }
-
-
-            if (sneakToggle) {
-                mc.getNetworkHandler().sendPacket(new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.RELEASE_SHIFT_KEY));
-                mc.player.setSneaking(false);
-            }
-            PosInfo blackInfo = RenderHelper.getBlackInfo(pos.offset(dir), dir, hitVec, true);
-            pri.blackList.add(blackInfo);
-            RenderUtil.renderList.add(blackInfo);
-        };
-        if (pri.bSetRotate.get() || isBucket) {
-            if (pri.bSetPacketRotate.get()) {
-                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) SeijaUtil.getYaw(hitVec), (float) SeijaUtil.getPitch(hitVec), mc.player.isOnGround(),mc.player.horizontalCollision));
-                r.run();
-            } else
-                Rotations.rotate(SeijaUtil.getYaw(hitVec), SeijaUtil.getPitch(hitVec), r);
-        } else {
-            r.run();
-        }
-
-    }
 
     public static void illegalRotate(RotationData data) {
         if (pri.bSetIllegalRotate.get() && data != null) {
-            if (mc.isInSingleplayer()) {
-                mc.player.prevYaw = (float) data.yaw();
-                PlayerMoveC2SPacket packet = new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), (float) data.yaw(),
-                    (float) data.pitch(), mc.player.isOnGround(),mc.player.horizontalCollision);
-                mc.player.networkHandler.sendPacket(packet);
-            } else
-                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.yaw(), (float) data.pitch(), mc.player.isOnGround(),mc.player.horizontalCollision));
-=======
-
-    public static void illegalRotate(RotationData data) {
-        if (pri.bSetIllegalRotate.get() && data != null) {
-=======
-
-    public static void illegalRotate(RotationData data) {
-        if (pri.bSetIllegalRotate.get() && data != null) {
->>>>>>> Stashed changes
 //            if (mc.isInSingleplayer()) {
 //                mc.player.lastYaw = (float) data.yaw();
 //                PlayerMoveC2SPacket packet = new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), (float) data.yaw(),
@@ -387,10 +282,6 @@ public class BlockUtil {
 //            } else
             mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.yaw(), (float) data.pitch(), mc.player.isOnGround(), mc.player.horizontalCollision));
             mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.yaw(), (float) data.pitch(), mc.player.isOnGround(), mc.player.horizontalCollision));
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
 
         }
     }

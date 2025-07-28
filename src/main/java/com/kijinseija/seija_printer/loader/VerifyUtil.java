@@ -11,9 +11,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
 import java.util.Base64;
 
-public class YanZhen extends Module implements Serializable {
+public class VerifyUtil extends Module implements Serializable {
      int k ;
-    public YanZhen() {
+    public VerifyUtil() {
         super(Addon.CATEGORY,"Hello Meteor","");
     }
 
@@ -253,12 +253,6 @@ public class YanZhen extends Module implements Serializable {
            return null;
        }
 
-   }
-   public static int doY(){
-       new Thread(()->{
-           new YanZhen().yanZheng();
-       }).start();
-       return 13993;
    }
 
    public void yanZheng(){

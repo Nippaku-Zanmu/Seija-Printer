@@ -1,6 +1,5 @@
 package com.kijinseija.seija_printer.print_main.printer.block_fixer.fixers;
 
-import com.kijinseija.seija_printer.print_main.modules.Printer;
 import com.kijinseija.seija_printer.print_main.printer.block_fixer.AbstractFixer;
 import com.kijinseija.seija_printer.print_main.printer.util.BlockRotDataGetter;
 import com.kijinseija.seija_printer.print_main.printer.util.BlockUtil;
@@ -41,23 +40,15 @@ public class ScaffoldFixer extends AbstractFixer {
                 if (!dirs.contains(Direction.UP)) continue;
                 DirData data = new DirData(helperPos, dirs);
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-                for (Vec3d clickVec : dataI.clickVecs(Direction.UP)) {
-=======
                 for (Vec3d clickVec : data.clickVecsInte(Direction.UP)) {
->>>>>>> Stashed changes
-=======
-                for (Vec3d clickVec : data.clickVecsInte(Direction.UP)) {
->>>>>>> Stashed changes
 
                     PlaceData interactData = PlaceData.NULL;
                     if (pri().bSetIllegalRotate.get()) {
-                        interactData = new PlaceData(helperPos, Direction.UP, clickVec, true, BlockRotDataGetter.getRotateDataFromDir(off.getOpposite()));
+                        interactData = PlaceData.newInstance(helperPos, Direction.UP, clickVec, true, BlockRotDataGetter.getRotateDataFromDir(off.getOpposite()));
                     } else if (Direction.fromHorizontalDegrees(SeijaUtil.getYaw(clickVec)) == off.getOpposite())
                         //1.21 Direction.fromRotation
                     {
-                        interactData = new PlaceData(helperPos, Direction.UP, clickVec, true, null);
+                        interactData = PlaceData.newInstance(helperPos, Direction.UP, clickVec, true, null);
                     }
                     if (interactData.valid()){
                         if (InvUtil.switchBlock(Blocks.SCAFFOLDING)) {
@@ -72,16 +63,8 @@ public class ScaffoldFixer extends AbstractFixer {
                 dirs.remove(Direction.UP);
                 DirData data = new DirData(helperPos, dirs);
                 for (Direction clickDir : dirs) {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-                    for (Vec3d clickVec : dataI.clickVecs(clickDir)) {
-                        PlaceData interactData =  new PlaceData(helperPos, clickDir, clickVec, true, null);
-=======
-=======
->>>>>>> Stashed changes
                     for (Vec3d clickVec : data.clickVecsInte(clickDir)) {
                         PlaceData interactData =  PlaceData.newInstance(helperPos, clickDir, clickVec, true, null);
->>>>>>> Stashed changes
                         if (InvUtil.switchBlock(Blocks.SCAFFOLDING)) {
                             BlockUtil.interactBlock(interactData);
                             PosInfo blackInfo = new PosInfo(pos, off, clickVec, false, System.currentTimeMillis(), Color.BLACK);

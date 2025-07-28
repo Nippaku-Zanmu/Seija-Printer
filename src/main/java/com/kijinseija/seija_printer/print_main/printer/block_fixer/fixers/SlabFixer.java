@@ -7,19 +7,16 @@ import com.kijinseija.seija_printer.print_main.printer.util.records.DirData;
 import com.kijinseija.seija_printer.print_main.printer.util.records.DirDataI;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceDataPack;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.block.AirBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.enums.SlabType;
 import net.minecraft.state.property.Properties;
-import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -56,18 +53,9 @@ public class SlabFixer extends AbstractFixer {
                         && dir.getAxis() == Direction.Axis.Y))
             ) continue;
             if (dir.getAxis() == Direction.Axis.Y) {
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-                DirDataI dataI = new DirDataI(pos, Collections.singletonList(dir));
-                for (Vec3d clickVec : dataI.clickVecs(dir, 0)) {
-                    dataPack = PlaceDataPack.inte(new PlaceData(pos, dir
-=======
-=======
->>>>>>> Stashed changes
                 DirData data = new DirData(pos, Collections.singletonList(dir));
                 for (Vec3d clickVec : data.clickVecsInte(dir, 0)) {
                     dataPack = PlaceDataPack.inte( PlaceData.newInstance(pos, dir
->>>>>>> Stashed changes
                         , clickVec, true, null));
                     break;
                 }
@@ -75,7 +63,7 @@ public class SlabFixer extends AbstractFixer {
             }
 
             for (Vec3d clickVec : dirData.clickVecs(dir, slabType == SlabType.BOTTOM ? 1 : 2)) {
-                dataPack = PlaceDataPack.plac(new PlaceData(pos.offset(dir), dir.getOpposite()
+                dataPack = PlaceDataPack.plac( PlaceData.newInstance(pos.offset(dir), dir.getOpposite()
                     , clickVec, true, null));
                 break;
             }

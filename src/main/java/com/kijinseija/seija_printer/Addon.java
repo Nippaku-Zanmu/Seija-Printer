@@ -13,30 +13,16 @@ import net.minecraft.item.Items;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.GL;
-import org.lwjgl.opengl.GL43;
-import org.lwjgl.opengl.GLDebugMessageCallback;
-import org.lwjgl.system.MemoryUtil;
 
 import java.lang.reflect.Constructor;
 
-import static org.lwjgl.opengl.GL11.glEnable;
 import static org.lwjgl.opengl.GL11C.GL_DONT_CARE;
-import static org.lwjgl.opengl.GL11C.glGetError;
-import static org.lwjgl.opengl.GL43.glDebugMessageCallback;
 import static org.lwjgl.opengl.GL43.glDebugMessageControl;
-import static org.lwjgl.opengl.GL43C.GL_DEBUG_OUTPUT;
-import static org.lwjgl.opengl.GL43C.GL_DEBUG_OUTPUT_SYNCHRONOUS;
-import static org.lwjgl.opengl.KHRRobustness.GL_NO_ERROR;
 
 public class Addon extends MeteorAddon {
 	public static final Logger LOG = LogManager.getLogger();
 	public static final Category CATEGORY = new Category("printer", new ItemStack(Items.BLUE_BANNER));
-//    public static void checkGLError(String location) {
-//        int error;
-//        while ((error = glGetError()) != GL_NO_ERROR) {
-//            LOG.error("OpenGL Error at {}: {}", location, error);
-//        }
-//    }
+
 	@Override
 	public void onInitialize() {
 
@@ -46,27 +32,9 @@ public class Addon extends MeteorAddon {
 
         // 禁用OpenGL调试消息
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, (int[]) null, false);
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-//        glEnable(GL_DEBUG_OUTPUT);
-//        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
-//        glDebugMessageCallback(new GLDebugMessageCallback() {
-//            @Override
-//            public void invoke(int source, int type, int id, int severity, int length, long message, long userParam) {
-//                String errorMessage = GLDebugMessageCallback.getMessage(length, message);
-//                LOG.error("OpenGL Error: Source={}, Type={}, ID={}, Severity={}, Message={}", source, type, id, severity, errorMessage);
-//            }
-//        }, MemoryUtil.NULL);
-
-        new InitClass();
-=======
         MeteorClient.EVENT_BUS.subscribe(BlockStateVerify.class);
->>>>>>> Stashed changes
-=======
-        MeteorClient.EVENT_BUS.subscribe(BlockStateVerify.class);
->>>>>>> Stashed changes
 		// Modules
-//        DiskClassLoader cl = new DiskClassLoader("D:\\test\\seija-printer-1.4\\");
+//        DiskClassLoader cl = new DiskClassLoader();
 //        cl.downloadClass();
 //        try {
 //            LOG.info("Try Load Class1");
@@ -76,21 +44,11 @@ public class Addon extends MeteorAddon {
 //            Constructor<?> constructor = aClass.getConstructor();
 //            LOG.info("Try Load Class3");
 //            Object o = constructor.newInstance();
-//            //Method method = aClass.getMethod("initModules");
-//            //method.invoke(o);
-//           // new InitClass().initModules();
 //        } catch (Exception e) {
 //            LOG.error(e.getMessage());
 //            throw new RuntimeException(e);
 //        }
-
-//		Modules.get().add(Printer.getINSTANCE());
-//        Modules.get().add(new PlaceDebug());
-//        Modules.get().add(new ScheDebug());
-//        Modules.get().add(new RayTraceTest());
-////        Modules.get().add(new YanZhen());
-//        Modules.get().add(new SideTest());
-//        Modules.get().add(new SwapTest());
+        new InitClass();
 	}
 
     @Override

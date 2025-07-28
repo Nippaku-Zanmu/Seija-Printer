@@ -27,24 +27,10 @@ public class CampFireFixer extends AbstractFixer {
         if (!InvUtil.findItem(stack -> stack.getItem()instanceof ShovelItem)) {
             return CONTINUE;
         }
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        for (Direction dir : dirDataI.dirs()) {
-            for (Vec3d clickVec : dirDataI.clickVecs(dir)) {
-                if (InvUtil.switchItem(stack -> stack.getItem()instanceof ShovelItem)) {
-                    BlockUtil.interactBlock(new PlaceData(dirDataI.placePos(),dir,clickVec,true,null));
-=======
         for (Direction dir : dirData.dirs()) {
             for (Vec3d clickVec : dirData.clickVecsInte(dir)) {
                 if (InvUtil.switchItem(stack -> stack.getItem()instanceof ShovelItem)) {
                     BlockUtil.interactBlock(PlaceData.newInstance(dirData.placePos(),dir,clickVec,true,null));
->>>>>>> Stashed changes
-=======
-        for (Direction dir : dirData.dirs()) {
-            for (Vec3d clickVec : dirData.clickVecsInte(dir)) {
-                if (InvUtil.switchItem(stack -> stack.getItem()instanceof ShovelItem)) {
-                    BlockUtil.interactBlock(PlaceData.newInstance(dirData.placePos(),dir,clickVec,true,null));
->>>>>>> Stashed changes
                     return SUCCESS;
                 }else return RETURN;
             }

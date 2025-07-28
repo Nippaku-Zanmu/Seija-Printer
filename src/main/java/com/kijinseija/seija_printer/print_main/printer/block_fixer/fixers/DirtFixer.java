@@ -23,30 +23,12 @@ public class DirtFixer extends AbstractFixer {
 
         DirData dirData = new DirData(pos, BlockUtil.getInteractDir(pos));
 
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        dirDataI.dirs().remove(Direction.DOWN);
-        for (Direction dir : dirDataI.dirs()) {
-            for (Vec3d clickVec : dirDataI.clickVecs(dir)) {
-                if (InvUtil.switchItem(stack -> needState.getBlock() instanceof DirtPathBlock
-                    ? stack.getItem() instanceof ShovelItem : stack.getItem() instanceof HoeItem)) {
-                    BlockUtil.interactBlock(new PlaceData(dirDataI.placePos(), dir, clickVec, true, null));
-=======
         dirData.dirs().remove(Direction.DOWN);
         for (Direction dir : dirData.dirs()) {
             for (Vec3d clickVec : dirData.clickVecsInte(dir)) {
                 if (InvUtil.switchItem(stack -> needState.getBlock() instanceof DirtPathBlock
                     ? stack.getItem() instanceof ShovelItem : stack.getItem() instanceof HoeItem)) {
                     BlockUtil.interactBlock(PlaceData.newInstance(dirData.placePos(), dir, clickVec, true, null));
->>>>>>> Stashed changes
-=======
-        dirData.dirs().remove(Direction.DOWN);
-        for (Direction dir : dirData.dirs()) {
-            for (Vec3d clickVec : dirData.clickVecsInte(dir)) {
-                if (InvUtil.switchItem(stack -> needState.getBlock() instanceof DirtPathBlock
-                    ? stack.getItem() instanceof ShovelItem : stack.getItem() instanceof HoeItem)) {
-                    BlockUtil.interactBlock(PlaceData.newInstance(dirData.placePos(), dir, clickVec, true, null));
->>>>>>> Stashed changes
                     return AbstractFixer.SUCCESS;
                 } else return AbstractFixer.RETURN;
             }

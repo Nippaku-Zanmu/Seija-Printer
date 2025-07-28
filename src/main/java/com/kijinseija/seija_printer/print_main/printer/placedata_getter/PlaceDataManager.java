@@ -27,7 +27,7 @@ public class PlaceDataManager implements HasExtraSetting {
     public static final PlaceDataManager INSTANCE = new PlaceDataManager();
     private static final MinecraftClient mc = MinecraftClient.getInstance();
 
-    public  PlaceDataPack getPlaceData(BlockPos pos, BlockState needState) {
+    public PlaceDataPack getPlaceData(BlockPos pos, BlockState needState) {
         if (!mc.world.getBlockState(pos).isReplaceable())
             return PlaceDataPack.NULL;
         //若某位置已有不可被替换的方块 则返回
@@ -73,13 +73,12 @@ public class PlaceDataManager implements HasExtraSetting {
                 //异常处理,防止小天才乱玩方块替换
             }
         //默认放置
-        //ChatUtils.sendMsg(Text.of("GetDataDef"));
         if (pri.bSetEnablePrecisionPlace.get() && pri.bSetTryVanillaPrecisionPlace.get()) {
             return DataGetter.getData(needState, new DirData(pos, dirs), stacks.get(0));
         }
         for (Direction dir : dirData.dirs()) {
             for (Vec3d hitVec : dirData.clickVecs(dir)) {
-                return PlaceDataPack.plac(new PlaceData(pos.offset(dir), dir.getOpposite()
+                return PlaceDataPack.plac( PlaceData.newInstance(pos.offset(dir), dir.getOpposite()
                     , hitVec, true, null));
             }
         }
