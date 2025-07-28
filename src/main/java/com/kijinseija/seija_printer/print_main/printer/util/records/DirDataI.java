@@ -1,23 +1,15 @@
 package com.kijinseija.seija_printer.print_main.printer.util.records;
 
 import com.kijinseija.seija_printer.print_main.modules.Printer;
-import com.kijinseija.seija_printer.print_main.printer.util.BlockUtil;
-import com.kijinseija.seija_printer.print_main.printer.util.RayTraceUtil;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public record DirDataI(BlockPos placePos, List<Direction> dirs) {
     private static Printer pri = Printer.getINSTANCE();
 
+<<<<<<< Updated upstream
     //    @Nullable
 //    public Vec3d getClickVec(Direction dir, boolean strictVec, boolean randomOffset) {
 //        if (i >= dirs.size() - 1) return null;
@@ -137,4 +129,7 @@ public record DirDataI(BlockPos placePos, List<Direction> dirs) {
             return getClickVecs(offset,mode);
         return getClickVec1(offset, mode);
     }
+=======
+
+>>>>>>> Stashed changes
 }

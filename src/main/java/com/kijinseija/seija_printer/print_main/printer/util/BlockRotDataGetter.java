@@ -84,35 +84,35 @@ public class BlockRotDataGetter {
             Orientation ori = bs.get(Properties.ORIENTATION);
             if (ori.getFacing().getAxis() != Direction.Axis.Y)
                 return getRotateDataFromDir(ori.getFacing().getOpposite());
-            return new RotationData(getRotateDataFromDir(ori.getRotation().getOpposite()).yaw(), getRotateDataFromDir(ori.getFacing().getOpposite()).pitch());
+            return  RotationData.build(getRotateDataFromDir(ori.getRotation().getOpposite()).yaw(), getRotateDataFromDir(ori.getFacing().getOpposite()).pitch());
         }
 
         return null;
     }
 
     public static RotationData getRotateDataFromDir(Direction dir) {
-        RotationData data = new RotationData(0, 0);
+        RotationData data =  RotationData.build(0, 0);
         switch (dir) {
-            case EAST -> data = new RotationData(-90, 0);
-            case WEST -> data = new RotationData(90, 0);
+            case EAST -> data =  RotationData.build(-90, 0);
+            case WEST -> data =  RotationData.build(90, 0);
 
-            case NORTH -> data = new RotationData(180, 0);
+            case NORTH -> data =  RotationData.build(180, 0);
 
-            case SOUTH -> data = new RotationData(0, 0);
+            case SOUTH -> data =  RotationData.build(0, 0);
 
-            case DOWN -> data = new RotationData(0, 90);
+            case DOWN -> data =  RotationData.build(0, 90);
 
-            case UP -> data = new RotationData(0, -90);
+            case UP -> data =  RotationData.build(0, -90);
 
         }
         return data;
     }
 
     public static RotationData getVecFromRotProp(int prop) {
-        return new RotationData(MathHelper.wrapDegrees(22.5 * prop - 180), 0);
+        return  RotationData.build(MathHelper.wrapDegrees(22.5 * prop - 180), 0);
     }
 
     public static RotationData getVecFromRotProp2(int prop) {
-        return new RotationData(MathHelper.wrapDegrees(22.5 * prop), 0);
+        return  RotationData.build(MathHelper.wrapDegrees(22.5 * prop), 0);
     }
 }

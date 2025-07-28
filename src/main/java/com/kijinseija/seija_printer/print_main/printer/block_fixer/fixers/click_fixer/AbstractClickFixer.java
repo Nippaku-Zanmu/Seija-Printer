@@ -2,6 +2,7 @@ package com.kijinseija.seija_printer.print_main.printer.block_fixer.fixers.click
 
 import com.kijinseija.seija_printer.print_main.printer.block_fixer.AbstractFixer;
 import com.kijinseija.seija_printer.print_main.printer.util.BlockUtil;
+import com.kijinseija.seija_printer.print_main.printer.util.records.DirData;
 import com.kijinseija.seija_printer.print_main.printer.util.records.DirDataI;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
 import meteordevelopment.meteorclient.settings.BoolSetting;
@@ -25,10 +26,17 @@ public abstract class AbstractClickFixer extends AbstractFixer {
     public int fixBlock(BlockPos pos, BlockState needState) {
 
 //        BlockUtil.interactBlock(pos,interactDir.get(0));
+<<<<<<< Updated upstream
         DirDataI dirDataI = new DirDataI(pos, BlockUtil.getInteractDir(pos));
         for (Direction dir : dirDataI.dirs()) {
             for (Vec3d clickVec : dirDataI.clickVecs(dir)) {
                 BlockUtil.interactBlock(new PlaceData(dirDataI.placePos(),dir,clickVec,true,null));
+=======
+        DirData dirData = new DirData(pos, BlockUtil.getInteractDir(pos));
+        for (Direction dir : dirData.dirs()) {
+            for (Vec3d clickVec : dirData.clickVecsInte(dir)) {
+                BlockUtil.interactBlock(PlaceData.newInstance(dirData.placePos(),dir,clickVec,true,null));
+>>>>>>> Stashed changes
                 return AbstractFixer.SUCCESS;
             }
         }

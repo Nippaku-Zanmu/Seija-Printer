@@ -3,6 +3,8 @@ package com.kijinseija.seija_printer;
 
 import com.kijinseija.seija_printer.loader.DiskClassLoader;
 import com.kijinseija.seija_printer.print_main.InitClass;
+import com.kijinseija.seija_printer.print_main.printer.placedata_getter.vanilla_precision_placer.BlockStateVerify;
+import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
 import meteordevelopment.meteorclient.systems.modules.Category;
 import meteordevelopment.meteorclient.systems.modules.Modules;
@@ -44,6 +46,7 @@ public class Addon extends MeteorAddon {
 
         // 禁用OpenGL调试消息
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, (int[]) null, false);
+<<<<<<< Updated upstream
 //        glEnable(GL_DEBUG_OUTPUT);
 //        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 //        glDebugMessageCallback(new GLDebugMessageCallback() {
@@ -55,6 +58,9 @@ public class Addon extends MeteorAddon {
 //        }, MemoryUtil.NULL);
 
         new InitClass();
+=======
+        MeteorClient.EVENT_BUS.subscribe(BlockStateVerify.class);
+>>>>>>> Stashed changes
 		// Modules
 //        DiskClassLoader cl = new DiskClassLoader("D:\\test\\seija-printer-1.4\\");
 //        cl.downloadClass();

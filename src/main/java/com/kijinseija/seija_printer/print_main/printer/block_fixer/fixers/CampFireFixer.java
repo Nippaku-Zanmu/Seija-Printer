@@ -2,6 +2,7 @@ package com.kijinseija.seija_printer.print_main.printer.block_fixer.fixers;
 
 import com.kijinseija.seija_printer.print_main.printer.block_fixer.AbstractFixer;
 import com.kijinseija.seija_printer.print_main.printer.util.BlockUtil;
+import com.kijinseija.seija_printer.print_main.printer.util.records.DirData;
 import com.kijinseija.seija_printer.print_main.printer.util.records.DirDataI;
 import com.kijinseija.seija_printer.print_main.printer.util.InvUtil;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
@@ -22,14 +23,21 @@ public class CampFireFixer extends AbstractFixer {
     @Override
     public int fixBlock(BlockPos pos, BlockState needState) {
         List<Direction> interactDir = BlockUtil.getInteractDir(pos);
-        DirDataI dirDataI = new DirDataI(pos, interactDir);
+        DirData dirData = new DirData(pos, interactDir);
         if (!InvUtil.findItem(stack -> stack.getItem()instanceof ShovelItem)) {
             return CONTINUE;
         }
+<<<<<<< Updated upstream
         for (Direction dir : dirDataI.dirs()) {
             for (Vec3d clickVec : dirDataI.clickVecs(dir)) {
                 if (InvUtil.switchItem(stack -> stack.getItem()instanceof ShovelItem)) {
                     BlockUtil.interactBlock(new PlaceData(dirDataI.placePos(),dir,clickVec,true,null));
+=======
+        for (Direction dir : dirData.dirs()) {
+            for (Vec3d clickVec : dirData.clickVecsInte(dir)) {
+                if (InvUtil.switchItem(stack -> stack.getItem()instanceof ShovelItem)) {
+                    BlockUtil.interactBlock(PlaceData.newInstance(dirData.placePos(),dir,clickVec,true,null));
+>>>>>>> Stashed changes
                     return SUCCESS;
                 }else return RETURN;
             }

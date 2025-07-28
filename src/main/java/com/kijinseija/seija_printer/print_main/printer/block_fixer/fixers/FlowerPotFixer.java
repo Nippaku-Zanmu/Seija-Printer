@@ -2,6 +2,7 @@ package com.kijinseija.seija_printer.print_main.printer.block_fixer.fixers;
 
 import com.kijinseija.seija_printer.print_main.printer.block_fixer.AbstractFixer;
 import com.kijinseija.seija_printer.print_main.printer.util.BlockUtil;
+import com.kijinseija.seija_printer.print_main.printer.util.records.DirData;
 import com.kijinseija.seija_printer.print_main.printer.util.records.DirDataI;
 import com.kijinseija.seija_printer.print_main.printer.util.InvUtil;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
@@ -21,15 +22,24 @@ public class FlowerPotFixer extends AbstractFixer {
     public int fixBlock(BlockPos pos, BlockState needState) {
 
         //block替换 仅自定义替换,不使用内置替换
-        DirDataI dirDataI = new DirDataI(pos, BlockUtil.getInteractDir(pos));
+        DirData dirData = new DirData(pos, BlockUtil.getInteractDir(pos));
 
         if (InvUtil.findBlock(((FlowerPotBlock) needState.getBlock()).getContent())){
+<<<<<<< Updated upstream
             for (Direction dir : dirDataI.dirs()) {
                 for (Vec3d clickVec : dirDataI.clickVecs(dir)) {
                     if (!InvUtil.switchBlock(((FlowerPotBlock) needState.getBlock()).getContent())) {
                         return RETURN;
                     }
                     BlockUtil.interactBlock(new PlaceData(dirDataI.placePos(),dir,clickVec,true,null));
+=======
+            for (Direction dir : dirData.dirs()) {
+                for (Vec3d clickVec : dirData.clickVecsInte(dir)) {
+                    if (!InvUtil.switchBlock(((FlowerPotBlock) needState.getBlock()).getContent())) {
+                        return RETURN;
+                    }
+                    BlockUtil.interactBlock(PlaceData.newInstance(dirData.placePos(),dir,clickVec,true,null));
+>>>>>>> Stashed changes
                     return SUCCESS;
                 }
             }

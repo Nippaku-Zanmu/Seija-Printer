@@ -7,6 +7,7 @@ import com.kijinseija.seija_printer.print_main.printer.block_fixer.FixerManager;
 import com.kijinseija.seija_printer.print_main.printer.extra_setting.ExtraSettingManager;
 import com.kijinseija.seija_printer.print_main.printer.placedata_getter.PlaceDataManager;
 import com.kijinseija.seija_printer.print_main.printer.placedata_getter.vanilla_precision_placer.FakePlacementContext;
+import com.kijinseija.seija_printer.print_main.printer.task_manager.RotationManager;
 import com.kijinseija.seija_printer.print_main.printer.util.*;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceDataPack;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PosInfo;
@@ -464,6 +465,7 @@ public class Printer extends LoaderAntiCrash {
 
 
     public void doPrint() {
+        if (RotationManager.INSTANCE.taskSize()>4)return;
         if (!timer.passed(dRangeSetPrintingDelay.get().getCurrentRandom())) return;
         if (mc.player == null || mc.world == null) return;
         //刷掉过时的黑名单方块
@@ -497,11 +499,12 @@ public class Printer extends LoaderAntiCrash {
                     timer.reset();
                     return;
                 }
-                if (placeDataPack.placeMode()) {
-                    BlockUtil.placeBlock(placeDataPack.data());//放置
-                } else {
-                    BlockUtil.interactBlock(placeDataPack.data());
-                }
+                BlockUtil.applyPlaceData(placeDataPack);
+//                if (placeDataPack.placeMode()) {
+//                    BlockUtil.placeBlock(placeDataPack.data());//放置
+//                } else {
+//                    BlockUtil.interactBlock(placeDataPack.data());
+//                }
                 timer.reset();//重置计时器
                 RenderUtil.isAniRenderSizeAdd = true;
                 placeCount += 1;

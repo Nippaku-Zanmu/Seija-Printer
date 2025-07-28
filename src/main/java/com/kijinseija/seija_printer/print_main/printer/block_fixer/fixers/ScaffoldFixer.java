@@ -6,6 +6,7 @@ import com.kijinseija.seija_printer.print_main.printer.util.BlockRotDataGetter;
 import com.kijinseija.seija_printer.print_main.printer.util.BlockUtil;
 import com.kijinseija.seija_printer.print_main.printer.util.InvUtil;
 import com.kijinseija.seija_printer.print_main.printer.util.SeijaUtil;
+import com.kijinseija.seija_printer.print_main.printer.util.records.DirData;
 import com.kijinseija.seija_printer.print_main.printer.util.records.DirDataI;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PosInfo;
@@ -38,9 +39,13 @@ public class ScaffoldFixer extends AbstractFixer {
             if (off != Direction.DOWN) {
 
                 if (!dirs.contains(Direction.UP)) continue;
-                DirDataI dataI = new DirDataI(helperPos, dirs);
+                DirData data = new DirData(helperPos, dirs);
 
+<<<<<<< Updated upstream
                 for (Vec3d clickVec : dataI.clickVecs(Direction.UP)) {
+=======
+                for (Vec3d clickVec : data.clickVecsInte(Direction.UP)) {
+>>>>>>> Stashed changes
 
                     PlaceData interactData = PlaceData.NULL;
                     if (pri().bSetIllegalRotate.get()) {
@@ -61,10 +66,15 @@ public class ScaffoldFixer extends AbstractFixer {
                 }
             } else {
                 dirs.remove(Direction.UP);
-                DirDataI dataI = new DirDataI(helperPos, dirs);
+                DirData data = new DirData(helperPos, dirs);
                 for (Direction clickDir : dirs) {
+<<<<<<< Updated upstream
                     for (Vec3d clickVec : dataI.clickVecs(clickDir)) {
                         PlaceData interactData =  new PlaceData(helperPos, clickDir, clickVec, true, null);
+=======
+                    for (Vec3d clickVec : data.clickVecsInte(clickDir)) {
+                        PlaceData interactData =  PlaceData.newInstance(helperPos, clickDir, clickVec, true, null);
+>>>>>>> Stashed changes
                         if (InvUtil.switchBlock(Blocks.SCAFFOLDING)) {
                             BlockUtil.interactBlock(interactData);
                             PosInfo blackInfo = new PosInfo(pos, off, clickVec, false, System.currentTimeMillis(), Color.BLACK);

@@ -1,7 +1,11 @@
 package com.kijinseija.seija_printer.print_main.printer.util;
 
 import com.kijinseija.seija_printer.print_main.modules.Printer;
+import com.kijinseija.seija_printer.print_main.printer.task_manager.RotationManager;
+import com.kijinseija.seija_printer.print_main.printer.task_manager.RotationTask;
+import com.kijinseija.seija_printer.print_main.printer.task_manager.Task;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
+import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceDataPack;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PosInfo;
 import com.kijinseija.seija_printer.print_main.printer.util.records.RotationData;
 import meteordevelopment.meteorclient.utils.player.Rotations;
@@ -35,19 +39,25 @@ public class BlockUtil {
     public static List<Direction> getInteractDir(BlockPos pos) {
         return (pri.bSetStrictDir.get() ? canTorchFac(pos) : Arrays.asList(Direction.values())).stream()
             .filter(dir -> (!pri.bSetStrictDir.get()) || canPlaceIn(pos.offset(dir)))
-            .filter(dir ->pri.dRangeSetPrintingYRange.get().isInRange(pos.toCenterPos().offset(dir, 0.5).y-mc.player.getY())  )
+            .filter(dir -> pri.dRangeSetPrintingYRange.get().isInRange(pos.toCenterPos().offset(dir, 0.5).y - mc.player.getY()))
             //高度检测 针对于放置比自己低太多的方块
             .filter(dir -> pos.toCenterPos().offset(dir, 0.5).distanceTo(mc.player.getEyePos()) <= pri.dSetPrintingRange.get())
             //距离检测
             .collect(Collectors.toList());
 
     }
-
-    public static void interactBlock(PlaceData data) {
+    public static List<Task> genTasks(PlaceDataPack pdp) {
+        boolean isPlaceMode = pdp.placeMode();
+        boolean isBucket = mc.player.getMainHandStack().getItem() instanceof BucketItem;
+        PlaceData data = pdp.data();
         Vec3d hitVec = data.hitVec();
         final BlockPos.Mutable pos = new BlockPos.Mutable(data.pos().getX(), data.pos().getY(), data.pos().getZ());
         Direction dir = data.dir();
+        ArrayList<Task> tasks = new ArrayList<>();
+
+
         Runnable r = () -> {
+<<<<<<< Updated upstream
             if (pri.bSetIllegalRotate.get() && data.exRotateData() != null) {
                 mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.exRotateData().yaw(), (float) data.exRotateData().pitch(), mc.player.isOnGround(),mc.player.horizontalCollision));
             }//非法转头
@@ -61,23 +71,199 @@ public class BlockUtil {
             PosInfo blackInfo = RenderHelper.getBlackInfo(pos, dir, hitVec, false);
             pri.blackList.add(blackInfo);
             RenderUtil.renderList.add(blackInfo);
+=======
+            boolean sneakToggle = false;
+            if (isPlaceMode && pri.bSetSneak.get()) {
+                if (!mc.player.isSneaking()) {
+                    sneakToggle = true;
+                    mc.player.setSneaking(true);
+                }
+            }
+
+            if (data.test() == null || data.test().getAsBoolean()) {
+                illegalRotate(data.exRotateData());
+                if (isBucket) {
+                    mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
+                }
+
+                if (pri.bSetPacketPlace.get()) {
+                    mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, getHitRes(pos, dir, hitVec), SeijaUtil.getSequence()));
+                    mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+                } else {
+                    mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, getHitRes(pos, dir, hitVec));
+                    mc.player.swingHand(Hand.MAIN_HAND);
+                }
+
+                PosInfo blackInfo = isPlaceMode ? RenderHelper.getBlackInfo(pos.offset(dir), dir, hitVec, true):
+                    RenderHelper.getBlackInfo(pos, dir, hitVec, false);
+                pri.blackList.add(blackInfo);
+                RenderUtil.renderList.add(blackInfo);
+            }
+
+            if (sneakToggle) {
+                mc.player.setSneaking(false);
+            }
+
+>>>>>>> Stashed changes
         };
-        if (pri.bSetRotate.get()) {
+        if (pri.bSetRotate.get() || isBucket) {
+            tasks.add(new RotationTask(null,RotationData.fromVec(hitVec)));
+        }
+        if (data.exRotateData()!=null)
+            tasks.add(new RotationTask(null,data.exRotateData()));
+
+        tasks.add(new Task(r));
+        return tasks;
+    }
+
+    public static void applyPlaceData(PlaceDataPack pdp) {
+
+        RotationManager.INSTANCE.addTask(genTasks(pdp));
+
+        if (true)return;
+        boolean isPlaceMode = pdp.placeMode();
+        boolean isBucket = mc.player.getMainHandStack().getItem() instanceof BucketItem;
+        PlaceData data = pdp.data();
+        Vec3d hitVec = data.hitVec();
+        final BlockPos.Mutable pos = new BlockPos.Mutable(data.pos().getX(), data.pos().getY(), data.pos().getZ());
+        Direction dir = data.dir();
+
+
+        Runnable r = () -> {
+            boolean sneakToggle = false;
+            if (isPlaceMode && pri.bSetSneak.get()) {
+                if (!mc.player.isSneaking()) {
+                    sneakToggle = true;
+                    mc.player.setSneaking(true);
+                }
+            }
+
+            if (data.test() == null || data.test().getAsBoolean()) {
+                illegalRotate(data.exRotateData());
+                if (isBucket) {
+                    mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
+                }
+
+                if (pri.bSetPacketPlace.get()) {
+                    mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, getHitRes(pos, dir, hitVec), SeijaUtil.getSequence()));
+                    mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+                } else {
+                    mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, getHitRes(pos, dir, hitVec));
+                    mc.player.swingHand(Hand.MAIN_HAND);
+                }
+
+                PosInfo blackInfo = isPlaceMode ? RenderHelper.getBlackInfo(pos.offset(dir), dir, hitVec, true):
+                RenderHelper.getBlackInfo(pos, dir, hitVec, false);
+                pri.blackList.add(blackInfo);
+                RenderUtil.renderList.add(blackInfo);
+            }
+
+            if (sneakToggle) {
+                mc.player.setSneaking(false);
+            }
+
+        };
+        if (pri.bSetRotate.get() || isBucket) {
             if (pri.bSetPacketRotate.get()) {
-                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) SeijaUtil.getYaw(hitVec), (float) SeijaUtil.getPitch(hitVec), mc.player.isOnGround(),mc.player.horizontalCollision));
+                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) SeijaUtil.getYaw(hitVec), (float) SeijaUtil.getPitch(hitVec), mc.player.isOnGround(), mc.player.horizontalCollision));
                 r.run();
             } else
                 Rotations.rotate(SeijaUtil.getYaw(hitVec), SeijaUtil.getPitch(hitVec), r);
+<<<<<<< Updated upstream
         } else r.run();
 
+=======
+        } else {
+            r.run();
+        }
+    }
+
+    public static void interactBlock(PlaceData data) {
+        applyPlaceData(new PlaceDataPack(data,false));
+//        Vec3d hitVec = data.hitVec();
+//        final BlockPos.Mutable pos = new BlockPos.Mutable(data.pos().getX(), data.pos().getY(), data.pos().getZ());
+//        Direction dir = data.dir();
+//        Runnable r = () -> {
+//            if (data.test() == null || data.test().getAsBoolean()) {
+//                if (pri.bSetIllegalRotate.get() && data.exRotateData() != null) {
+//                    mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.exRotateData().yaw(), (float) data.exRotateData().pitch(), mc.player.isOnGround(), mc.player.horizontalCollision));
+//                }//非法转头
+//                if (pri.bSetPacketPlace.get()) {
+//                    mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, getHitRes(pos, dir, hitVec), SeijaUtil.getSequence()));
+//                    mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+//                } else {
+//                    mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, getHitRes(pos, dir, hitVec));
+//                    mc.player.swingHand(Hand.MAIN_HAND);
+//                }
+//
+//                PosInfo blackInfo = RenderHelper.getBlackInfo(pos, dir, hitVec, false);
+//                pri.blackList.add(blackInfo);
+//                RenderUtil.renderList.add(blackInfo);
+//            }
+//        };
+//        if (pri.bSetRotate.get()) {
+//            if (pri.bSetPacketRotate.get()) {
+//                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) SeijaUtil.getYaw(hitVec), (float) SeijaUtil.getPitch(hitVec), mc.player.isOnGround(), mc.player.horizontalCollision));
+//                r.run();
+//            } else
+//                Rotations.rotate(SeijaUtil.getYaw(hitVec), SeijaUtil.getPitch(hitVec), r);
+//        } else r.run();
+    }
+
+    public static void placeBlock(PlaceData data) {
+        applyPlaceData(new PlaceDataPack(data,true));
+//        final BlockPos.Mutable pos = new BlockPos.Mutable(data.pos().getX(), data.pos().getY(), data.pos().getZ());
+//
+//
+//        Direction dir = data.dir();
+//        Vec3d hitVec = data.hitVec();
+//        final boolean isBucket = mc.player.getMainHandStack().getItem() instanceof BucketItem;
+//
+//        Runnable r = () -> {
+//            boolean sneakToggle = false;
+//            if (pri.bSetSneak.get()) {
+//                if (!mc.player.isSneaking()) {
+//                    sneakToggle = true;
+//                    mc.player.setSneaking(true);
+//                }
+//            }
+//            if (data.test() == null || data.test().getAsBoolean()) {
+//                //非法转头
+//                illegalRotate(data.exRotateData());
+//                if (isBucket) {
+//                    mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
+//                }
+//                if (pri.bSetPacketPlace.get()) {
+//                    mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.MAIN_HAND, getHitRes(pos, dir, hitVec), SeijaUtil.getSequence()));
+//                    mc.player.networkHandler.sendPacket(new HandSwingC2SPacket(Hand.MAIN_HAND));
+//                } else {
+//                    mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, getHitRes(pos, dir, hitVec));
+//                    mc.player.swingHand(Hand.MAIN_HAND);
+//                }
+//                PosInfo blackInfo = RenderHelper.getBlackInfo(pos.offset(dir), dir, hitVec, true);
+//                pri.blackList.add(blackInfo);
+//                RenderUtil.renderList.add(blackInfo);
+//            }
+//            if (sneakToggle) {
+//                mc.player.setSneaking(false);
+//            }
+//
+//        };
+//        if (pri.bSetRotate.get() || isBucket) {
+//            if (pri.bSetPacketRotate.get()) {
+//                mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) SeijaUtil.getYaw(hitVec), (float) SeijaUtil.getPitch(hitVec), mc.player.isOnGround(), mc.player.horizontalCollision));
+//                r.run();
+//            } else
+//                Rotations.rotate(SeijaUtil.getYaw(hitVec), SeijaUtil.getPitch(hitVec), r);
+//        } else {
+//            r.run();
+//        }
+>>>>>>> Stashed changes
 
     }
 
     public static List<Direction> getSortedDirs(BlockPos pos) {
-        return pri.bSetSortDir.get()?DirSorter.sort(getDirs(pos), pos):getDirs(pos);
-//        if ()
-//            return ;
-//        return ;
+        return pri.bSetSortDir.get() ? DirSorter.sort(getDirs(pos), pos) : getDirs(pos);
     }
 
     public static List<Direction> getDirs(BlockPos pos) {
@@ -97,7 +283,7 @@ public class BlockUtil {
             //不可被替换
             .filter(dir -> (mc.world.getBlockState(pos).isAir()) || !mc.world.getBlockState(pos).isSideSolid(mc.world, pos, dir, SideShapeType.FULL))
             //方块自身阻挡检测
-            .filter(dir -> pri.dRangeSetPrintingYRange.get().isInRange(pos.toCenterPos().offset(dir, 0.5).y-mc.player.getY()))
+            .filter(dir -> pri.dRangeSetPrintingYRange.get().isInRange(pos.toCenterPos().offset(dir, 0.5).y - mc.player.getY()))
             //高度检测 针对于放置比自己低太多的方块
             .filter(dir -> SeijaUtil.isSneak() || !isCanUseBlock(pos.offset(dir), mc.world.getBlockState(pos.offset(dir)), mc.world))
             //不可交互
@@ -106,6 +292,7 @@ public class BlockUtil {
             .collect(Collectors.toList());
     }
 
+<<<<<<< Updated upstream
     public static void placeBlock(PlaceData data) {
         final BlockPos.Mutable pos = new BlockPos.Mutable(data.pos().getX(), data.pos().getY(), data.pos().getZ());
 
@@ -170,6 +357,19 @@ public class BlockUtil {
                 mc.player.networkHandler.sendPacket(packet);
             } else
                 mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.yaw(), (float) data.pitch(), mc.player.isOnGround(),mc.player.horizontalCollision));
+=======
+
+    public static void illegalRotate(RotationData data) {
+        if (pri.bSetIllegalRotate.get() && data != null) {
+//            if (mc.isInSingleplayer()) {
+//                mc.player.lastYaw = (float) data.yaw();
+//                PlayerMoveC2SPacket packet = new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), (float) data.yaw(),
+//                    (float) data.pitch(), mc.player.isOnGround(),mc.player.horizontalCollision);
+//                mc.player.networkHandler.sendPacket(packet);
+//            } else
+            mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.yaw(), (float) data.pitch(), mc.player.isOnGround(), mc.player.horizontalCollision));
+            mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.yaw(), (float) data.pitch(), mc.player.isOnGround(), mc.player.horizontalCollision));
+>>>>>>> Stashed changes
 
         }
     }

@@ -27,6 +27,18 @@ public class BuckedDataGetter extends AbstractDataGetter {
                 continue;
             }
             for (Vec3d clickVec : dirData.clickVecs(offsetDir, new DirData.DirDataConfig().setRaytrace(true).setStrictVec(true))) {
+<<<<<<< Updated upstream
+=======
+                return new PlaceData(placePos.offset(offsetDir), offsetDir.getOpposite(), clickVec, true,
+                    (Printer.getINSTANCE().bSetRotate.get() ? null : RotationData.fromVec(clickVec)), () -> {
+                    BlockHitResult blockHitResult = RayTraceUtil.INSTANCE.rayHitRes
+                        (mc.player.getEyePos(),  RotationData.build(mc.player.getYaw(),
+                                mc.player.getPitch()), false,
+                            mc.player.getAttributeValue(EntityAttributes.BLOCK_INTERACTION_RANGE));
+//                    ChatUtils.info(blockHitResult.getType() + "  " + blockHitResult.getBlockPos());
+//                    ChatUtils.info();
+                    return blockHitResult.getType().equals(HitResult.Type.BLOCK) && blockHitResult.getBlockPos().equals(placePos.offset(offsetDir));
+>>>>>>> Stashed changes
 
                 return new PlaceData(placePos.offset(offsetDir), offsetDir.getOpposite(), clickVec, true
                     , (Printer.getINSTANCE().bSetRotate.get() ? null : RotationData.fromVec(clickVec)));

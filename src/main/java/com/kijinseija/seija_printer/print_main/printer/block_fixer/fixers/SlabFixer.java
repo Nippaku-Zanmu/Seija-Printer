@@ -2,8 +2,8 @@ package com.kijinseija.seija_printer.print_main.printer.block_fixer.fixers;
 
 import com.kijinseija.seija_printer.print_main.printer.block_fixer.AbstractFixer;
 import com.kijinseija.seija_printer.print_main.printer.util.BlockUtil;
-import com.kijinseija.seija_printer.print_main.printer.util.records.DirData;
 import com.kijinseija.seija_printer.print_main.printer.util.InvUtil;
+import com.kijinseija.seija_printer.print_main.printer.util.records.DirData;
 import com.kijinseija.seija_printer.print_main.printer.util.records.DirDataI;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceDataPack;
@@ -56,9 +56,15 @@ public class SlabFixer extends AbstractFixer {
                         && dir.getAxis() == Direction.Axis.Y))
             ) continue;
             if (dir.getAxis() == Direction.Axis.Y) {
+<<<<<<< Updated upstream
                 DirDataI dataI = new DirDataI(pos, Collections.singletonList(dir));
                 for (Vec3d clickVec : dataI.clickVecs(dir, 0)) {
                     dataPack = PlaceDataPack.inte(new PlaceData(pos, dir
+=======
+                DirData data = new DirData(pos, Collections.singletonList(dir));
+                for (Vec3d clickVec : data.clickVecsInte(dir, 0)) {
+                    dataPack = PlaceDataPack.inte( PlaceData.newInstance(pos, dir
+>>>>>>> Stashed changes
                         , clickVec, true, null));
                     break;
                 }
