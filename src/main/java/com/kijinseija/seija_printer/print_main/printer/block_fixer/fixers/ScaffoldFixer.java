@@ -42,7 +42,11 @@ public class ScaffoldFixer extends AbstractFixer {
                 DirData data = new DirData(helperPos, dirs);
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                 for (Vec3d clickVec : dataI.clickVecs(Direction.UP)) {
+=======
+                for (Vec3d clickVec : data.clickVecsInte(Direction.UP)) {
+>>>>>>> Stashed changes
 =======
                 for (Vec3d clickVec : data.clickVecsInte(Direction.UP)) {
 >>>>>>> Stashed changes
@@ -69,9 +73,12 @@ public class ScaffoldFixer extends AbstractFixer {
                 DirData data = new DirData(helperPos, dirs);
                 for (Direction clickDir : dirs) {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                     for (Vec3d clickVec : dataI.clickVecs(clickDir)) {
                         PlaceData interactData =  new PlaceData(helperPos, clickDir, clickVec, true, null);
 =======
+=======
+>>>>>>> Stashed changes
                     for (Vec3d clickVec : data.clickVecsInte(clickDir)) {
                         PlaceData interactData =  PlaceData.newInstance(helperPos, clickDir, clickVec, true, null);
 >>>>>>> Stashed changes

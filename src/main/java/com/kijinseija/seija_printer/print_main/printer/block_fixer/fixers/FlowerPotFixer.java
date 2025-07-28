@@ -26,12 +26,21 @@ public class FlowerPotFixer extends AbstractFixer {
 
         if (InvUtil.findBlock(((FlowerPotBlock) needState.getBlock()).getContent())){
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             for (Direction dir : dirDataI.dirs()) {
                 for (Vec3d clickVec : dirDataI.clickVecs(dir)) {
                     if (!InvUtil.switchBlock(((FlowerPotBlock) needState.getBlock()).getContent())) {
                         return RETURN;
                     }
                     BlockUtil.interactBlock(new PlaceData(dirDataI.placePos(),dir,clickVec,true,null));
+=======
+            for (Direction dir : dirData.dirs()) {
+                for (Vec3d clickVec : dirData.clickVecsInte(dir)) {
+                    if (!InvUtil.switchBlock(((FlowerPotBlock) needState.getBlock()).getContent())) {
+                        return RETURN;
+                    }
+                    BlockUtil.interactBlock(PlaceData.newInstance(dirData.placePos(),dir,clickVec,true,null));
+>>>>>>> Stashed changes
 =======
             for (Direction dir : dirData.dirs()) {
                 for (Vec3d clickVec : dirData.clickVecsInte(dir)) {

@@ -47,6 +47,7 @@ public class Addon extends MeteorAddon {
         // 禁用OpenGL调试消息
         glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, (int[]) null, false);
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
 //        glEnable(GL_DEBUG_OUTPUT);
 //        glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 //        glDebugMessageCallback(new GLDebugMessageCallback() {
@@ -58,6 +59,9 @@ public class Addon extends MeteorAddon {
 //        }, MemoryUtil.NULL);
 
         new InitClass();
+=======
+        MeteorClient.EVENT_BUS.subscribe(BlockStateVerify.class);
+>>>>>>> Stashed changes
 =======
         MeteorClient.EVENT_BUS.subscribe(BlockStateVerify.class);
 >>>>>>> Stashed changes

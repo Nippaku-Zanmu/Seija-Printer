@@ -58,6 +58,7 @@ public class BlockUtil {
 
         Runnable r = () -> {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
             if (pri.bSetIllegalRotate.get() && data.exRotateData() != null) {
                 mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.exRotateData().yaw(), (float) data.exRotateData().pitch(), mc.player.isOnGround(),mc.player.horizontalCollision));
             }//非法转头
@@ -72,6 +73,8 @@ public class BlockUtil {
             pri.blackList.add(blackInfo);
             RenderUtil.renderList.add(blackInfo);
 =======
+=======
+>>>>>>> Stashed changes
             boolean sneakToggle = false;
             if (isPlaceMode && pri.bSetSneak.get()) {
                 if (!mc.player.isSneaking()) {
@@ -104,6 +107,9 @@ public class BlockUtil {
                 mc.player.setSneaking(false);
             }
 
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
         };
         if (pri.bSetRotate.get() || isBucket) {
@@ -170,9 +176,12 @@ public class BlockUtil {
             } else
                 Rotations.rotate(SeijaUtil.getYaw(hitVec), SeijaUtil.getPitch(hitVec), r);
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         } else r.run();
 
 =======
+=======
+>>>>>>> Stashed changes
         } else {
             r.run();
         }
@@ -258,6 +267,9 @@ public class BlockUtil {
 //        } else {
 //            r.run();
 //        }
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
     }
@@ -292,6 +304,7 @@ public class BlockUtil {
             .collect(Collectors.toList());
     }
 
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
     public static void placeBlock(PlaceData data) {
         final BlockPos.Mutable pos = new BlockPos.Mutable(data.pos().getX(), data.pos().getY(), data.pos().getZ());
@@ -361,6 +374,11 @@ public class BlockUtil {
 
     public static void illegalRotate(RotationData data) {
         if (pri.bSetIllegalRotate.get() && data != null) {
+=======
+
+    public static void illegalRotate(RotationData data) {
+        if (pri.bSetIllegalRotate.get() && data != null) {
+>>>>>>> Stashed changes
 //            if (mc.isInSingleplayer()) {
 //                mc.player.lastYaw = (float) data.yaw();
 //                PlayerMoveC2SPacket packet = new PlayerMoveC2SPacket.Full(mc.player.getX(), mc.player.getY(), mc.player.getZ(), (float) data.yaw(),
@@ -369,6 +387,9 @@ public class BlockUtil {
 //            } else
             mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.yaw(), (float) data.pitch(), mc.player.isOnGround(), mc.player.horizontalCollision));
             mc.player.networkHandler.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround((float) data.yaw(), (float) data.pitch(), mc.player.isOnGround(), mc.player.horizontalCollision));
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
         }

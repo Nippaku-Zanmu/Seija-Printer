@@ -27,9 +27,15 @@ public class StrippedFixer extends AbstractFixer {
         if (InvUtil.findItem(stack -> stack.getItem() instanceof AxeItem)) {
             for (Direction dir : interactDir) {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                 for (Vec3d clickVec : dirDataI.clickVecs(dir)) {
                     if (InvUtil.switchItem(stack -> stack.getItem() instanceof AxeItem)) {
                         BlockUtil.interactBlock(new PlaceData(dirDataI.placePos(),dir,clickVec,true,null));
+=======
+                for (Vec3d clickVec : dirData.clickVecsInte(dir)) {
+                    if (InvUtil.switchItem(stack -> stack.getItem() instanceof AxeItem)) {
+                        BlockUtil.interactBlock(PlaceData.newInstance(dirData.placePos(),dir,clickVec,true,null));
+>>>>>>> Stashed changes
 =======
                 for (Vec3d clickVec : dirData.clickVecsInte(dir)) {
                     if (InvUtil.switchItem(stack -> stack.getItem() instanceof AxeItem)) {

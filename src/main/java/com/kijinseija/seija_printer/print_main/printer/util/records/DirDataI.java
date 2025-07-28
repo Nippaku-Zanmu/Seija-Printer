@@ -10,6 +10,7 @@ public record DirDataI(BlockPos placePos, List<Direction> dirs) {
     private static Printer pri = Printer.getINSTANCE();
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     //    @Nullable
 //    public Vec3d getClickVec(Direction dir, boolean strictVec, boolean randomOffset) {
 //        if (i >= dirs.size() - 1) return null;
@@ -129,6 +130,9 @@ public record DirDataI(BlockPos placePos, List<Direction> dirs) {
             return getClickVecs(offset,mode);
         return getClickVec1(offset, mode);
     }
+=======
+
+>>>>>>> Stashed changes
 =======
 
 >>>>>>> Stashed changes

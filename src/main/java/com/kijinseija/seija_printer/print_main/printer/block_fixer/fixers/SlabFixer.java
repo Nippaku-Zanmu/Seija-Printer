@@ -57,10 +57,13 @@ public class SlabFixer extends AbstractFixer {
             ) continue;
             if (dir.getAxis() == Direction.Axis.Y) {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                 DirDataI dataI = new DirDataI(pos, Collections.singletonList(dir));
                 for (Vec3d clickVec : dataI.clickVecs(dir, 0)) {
                     dataPack = PlaceDataPack.inte(new PlaceData(pos, dir
 =======
+=======
+>>>>>>> Stashed changes
                 DirData data = new DirData(pos, Collections.singletonList(dir));
                 for (Vec3d clickVec : data.clickVecsInte(dir, 0)) {
                     dataPack = PlaceDataPack.inte( PlaceData.newInstance(pos, dir

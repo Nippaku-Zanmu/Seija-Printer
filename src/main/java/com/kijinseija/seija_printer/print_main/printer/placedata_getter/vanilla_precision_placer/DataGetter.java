@@ -33,9 +33,12 @@ public class DataGetter {
     }
 
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     private static PlaceDataPack getDataInt(BlockState needState, DirData d, ItemStack stack) {
         DirDataI data = new DirDataI(d.placePos(), BlockUtil.getInteractDir(d.placePos()));
 =======
+=======
+>>>>>>> Stashed changes
     /**
      * getd
      *
@@ -132,6 +135,9 @@ public class DataGetter {
     }
 
     private static PlaceDataPack getDataInt(BlockState needState, DirData data, ItemStack stack) {
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
         BlockPos placePos = data.placePos();
         if (needState.getBlock().equals(mc.world.getBlockState(placePos).getBlock())) {
@@ -176,8 +182,11 @@ public class DataGetter {
                     continue fV;
                 }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                 return PlaceDataPack.inte(new PlaceData(placePos, offDir, clickVec, true, rData));
 =======
+=======
+>>>>>>> Stashed changes
                 BooleanSupplier verify = () -> {
                     FakePlacementContext contextVerify = BlockStateVerify.getContextVerify(clickVec, placePos, offDir, stack, rData);
                     if (contextVerify.getBlockPos().equals(placePos) && contextVerify.getSide().equals(offDir)) {
@@ -189,6 +198,9 @@ public class DataGetter {
                     return false;
                 };
                 return PlaceDataPack.inte(new PlaceData(placePos, offDir, clickVec, true, rData, verify));
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
             }
         }
@@ -248,8 +260,11 @@ public class DataGetter {
                     continue fV;
                 }
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
                 return PlaceDataPack.plac(new PlaceData(placePos.offset(offDir), offDir.getOpposite(), clickVec, true, rData));
 =======
+=======
+>>>>>>> Stashed changes
                 BooleanSupplier verify = () -> {
                     FakePlacementContext contextVerify = BlockStateVerify.getContextVerify(clickVec, placePos.offset(offDir), offDir.getOpposite(), stack, rData);
                     if (contextVerify.getBlockPos().equals(placePos) && contextVerify.getSide().equals(offDir.getOpposite())) {
@@ -261,6 +276,9 @@ public class DataGetter {
                 };
 
                 return PlaceDataPack.plac(new PlaceData(placePos.offset(offDir), offDir.getOpposite(), clickVec, true, rData, verify));
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
             }
         }
