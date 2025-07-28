@@ -3,8 +3,7 @@
   "package": "com.kijinseija.seija_printer.mixin",
   "compatibilityLevel": "JAVA_16",
   "client": [
-    "ClientWorldAccessor",
-    "DefaultSettingsWidgetFactoryMixin"
+    "ClientWorldAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

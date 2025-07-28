@@ -5,12 +5,12 @@ import meteordevelopment.meteorclient.gui.WindowScreen;
 import meteordevelopment.meteorclient.gui.renderer.GuiRenderer;
 import meteordevelopment.meteorclient.gui.screens.settings.BlockListSettingScreen;
 import meteordevelopment.meteorclient.gui.widgets.containers.WTable;
+import meteordevelopment.meteorclient.gui.widgets.input.WTextBox;
 import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
 import meteordevelopment.meteorclient.gui.widgets.pressable.WPressable;
 import meteordevelopment.meteorclient.settings.BlockListSetting;
 
 import net.minecraft.block.Block;
-import net.minecraft.text.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +29,21 @@ public class BlockReplaceSettingScreen extends WindowScreen {
     private final BlockReplaceSetting setting;
     WTable table = add(theme.table()).expandX().widget();
 
+    private WTextBox filter;
+    private String filterText = "";
+
     @Override
     public void initWidgets() {
-        table.clear();
+//        table = add(theme.table()).expandX().widget();
+        widgets();
+    }
+
+    public void widgets() {
+
+
+//        if (table.rowI()!=setting.get().size()+1)
+//            table.clear();
+
         for (Map.Entry<List<Block>, List<Block>> entry : setting.get().entrySet()) {
             if (entry.getValue() == null) {
                 continue;
@@ -55,7 +67,8 @@ public class BlockReplaceSettingScreen extends WindowScreen {
                 keyScreen.onClosed(() -> {
                     keyBlocks.clear();
                     keyBlocks.addAll(keySetting.get());
-                    initWidgets();
+                    table.clear();
+                    widgets();
                 });//关闭窗口时应用选择的配置
                 mc.setScreen(keyScreen);
             };
@@ -80,7 +93,8 @@ public class BlockReplaceSettingScreen extends WindowScreen {
                 valueScreen.onClosed(() -> {
                     valueBlocks.clear();
                     valueBlocks.addAll(valueSetting.get());
-                    initWidgets();
+                    table.clear();
+                    widgets();
                 });
                 mc.setScreen(valueScreen);
             };
@@ -92,7 +106,8 @@ public class BlockReplaceSettingScreen extends WindowScreen {
                 valueBlocks.clear();
                 setting.get().put(keyBlocks, null);
                 setting.get().remove(keyBlocks);
-                initWidgets();
+                table.clear();
+                widgets();
             };
             table.row();
         }
@@ -103,7 +118,8 @@ public class BlockReplaceSettingScreen extends WindowScreen {
         WButton add = table.add(theme.button("Add")).expandCellX().center().widget();
         add.action = () -> {
             setting.get().put(new ArrayList<>(), new ArrayList<>());
-            initWidgets();
+            table.clear();
+            widgets();
         };
     }
 }

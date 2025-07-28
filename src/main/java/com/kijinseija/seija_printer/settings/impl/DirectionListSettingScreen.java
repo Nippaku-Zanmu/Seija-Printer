@@ -23,7 +23,7 @@ public class DirectionListSettingScreen extends WindowScreen {
     public void initWidgets() {
         List<Direction> gms = setting.get();
         for (Direction direction : Direction.values()) {
-            table.add(theme.label(Utils.nameToTitle(direction.getName()))).expandCellX();
+            table.add(theme.label(Utils.nameToTitle(direction.name()))).expandCellX();
 
             boolean contains = setting.get().contains(direction);
             WCheckbox checkbox = table.add(theme.checkbox(contains)).widget();
