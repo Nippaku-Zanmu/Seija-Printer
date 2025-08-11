@@ -10,14 +10,9 @@ import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.settings.Settings;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
-import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.SideShapeType;
 import net.minecraft.item.Item;
 import net.minecraft.text.Text;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
 import java.util.List;

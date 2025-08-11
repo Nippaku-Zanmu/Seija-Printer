@@ -465,7 +465,7 @@ public class Printer extends LoaderAntiCrash {
 
 
     public void doPrint() {
-        if (RotationManager.INSTANCE.taskSize()>4)return;
+        if (RotationManager.INSTANCE.taskSize() > 4) return;
         if (!timer.passed(dRangeSetPrintingDelay.get().getCurrentRandom())) return;
         if (mc.player == null || mc.world == null) return;
         //刷掉过时的黑名单方块
@@ -489,9 +489,11 @@ public class Printer extends LoaderAntiCrash {
         PosSorter.sort(collect);
         //放置计数
         int placeCount = 0;
+        Block placeBlock = null;//放置方块记录 1t只能放置1种 用于原版高速放置
         for (BlockPos blockPos : collect) {//遍历所有的可操作方块
             if (placeCount >= iSetBlockPreTick.get()) return;
             BlockState needState = BlockReplaceUtils.INSTANCE.getScheState(blockPos);//获取需要的方块状态
+            if (placeBlock!=null&&needState.getBlock()!=placeBlock)continue;
             BlockState placeNeedState = BlockReplaceUtils.INSTANCE.normalReplaceState(needState);
             PlaceDataPack placeDataPack = PlaceDataManager.INSTANCE.getPlaceData(blockPos, placeNeedState);//获取放置数据
             if (placeDataPack.data().valid()) {//如果数据可用
@@ -508,6 +510,7 @@ public class Printer extends LoaderAntiCrash {
                 timer.reset();//重置计时器
                 RenderUtil.isAniRenderSizeAdd = true;
                 placeCount += 1;
+                placeBlock = needState.getBlock();
             }
 
             //若方块放置失败则尝试修复
@@ -563,11 +566,14 @@ public class Printer extends LoaderAntiCrash {
         if (e == null || mc == null || mc.world == null || mc.player == null) return;
         RenderHelper.COLOR.setSpeed(dSetRainbowSpeed.get() / 100);
         RenderHelper.COLOR.getNext();
+        if (mc.world != FakePlacementContext.getFakePlayer().getWorld())
+            FakePlacementContext.updatePlayerEntity();
     }
 
     @Override
     public void onActivate() {
         super.onActivate();
+
         FakePlacementContext.updatePlayerEntity();
         //更新玩家实体(避免重连客户端导致原版计算失效)
     }
