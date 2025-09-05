@@ -22,7 +22,7 @@ public class FlowerPotFixer extends AbstractFixer {
     public int fixBlock(BlockPos pos, BlockState needState) {
 
         //block替换 仅自定义替换,不使用内置替换
-        DirData dirData = new DirData(pos, BlockUtil.getInteractDir(pos));
+        DirData dirData = new DirData(pos, BlockUtil.getSortedDirs(pos,true));
 
         if (InvUtil.findBlock(((FlowerPotBlock) needState.getBlock()).getContent())){
             for (Direction dir : dirData.dirs()) {

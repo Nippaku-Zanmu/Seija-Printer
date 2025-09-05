@@ -104,7 +104,7 @@ public class BlockReplaceUtils {
 
 
     public Block bridgeBlockReplace(BlockState bs, BlockPos pos) {
-        List<Direction> interactDir = BlockUtil.getInteractDir(pos);
+        List<Direction> interactDir = BlockUtil.getSortedDirs(pos,true);
 
         if (
             pri.bSetBridgeMode.get()//开了桥模式

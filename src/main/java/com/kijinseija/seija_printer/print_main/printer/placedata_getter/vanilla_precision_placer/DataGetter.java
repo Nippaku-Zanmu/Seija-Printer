@@ -46,7 +46,7 @@ public class DataGetter {
      * @see PlaceDataPack
      */
     private static PlaceDataPack getd(BlockState needState, DirData data, ItemStack stack, boolean mode) {
-        if (mode)data = new DirData(data.placePos(), BlockUtil.getInteractDir(data.placePos()));
+        if (mode)data = new DirData(data.placePos(), BlockUtil.getSortedDirs(data.placePos(),true));
         BlockPos placePos = data.placePos();
 
 

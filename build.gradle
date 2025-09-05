@@ -33,7 +33,6 @@ repositories {
         name = "Meteor Dev Snapshots"
         url = "https://maven.meteordev.org/snapshots"
     }
-//    flatDir { dirs 'D://hack/SeijaLib' }
     maven { url 'file:///D://hack/SeijaLib' }
 
     mavenCentral()
@@ -54,8 +53,10 @@ dependencies {
 
 
     //litematica 1.21
-    modImplementation "com.github.sakura-ryoko:litematica:${project.minecraft_version}-${project.litematica_version}"
-    modImplementation "com.github.sakura-ryoko:malilib:${project.minecraft_version}-${project.malilib_version}"
+//    modImplementation "com.github.sakura-ryoko:litematica:${project.minecraft_version}-${project.litematica_version}"
+//    modImplementation "com.github.sakura-ryoko:malilib:${project.minecraft_version}-${project.malilib_version}"
+    modImplementation("com.github.sakura-ryoko:malilib:${malilib_version}")
+    modImplementation("com.github.sakura-ryoko:litematica:${litematica_version}")
 
 }
 

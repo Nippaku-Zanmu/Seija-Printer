@@ -21,7 +21,7 @@ public class DirtFixer extends AbstractFixer {
     @Override
     public int fixBlock(BlockPos pos, BlockState needState) {
 
-        DirData dirData = new DirData(pos, BlockUtil.getInteractDir(pos));
+        DirData dirData = new DirData(pos, BlockUtil.getSortedDirs(pos,true));
 
         dirData.dirs().remove(Direction.DOWN);
         for (Direction dir : dirData.dirs()) {

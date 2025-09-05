@@ -26,7 +26,7 @@ public abstract class AbstractClickFixer extends AbstractFixer {
     public int fixBlock(BlockPos pos, BlockState needState) {
 
 //        BlockUtil.interactBlock(pos,interactDir.get(0));
-        DirData dirData = new DirData(pos, BlockUtil.getInteractDir(pos));
+        DirData dirData = new DirData(pos, BlockUtil.getSortedDirs(pos,true));
         for (Direction dir : dirData.dirs()) {
             for (Vec3d clickVec : dirData.clickVecsInte(dir)) {
                 BlockUtil.interactBlock(PlaceData.newInstance(dirData.placePos(),dir,clickVec,true,null));
@@ -38,7 +38,7 @@ public abstract class AbstractClickFixer extends AbstractFixer {
 
     @Override
     public boolean needFix(BlockPos pos, BlockState needState) {
-        List<Direction> interactDir = BlockUtil.getInteractDir(pos);
+        List<Direction> interactDir = BlockUtil.getSortedDirs(pos,true);
         if (interactDir.isEmpty())
             return false;
         return true;

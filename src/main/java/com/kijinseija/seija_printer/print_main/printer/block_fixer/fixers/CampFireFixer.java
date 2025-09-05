@@ -22,7 +22,7 @@ public class CampFireFixer extends AbstractFixer {
 
     @Override
     public int fixBlock(BlockPos pos, BlockState needState) {
-        List<Direction> interactDir = BlockUtil.getInteractDir(pos);
+        List<Direction> interactDir = BlockUtil.getSortedDirs(pos,true);
         DirData dirData = new DirData(pos, interactDir);
         if (!InvUtil.findItem(stack -> stack.getItem()instanceof ShovelItem)) {
             return CONTINUE;

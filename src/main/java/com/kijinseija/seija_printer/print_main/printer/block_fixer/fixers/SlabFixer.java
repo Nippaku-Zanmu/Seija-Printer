@@ -32,7 +32,7 @@ public class SlabFixer extends AbstractFixer {
         BlockState blockState = mc.world.getBlockState(pos);
         SlabType slabType = blockState.get(Properties.SLAB_TYPE);
 
-        List<Direction> dirs = new ArrayList<>(BlockUtil.getSortedDirs(pos));
+        List<Direction> dirs = new ArrayList<>(BlockUtil.getSortedDirs(pos,false));
         DirData dirData = new DirData(pos, dirs);
 
         switch (slabType) {

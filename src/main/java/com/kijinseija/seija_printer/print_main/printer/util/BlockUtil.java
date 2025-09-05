@@ -36,16 +36,7 @@ public class BlockUtil {
     private static MinecraftClient mc = MinecraftClient.getInstance();
 
 
-    public static List<Direction> getInteractDir(BlockPos pos) {
-        return (pri.bSetStrictDir.get() ? canTorchFac(pos) : Arrays.asList(Direction.values())).stream()
-            .filter(dir -> (!pri.bSetStrictDir.get()) || canPlaceIn(pos.offset(dir)))
-            .filter(dir -> pri.dRangeSetPrintingYRange.get().isInRange(pos.toCenterPos().offset(dir, 0.5).y - mc.player.getY()))
-            //高度检测 针对于放置比自己低太多的方块
-            .filter(dir -> pos.toCenterPos().offset(dir, 0.5).distanceTo(mc.player.getEyePos()) <= pri.dSetPrintingRange.get())
-            //距离检测
-            .collect(Collectors.toList());
 
-    }
     public static List<Task> genTasks(PlaceDataPack pdp) {
         boolean isPlaceMode = pdp.placeMode();
         boolean isBucket = mc.player.getMainHandStack().getItem() instanceof BucketItem;
@@ -240,11 +231,25 @@ public class BlockUtil {
 //        }
 
     }
-
-    public static List<Direction> getSortedDirs(BlockPos pos) {
+    //t inte f plac
+    public static List<Direction> getSortedDirs(BlockPos pos,boolean mode) {
+        if (mode){
+            return pri.bSetSortDir.get() ? DirSorter.sort(getInteractDir(pos), pos) : getInteractDir(pos);
+        }
         return pri.bSetSortDir.get() ? DirSorter.sort(getDirs(pos), pos) : getDirs(pos);
     }
+    public static List<Direction> getInteractDir(BlockPos pos) {
+        if (!mc.world.getWorldBorder().contains(pos))return new LinkedList<>();
+        return (pri.bSetStrictDir.get() ? canTorchFac(pos) : Arrays.asList(Direction.values())).stream()
+            .filter(dir -> (!pri.bSetStrictDir.get()) || canPlaceIn(pos.offset(dir)))
+            .filter(dir -> pri.dRangeSetPrintingYRange.get().isInRange(pos.toCenterPos().offset(dir, 0.5).y - mc.player.getY()))
+            //高度检测 针对于放置比自己低太多的方块
+            .filter(dir -> pos.toCenterPos().offset(dir, 0.5).distanceTo(mc.player.getEyePos()) <= pri.dSetPrintingRange.get())
+            //距离检测
 
+            .collect(Collectors.toList());
+
+    }
     public static List<Direction> getDirs(BlockPos pos) {
 //        if (!mc.world.getBlockState(pos).isReplaceable()){
 //            return new ArrayList<>();
@@ -268,6 +273,8 @@ public class BlockUtil {
             //不可交互
             .filter(dir -> pos.toCenterPos().offset(dir, 0.5).distanceTo(mc.player.getEyePos()) <= pri.dSetPrintingRange.get())
             //距离检测
+            .filter(dir-> mc.world.getWorldBorder().contains(pos.offset(dir)))
+            //边境
             .collect(Collectors.toList());
     }
 
@@ -305,7 +312,7 @@ public class BlockUtil {
     }
 
     public static List<Direction> canTorchFac(BlockPos pos) {
-        List<Direction> list = new ArrayList<>();
+        List<Direction> list = new LinkedList<>();
         if (mc.player.getEyePos().getY() < pos.getY())
             list.add(Direction.DOWN);
         if (mc.player.getEyePos().getY() > pos.getY() + 1/*||pos.getY()<=mc.player.getEyePos().getY()+1*/)

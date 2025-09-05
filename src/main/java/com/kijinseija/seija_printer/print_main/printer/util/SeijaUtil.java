@@ -76,13 +76,13 @@ public class SeijaUtil {
     }
 
     public static boolean intersectsWithEntity(Box box, Predicate<Entity> predicate) {
-        EntityLookup<Entity> entityLookup = ((WorldAccessor) mc.world).getEntityLookup();
+        EntityLookup<Entity> entityLookup = ((WorldAccessor) mc.world).meteor$getEntityLookup();
 
         // Fast implementation using SimpleEntityLookup that returns on the first intersecting entity
         if (entityLookup instanceof SimpleEntityLookup<Entity> simpleEntityLookup) {
-            SectionedEntityCache<Entity> cache = ((SimpleEntityLookupAccessor) simpleEntityLookup).getCache();
-            LongSortedSet trackedPositions = ((SectionedEntityCacheAccessor) cache).getTrackedPositions();
-            Long2ObjectMap<EntityTrackingSection<Entity>> trackingSections = ((SectionedEntityCacheAccessor) cache).getTrackingSections();
+            SectionedEntityCache<Entity> cache = ((SimpleEntityLookupAccessor) simpleEntityLookup).meteor$getCache();
+            LongSortedSet trackedPositions = ((SectionedEntityCacheAccessor) cache).meteor$getTrackedPositions();
+            Long2ObjectMap<EntityTrackingSection<Entity>> trackingSections = ((SectionedEntityCacheAccessor) cache).meteor$getTrackingSections();
 
             int i = ChunkSectionPos.getSectionCoord(box.minX - 2);
             int j = ChunkSectionPos.getSectionCoord(box.minY - 2);
@@ -105,7 +105,7 @@ public class SeijaUtil {
                         EntityTrackingSection<Entity> entityTrackingSection = trackingSections.get(r);
 
                         if (entityTrackingSection != null && entityTrackingSection.getStatus().shouldTrack()) {
-                            for (Entity entity : ((EntityTrackingSectionAccessor) entityTrackingSection).<Entity>getCollection()) {
+                            for (Entity entity : ((EntityTrackingSectionAccessor) entityTrackingSection).<Entity>meteor$getCollection()) {
                                 if (entity.getBoundingBox().intersects(box) && predicate.test(entity)) return true;
                             }
                         }

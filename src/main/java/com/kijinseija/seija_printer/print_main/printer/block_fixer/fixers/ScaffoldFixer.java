@@ -34,7 +34,7 @@ public class ScaffoldFixer extends AbstractFixer {
             BlockPos helperPos = pos.offset(off);
             if (!(mc.world.getBlockState(helperPos).getBlock() instanceof ScaffoldingBlock
             &&mc.world.getBlockState(helperPos).get(ScaffoldingBlock.DISTANCE)<6)) continue;
-            List<Direction> dirs = BlockUtil.getInteractDir(helperPos);
+            List<Direction> dirs = BlockUtil.getSortedDirs(helperPos,true);
             if (off != Direction.DOWN) {
 
                 if (!dirs.contains(Direction.UP)) continue;
