@@ -1,18 +1,17 @@
 package com.kijinseija.seija_printer.print_main.printer.util;
 
-import com.kijinseija.seija_printer.Addon;
-import com.kijinseija.seija_printer.print_main.printer.Printer;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
+import com.kijinseija.seija_printer.print_main.modules.Printer;
+import com.kijinseija.seija_printer.print_main.printer.util.records.RotationData;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.text.Text;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 
+import javax.annotation.Nullable;
 import java.util.HashMap;
 
 public class RayTraceUtil {
@@ -46,7 +45,7 @@ public class RayTraceUtil {
         return mc.world.raycast(new RaycastContext(vec3d, vec3d3, RaycastContext.ShapeType.OUTLINE, includeFluids ? RaycastContext.FluidHandling.ANY : RaycastContext.FluidHandling.NONE, mc.player));
     }
 
-    private static  Vec3d getRotationVector(float pitch, float yaw) {
+    public static  Vec3d getRotationVector(float pitch, float yaw) {
         float f = pitch * ((float) Math.PI / 180);
         float g = -yaw * ((float) Math.PI / 180);
         float h = MathHelper.cos(g);
@@ -55,10 +54,13 @@ public class RayTraceUtil {
         float k = MathHelper.sin(f);
         return new Vec3d(i * j, -k, h * j);
     }
-    public boolean rayTrace(Vec3d target){
-        if (!(pri.strictVec.get()&&pri.rayTrace.get()))return true;
+    public boolean rayTrace(@Nullable BlockPos placePos,@Nullable Direction offsetDir,Vec3d target){
+        return rayTrace(placePos,offsetDir, target,pri.bSetRayTrace.isVisible()&&pri.bSetRayTrace.get(),pri.bSetIgnoreEntity.get(), pri.dSetPrintingRange.get());
+    }
+    public boolean rayTrace(@Nullable BlockPos interactPos,@Nullable Direction clickDir, Vec3d target, boolean raytrace, boolean ignoreEntity, double rayRange){
+        if (!(raytrace))return true;
 
-        Entity entity2 = mc.getCameraEntity();
+        Entity entity2 = mc.player;
         if (entity2 == null) {
             return false;
         }
@@ -66,7 +68,7 @@ public class RayTraceUtil {
             return false;
         }
 
-        double d = pri.printingRange.get();
+        double d =rayRange;
         HitResult crosshairTarget = null;
 
         //crosshairTarget = entity2.raycast(d, 1, false);
@@ -81,14 +83,15 @@ public class RayTraceUtil {
         boolean bl = false;
         int i = 3;
         double e = d;
-        if (mc.interactionManager.hasExtendedReach()) {
-            d = e = 6.0;
-        } else {
-            if (e > 3.0) {
-                bl = true;
-            }
-            d = e;
-        }
+//        if (mc.interactionManager.hasExtendedReach()) {
+//            d = e = 6.0;
+//        } else {
+//            if (e > 3.0) {
+//                bl = true;
+//            }
+//            d = e;
+//        }
+        //121
         e *= e;
 
         if (crosshairTarget != null) {
@@ -96,7 +99,7 @@ public class RayTraceUtil {
         }
 
 
-        if (!pri.ignoreEntity.get()){
+        if (!ignoreEntity){
             Box box = entity2.getBoundingBox().stretch(vec3d2.multiply(d)).expand(1.0, 1.0, 1.0);
             EntityHitResult entityHitResult = ProjectileUtil.raycast(entity2, vec3d, vec3d3, box, entity -> !entity.isSpectator() && entity.canHit(), e);
             if (entityHitResult != null) {
@@ -113,6 +116,73 @@ public class RayTraceUtil {
         if (crosshairTarget == null)return false;
         if (crosshairTarget.getType()!= HitResult.Type.BLOCK)return false;
         //ChatUtils.sendMsg(Text.of("pos:"+ crosshairTarget.getPos()+ " dis: "+target.distanceTo(crosshairTarget.getPos())));
-        return target.distanceTo(crosshairTarget.getPos())<=0.1;
+        if (clickDir==null||interactPos==null)
+            return  target.distanceTo(crosshairTarget.getPos())<=0.1;
+        return target.distanceTo(crosshairTarget.getPos())<=0.1
+            &&(!(crosshairTarget instanceof BlockHitResult bhr0) || bhr0.getSide() == clickDir)
+            &&(!(crosshairTarget instanceof BlockHitResult bhr) ||interactPos.equals(bhr.getBlockPos()));
+    }
+    public BlockHitResult rayHitRes(Vec3d start, RotationData rotate, boolean ignoreEntity, double rayRange){
+
+
+        Entity entity2 = mc.player;
+        if (entity2 == null) {
+            return null;
+        }
+        if (mc.world == null) {
+            return null;
+        }
+
+        double d =rayRange;
+        HitResult crosshairTarget = null;
+
+        //crosshairTarget = entity2.raycast(d, 1, false);
+
+        Vec3d vec3d2 = getRotationVector((float) rotate.pitch(), (float) rotate.yaw());//entity2.getRotationVec(1.0f);
+        Vec3d vec3d3 = start.add(vec3d2.x * d, vec3d2.y * d, vec3d2.z * d);
+
+        crosshairTarget =  mc.world.raycast(new RaycastContext(start, vec3d3, RaycastContext.ShapeType.OUTLINE, false ? RaycastContext.FluidHandling.ANY : RaycastContext.FluidHandling.NONE, entity2));
+
+
+        boolean bl = false;
+        int i = 3;
+        double e = d;
+//        if (mc.interactionManager.hasExtendedReach()) {
+//            d = e = 6.0;
+//        } else {
+//            if (e > 3.0) {
+//                bl = true;
+//            }
+//            d = e;
+//        }
+        //121
+        e *= e;
+
+        if (crosshairTarget != null) {
+            e = crosshairTarget.getPos().squaredDistanceTo(start);
+        }
+
+
+        if (!ignoreEntity){
+            Box box = entity2.getBoundingBox().stretch(vec3d2.multiply(d)).expand(1.0, 1.0, 1.0);
+            EntityHitResult entityHitResult = ProjectileUtil.raycast(entity2, start, vec3d3, box, entity -> !entity.isSpectator() && entity.canHit(), e);
+            if (entityHitResult != null) {
+                Vec3d vec3d4 = entityHitResult.getPos();
+                double g = start.squaredDistanceTo(vec3d4);
+                if (bl && g > 9.0) {
+                    crosshairTarget = BlockHitResult.createMissed(vec3d4, Direction.getFacing(vec3d2.x, vec3d2.y, vec3d2.z), BlockPos.ofFloored(vec3d4));
+                } else if (g < e || crosshairTarget == null) {
+                    crosshairTarget = entityHitResult;
+                }
+            }
+        }
+
+        if (crosshairTarget == null)return null;
+        if (crosshairTarget instanceof BlockHitResult) {
+            return (BlockHitResult) crosshairTarget;
+        }
+        return null;
+        //ChatUtils.sendMsg(Text.of("pos:"+ crosshairTarget.getPos()+ " dis: "+target.distanceTo(crosshairTarget.getPos())));
+
     }
 }

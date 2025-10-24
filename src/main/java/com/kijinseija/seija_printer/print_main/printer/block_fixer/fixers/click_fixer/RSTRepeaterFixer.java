@@ -7,8 +7,15 @@ import net.minecraft.util.math.BlockPos;
 public class RSTRepeaterFixer extends AbstractClickFixer {
 
 
+    public RSTRepeaterFixer() {
+        super("RepeaterFix");
+    }
+
     @Override
     public boolean needFix(BlockPos pos, BlockState needState) {
+        if (!super.needFix(pos,needState)) {
+            return false;
+        }
         BlockState blockState = mc.world.getBlockState(pos);
         if (
             blockState.getBlock() instanceof RepeaterBlock

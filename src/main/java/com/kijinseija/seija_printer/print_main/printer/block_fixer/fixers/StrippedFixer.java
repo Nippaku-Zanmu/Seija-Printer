@@ -2,9 +2,10 @@ package com.kijinseija.seija_printer.print_main.printer.block_fixer.fixers;
 
 import com.kijinseija.seija_printer.print_main.printer.block_fixer.AbstractFixer;
 import com.kijinseija.seija_printer.print_main.printer.util.BlockUtil;
-import com.kijinseija.seija_printer.print_main.printer.util.DirDataI;
+import com.kijinseija.seija_printer.print_main.printer.util.records.DirData;
+import com.kijinseija.seija_printer.print_main.printer.util.records.DirDataI;
 import com.kijinseija.seija_printer.print_main.printer.util.InvUtil;
-import com.kijinseija.seija_printer.print_main.printer.util.PlaceData;
+import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.AxeItem;
@@ -15,21 +16,25 @@ import net.minecraft.util.math.Vec3d;
 import java.util.List;
 
 public class StrippedFixer extends AbstractFixer {
+    public StrippedFixer() {
+        super("LogFix");
+    }
+
     @Override
-    public boolean fixBlock(BlockPos pos, BlockState needState) {
-        List<Direction> interactDir = BlockUtil.getInteractDir(pos);
-        DirDataI dirDataI = new DirDataI(pos, interactDir);
+    public int fixBlock(BlockPos pos, BlockState needState) {
+        List<Direction> interactDir = BlockUtil.getSortedDirs(pos,true);
+        DirData dirData = new DirData(pos, interactDir);
         if (InvUtil.findItem(stack -> stack.getItem() instanceof AxeItem)) {
             for (Direction dir : interactDir) {
-                for (Vec3d clickVec : dirDataI.clickVecs(dir)) {
+                for (Vec3d clickVec : dirData.clickVecsInte(dir)) {
                     if (InvUtil.switchItem(stack -> stack.getItem() instanceof AxeItem)) {
-                        BlockUtil.interactBlock(new PlaceData(dirDataI.placePos(),dir,clickVec,true,null));
-                        return true;
-                    }
+                        BlockUtil.interactBlock(PlaceData.newInstance(dirData.placePos(),dir,clickVec,true,null));
+                        return SUCCESS;
+                    }else return RETURN;
                 }
             }
         }
-        return false;
+        return CONTINUE;
     }
 
     @Override

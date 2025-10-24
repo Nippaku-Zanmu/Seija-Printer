@@ -1,14 +1,29 @@
 package com.kijinseija.seija_printer.print_main.printer.block_fixer;
 
-import com.kijinseija.seija_printer.print_main.printer.Printer;
+import com.kijinseija.seija_printer.print_main.modules.Printer;
+import meteordevelopment.meteorclient.settings.BoolSetting;
+import meteordevelopment.meteorclient.settings.Setting;
+import meteordevelopment.meteorclient.settings.Settings;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.math.BlockPos;
 
 public abstract class AbstractFixer {
     public MinecraftClient mc = MinecraftClient.getInstance();
-    public Printer pri = Printer.INSTANCE;
 
+    public AbstractFixer(String name) {
+        bSetEnable = new BoolSetting.Builder().name(name).defaultValue(true).build();
+    }
+    public AbstractFixer( BoolSetting setting) {
+        bSetEnable = setting;
+    }
+
+
+    public Printer pri(){
+        return Printer.getINSTANCE();
+    }
+
+    public BoolSetting bSetEnable;
 
     /**
      * fix block进行方块修复
@@ -17,7 +32,7 @@ public abstract class AbstractFixer {
      * @param needState needState需要的状态
      * @return {@link boolean}是否进行了修复
      */
-    public abstract boolean fixBlock(BlockPos pos, BlockState needState);
+    public abstract int fixBlock(BlockPos pos, BlockState needState);
     /**
      * need fix 检测是否需要修复
      *
@@ -26,5 +41,11 @@ public abstract class AbstractFixer {
      * @return {@link boolean}是否需要修复
      */
     public abstract boolean needFix(BlockPos pos, BlockState needState);
+    public boolean isEnable(){return bSetEnable.get();}
+
+
+    public static final int CONTINUE = 0;
+    public static final int SUCCESS = 1;
+    public static final int RETURN = 2;
 
 }

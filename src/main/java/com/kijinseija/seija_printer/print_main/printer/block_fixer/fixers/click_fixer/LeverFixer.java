@@ -6,8 +6,15 @@ import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.BlockPos;
 
 public class LeverFixer extends AbstractClickFixer{
+    public LeverFixer() {
+        super("LeverFix");
+    }
+
     @Override
     public boolean needFix(BlockPos pos, BlockState needState) {
+        if (!super.needFix(pos,needState)) {
+            return false;
+        }
         BlockState blockState = mc.world.getBlockState(pos);
         if (
             blockState.getBlock() instanceof LeverBlock&&needState.getBlock()==blockState.getBlock()) {

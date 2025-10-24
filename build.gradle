@@ -1,20 +1,20 @@
 //file:noinspection JCenterRepository
 //file:noinspection GrDeprecatedAPIUsage
 plugins {
-    id 'fabric-loom' version '1.1-SNAPSHOT'
+
+    id "fabric-loom" version "1.10-SNAPSHOT"
     id 'maven-publish'
 }
 
-sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
 
 archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
 
-
 repositories {
-    jcenter()
+//    jcenter()
 
     maven {
         name = "jitpack"
@@ -24,16 +24,18 @@ repositories {
 
     maven { url = "https://www.cursemaven.com" }
     maven { url = "https://masa.dy.fi/maven" }
-
+    maven { url = "https://maven.terraformersmc.com/releases/" }
     maven {
-        name = "meteor-maven"
+        name = "Meteor Dev Releases"
         url = "https://maven.meteordev.org/releases"
     }
-
     maven {
-        name = "meteor-maven-snapshots"
+        name = "Meteor Dev Snapshots"
         url = "https://maven.meteordev.org/snapshots"
     }
+    maven { url 'file:///D://hack/SeijaLib' }
+
+    mavenCentral()
 }
 loom {
     accessWidenerPath = file("src/main/resources/seija-printer.accesswidener")
@@ -45,19 +47,16 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 
-    // Meteor
-    modImplementation "meteordevelopment:meteor-client:${project.meteor_version}"
-    modImplementation "baritone:fabric:${project.minecraft_version}-SNAPSHOT"
-    //Download https://maven.meteordev.org/snapshots/meteordevelopment/meteor-client/0.5.4-SNAPSHOT/maven-metadata.xml, took 434 ms (0 B)
-    //Download https://maven.meteordev.org/snapshots/meteordevelopment/meteor-client/0.5.4-SNAPSHOT/meteor-client-0.5.4-20230723.170226-4.jar, took 3 s 318 ms (4.97 MB)
-    //Download https://maven.meteordev.org/snapshots/meteordevelopment/meteor-client/0.5.4-SNAPSHOT/meteor-client-0.5.4-20230723.170226-4-sources.jar, took 2 s 268 ms (1.69 MB)
+    //Meteor(1.21)
+//    modImplementation files('D:\\hack\\SeijaLib\\meteor-client-0.6.0-2229.jar')
+    modImplementation "meteordevelopment:meteor-client:${project.minecraft_version}-SNAPSHOT"
 
-    //litematica
-    modImplementation "curse.maven:litematica-${project.litematica_projectid}:${project.litematica_fileid}"
-    //modImplementation "fi.dy.masa.malilib:malilib-fabric-${project.minecraft_version}:${project.malilib_version}"
-    //modImplementation "fi.dy.masa.malilib:malilib-fabric-1.20.1.0.16.1"
-    modImplementation "fi.dy.masa.malilib:malilib-fabric-1.20.1:${project.malilib_version}"
 
+    //litematica 1.21
+//    modImplementation "com.github.sakura-ryoko:litematica:${project.minecraft_version}-${project.litematica_version}"
+//    modImplementation "com.github.sakura-ryoko:malilib:${project.minecraft_version}-${project.malilib_version}"
+    modImplementation("com.github.sakura-ryoko:malilib:${malilib_version}")
+    modImplementation("com.github.sakura-ryoko:litematica:${litematica_version}")
 
 }
 
@@ -65,8 +64,39 @@ processResources {
     filesMatching("fabric.mod.json") {
         expand "version": project.version
     }
+
+
 }
 
 tasks.withType(JavaCompile).configureEach {
     it.options.encoding("UTF-8")
+}
+
+tasks {
+    processResources {
+        def propertyMap = [
+            "version"   : project.version,
+            "mc_version": project.minecraft_version,
+        ]
+
+        filesMatching("fabric.mod.json") {
+            expand(propertyMap)
+        }
+    }
+
+    jar {
+//        from("LICENSE") {
+//            rename { "${it}_${project.base.archivesBaseName}" }
+//        }
+    }
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        it.options.encoding = "UTF-8"
+        it.options.release = 21
+    }
 }
