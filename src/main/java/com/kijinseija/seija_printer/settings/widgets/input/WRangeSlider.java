@@ -6,6 +6,7 @@
 package com.kijinseija.seija_printer.settings.widgets.input;
 
 import meteordevelopment.meteorclient.gui.widgets.WWidget;
+import net.minecraft.client.gui.Click;
 import net.minecraft.util.math.MathHelper;
 
 public abstract class WRangeSlider extends WWidget {
@@ -47,7 +48,10 @@ public abstract class WRangeSlider extends WWidget {
     }
 
     @Override
-    public boolean onMouseClicked(double mouseX, double mouseY, int button, boolean used) {
+    public boolean onMouseClicked(Click click, boolean used) {
+        final double mouseX = click.x();
+
+
         if (mouseOver && !used) {
 //            valueAtDragStart = value1;
             double handleSize = handleSize();
@@ -154,7 +158,7 @@ public abstract class WRangeSlider extends WWidget {
     }
 
     @Override
-    public boolean onMouseReleased(double mouseX, double mouseY, int button) {
+    public boolean onMouseReleased(Click click) {
         if (dragging) {
             if (value1 != valueAtDragStart && actionOnRelease != null) {
                 actionOnRelease.run();
@@ -202,8 +206,8 @@ public abstract class WRangeSlider extends WWidget {
     }
 
     public void set(double v1, double v2) {
-        value1 = Math.clamp(v1,min,max);
-        value2 = Math.clamp(v2,min,max);
+        value1 = Math.clamp(v1, min, max);
+        value2 = Math.clamp(v2, min, max);
     }
 
     public void setMin(double min) {

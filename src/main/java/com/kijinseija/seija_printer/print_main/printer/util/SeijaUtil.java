@@ -38,7 +38,7 @@ public class SeijaUtil {
                 eyeHeight = mc.player.getEyeHeight(mc.player.getPose());
             } else eyeHeight = mc.player.getEyeHeight(EntityPose.CROUCHING);
         } else
-            eyeHeight = mc.player.getEyePos().y - mc.player.getPos().y;
+            eyeHeight = mc.player.getEyePos().y - mc.player.getEntityPos().y;
         return eyeHeight;
     }
 

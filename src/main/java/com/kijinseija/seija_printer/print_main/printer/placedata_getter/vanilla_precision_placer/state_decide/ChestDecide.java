@@ -1,5 +1,6 @@
 package com.kijinseija.seija_printer.print_main.printer.placedata_getter.vanilla_precision_placer.state_decide;
 
+import meteordevelopment.meteorclient.settings.Setting;
 import net.minecraft.block.AbstractChestBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ChestBlock;
@@ -49,5 +50,9 @@ public class ChestDecide implements Decide{
             }
         }
         return null;
+    }
+    @Override
+    public Setting[] getSettings() {
+        return new Setting[0];
     }
 }

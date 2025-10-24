@@ -566,7 +566,7 @@ public class Printer extends LoaderAntiCrash {
         if (e == null || mc == null || mc.world == null || mc.player == null) return;
         RenderHelper.COLOR.setSpeed(dSetRainbowSpeed.get() / 100);
         RenderHelper.COLOR.getNext();
-        if (mc.world != FakePlacementContext.getFakePlayer().getWorld())
+        if (mc.world != FakePlacementContext.getFakePlayer().getEntityWorld())
             FakePlacementContext.updatePlayerEntity();
     }
 

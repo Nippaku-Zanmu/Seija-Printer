@@ -1,5 +1,6 @@
 package com.kijinseija.seija_printer.print_main.printer.placedata_getter.vanilla_precision_placer.state_decide;
 
+import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.ConnectingBlock;
@@ -37,8 +38,14 @@ public class MultifaceGrowthDecide implements Decide {
         return false;
     }
 
+
+
     @Override
     public boolean isSuit(BlockState needState, BlockState nowState, BlockPos ignore) {
         return needState.getBlock() instanceof MultifaceGrowthBlock && nowState.getBlock() instanceof MultifaceGrowthBlock;
+    }
+    @Override
+    public Setting[] getSettings() {
+        return new Setting[0];
     }
 }
