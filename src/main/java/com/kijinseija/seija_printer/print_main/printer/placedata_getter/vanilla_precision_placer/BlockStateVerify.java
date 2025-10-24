@@ -19,8 +19,8 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 
 import static com.kijinseija.seija_printer.print_main.printer.placedata_getter.vanilla_precision_placer.FakePlacementContext.fakePlayer;
 import static com.kijinseija.seija_printer.print_main.printer.placedata_getter.vanilla_precision_placer.FakePlacementContext.setRotate;
@@ -47,7 +47,7 @@ public class BlockStateVerify {
 
     protected static FakePlacementContext getContextVerify(Vec3d clickVec, BlockPos placePos, Direction offsetDir, ItemStack stack, @Nullable RotationData rdata) {
 
-        fakePlayer.setPosition(mc.player.getPos());
+        fakePlayer.setPosition(mc.player.getEntityPos());
         if (rdata == null) {
             setRotate(fakePlayer, sendYaw, sendPitch);
             //ChatUtils.sendMsg(Text.of(mc.player.getYaw() + "," + mc.player.getPitch()));

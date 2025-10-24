@@ -7,8 +7,9 @@ import net.minecraft.block.enums.Orientation;
 import net.minecraft.state.property.Properties;
 import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.MathHelper;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
+
 
 public class BlockRotDataGetter {
     private static final Printer pri = Printer.getINSTANCE();
@@ -41,7 +42,7 @@ public class BlockRotDataGetter {
             || block instanceof CarvedPumpkinBlock || block instanceof ChiseledBookshelfBlock
             || block instanceof EndPortalFrameBlock || block instanceof FlowerbedBlock
             || block instanceof GlazedTerracottaBlock || block instanceof JigsawBlock
-            || block instanceof LoomBlock
+            || block instanceof LoomBlock || block instanceof ShelfBlock
         ) {
             return getRotateDataFromDir(bs.get(Properties.HORIZONTAL_FACING).getOpposite());
         }

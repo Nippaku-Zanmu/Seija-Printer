@@ -95,8 +95,8 @@ public class RayTraceTest extends Module {
         Vec3d vec3d = PredictUtility.getPredPlayerVec().offset(Direction.UP,SeijaUtil.getEyeHeight());
         Vec3d targetVec = new Vec3d(x.get(),y.get(),z.get());
         Vec3d vec3d2 = getRotationVector((float) SeijaUtil.getPitch(targetVec), (float) SeijaUtil.getYaw(targetVec));//entity2.getRotationVec(1.0f);
-        ChatUtils.sendMsg(Text.of("P:" +mc.cameraEntity.getPitch()+","+ SeijaUtil.getPitch(targetVec)));
-        ChatUtils.sendMsg(Text.of("Y:" +mc.cameraEntity.getYaw()+","+ SeijaUtil.getYaw(targetVec)));
+        ChatUtils.sendMsg(Text.of("P:" +mc.getCameraEntity().getPitch()+","+ SeijaUtil.getPitch(targetVec)));
+        ChatUtils.sendMsg(Text.of("Y:" +mc.getCameraEntity().getYaw()+","+ SeijaUtil.getYaw(targetVec)));
         Vec3d vec3d3 = vec3d.add(vec3d2.x * d, vec3d2.y * d, vec3d2.z * d);
 
         crosshairTarget =  mc.world.raycast(new RaycastContext(vec3d, vec3d3, RaycastContext.ShapeType.OUTLINE, false ? RaycastContext.FluidHandling.ANY : RaycastContext.FluidHandling.NONE, entity2));

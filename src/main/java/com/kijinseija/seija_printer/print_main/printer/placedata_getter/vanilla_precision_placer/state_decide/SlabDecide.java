@@ -1,5 +1,6 @@
 package com.kijinseija.seija_printer.print_main.printer.placedata_getter.vanilla_precision_placer.state_decide;
 
+import meteordevelopment.meteorclient.settings.Setting;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.SlabBlock;
 import net.minecraft.block.enums.SlabType;
@@ -19,5 +20,9 @@ public class SlabDecide implements Decide {
         }else {
             return needState.get(Properties.SLAB_TYPE) == nowState.get(Properties.SLAB_TYPE);
         }
+    }
+    @Override
+    public Setting[] getSettings() {
+        return new Setting[0];
     }
 }

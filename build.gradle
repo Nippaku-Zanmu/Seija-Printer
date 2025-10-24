@@ -2,7 +2,7 @@
 //file:noinspection GrDeprecatedAPIUsage
 plugins {
 
-    id "fabric-loom" version "1.10-SNAPSHOT"
+    id "fabric-loom" version "1.11-SNAPSHOT"
     id 'maven-publish'
 }
 
@@ -32,6 +32,10 @@ repositories {
     maven {
         name = "Meteor Dev Snapshots"
         url = "https://maven.meteordev.org/snapshots"
+    }
+    maven {
+        name = "fallenbreath mixin-auditor"
+        url = "https://maven.fallenbreath.me/releases"
     }
     maven { url 'file:///D://hack/SeijaLib' }
 

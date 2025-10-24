@@ -10,8 +10,8 @@ import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 
 public class RayTraceUtil {
@@ -54,7 +54,7 @@ public class RayTraceUtil {
         float k = MathHelper.sin(f);
         return new Vec3d(i * j, -k, h * j);
     }
-    public boolean rayTrace(@Nullable BlockPos placePos,@Nullable Direction offsetDir,Vec3d target){
+    public boolean rayTrace(@Nullable BlockPos placePos, @Nullable Direction offsetDir, Vec3d target){
         return rayTrace(placePos,offsetDir, target,pri.bSetRayTrace.isVisible()&&pri.bSetRayTrace.get(),pri.bSetIgnoreEntity.get(), pri.dSetPrintingRange.get());
     }
     public boolean rayTrace(@Nullable BlockPos interactPos,@Nullable Direction clickDir, Vec3d target, boolean raytrace, boolean ignoreEntity, double rayRange){
