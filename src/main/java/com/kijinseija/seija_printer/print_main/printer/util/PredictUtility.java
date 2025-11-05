@@ -1,3 +1,8 @@
+/*
+ * Copyright 2025 Nippaku_Zanmu
+ * SPDX-License-Identifier: gplv3
+ */
+
 // Decompiled with: CFR 0.152
 // Class Version: 17
 package com.kijinseija.seija_printer.print_main.printer.util;

@@ -1,3 +1,8 @@
+/*
+ * Copyright 2025 Nippaku_Zanmu
+ * SPDX-License-Identifier: gplv3
+ */
+
 package com.kijinseija.seija_printer.print_main.printer.block_fixer.fixers.click_fixer;
 
 import meteordevelopment.meteorclient.settings.BoolSetting;

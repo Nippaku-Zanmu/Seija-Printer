@@ -1,3 +1,8 @@
+/*
+ * Copyright 2025 Nippaku_Zanmu
+ * SPDX-License-Identifier: gplv3
+ */
+
 package com.kijinseija.seija_printer.print_main.printer.placedata_getter.vanilla_precision_placer.state_decide;
 
 import com.kijinseija.seija_printer.print_main.printer.extra_setting.HasExtraSetting;
