@@ -252,7 +252,7 @@ public class Printer extends LoaderAntiCrash {
         .build());
 
 
-    private final Setting<List<Block>> liSetBlackLists = sgAdvancedSettings.add(new BlockListSetting.Builder()
+    public final Setting<List<Block>> liSetBlackLists = sgAdvancedSettings.add(new BlockListSetting.Builder()
         .name("BlackList")
         .description("Black List.")
         .build()
@@ -456,18 +456,6 @@ public class Printer extends LoaderAntiCrash {
     SeijaTimer timer = new SeijaTimer(() -> dRangeSetPrintingDelay.get().nextRandom());
     public final List<PosInfo> blackList = Collections.synchronizedList(new ArrayList<>());
 
-    private boolean isInBlackList(BlockPos pos) {
-        if (liSetBlackLists.get().contains(BlockReplaceUtils.INSTANCE.getScheState(pos).getBlock())) {
-            return true;
-        }
-        for (PosInfo info : blackList) {
-            if (info.pos().equals(pos)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
 
     public void doPrint() {
         if (RotationManager.INSTANCE.taskSize() > 4) return;
@@ -476,21 +464,36 @@ public class Printer extends LoaderAntiCrash {
         //刷掉过时的黑名单方块
         blackList.removeIf(b -> System.currentTimeMillis() - b.timestamp() > dSetAntiReplaceTime.get());
         //WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
+        List<BlockPos> collect = new LinkedList<>();
+//        List<BlockPos> sphere = BlockUtil.getSphere(mc.player.getBlockPos(), dSetPrintingRange.get().intValue(), dSetPrintingRange.get().intValue());
+//
+//        List<BlockPos> collect = sphere.stream()
+//            //.filter(SeijaUtil::canPlaceIn)
+//            .filter(bp -> DataManager.getRenderLayerRange().isPositionWithinRange(bp))
+//            //投影中可见的方块
+//            .filter(bp -> !BlockUtil.isInBlackList(bp))
+//            //不在黑名单
+//            .filter(bp -> BlockUtil.isValidState(BlockReplaceUtils.INSTANCE.getScheState(bp), bp))
+//            //不是床头之类的不可放置方块
+//            //  .filter(bp -> !SeijaUtil.intersectsWithEntity(new Box(bp), entity -> !entity.isSpectator() && !(entity instanceof ItemEntity) && !(entity instanceof ArmorStandEntity)))
+//            //没被实体卡住
+//            .filter(bp -> SurfaceUtil.surfaceCheck(bp, iSetSurfaceSize.get()))
+//            //表面模式检测
+//            .collect(Collectors.toList());
+        int ymax = (int) Math.ceil(dRangeSetPrintingYRange.get().getMax());
+        int ymin = (int) Math.floor(dRangeSetPrintingYRange.get().getMin());
+        for(BlockPos pos:
+        BlockUtil.sphereIterate(mc.player.getBlockPos(), dSetPrintingRange.get().intValue(),
+            ymax,
+            ymin)
+        ){
 
-        List<BlockPos> sphere = BlockUtil.getSphere(mc.player.getBlockPos(), dSetPrintingRange.get().intValue(), dSetPrintingRange.get().intValue());
-        List<BlockPos> collect = sphere.stream()
-            //.filter(SeijaUtil::canPlaceIn)
-            .filter(bp -> DataManager.getRenderLayerRange().isPositionWithinRange(bp))
-            //投影中可见的方块
-            .filter(bp -> !isInBlackList(bp))
-            //不在黑名单
-            .filter(bp -> BlockUtil.isValidState(BlockReplaceUtils.INSTANCE.getScheState(bp), bp))
-            //不是床头之类的不可放置方块
-            //  .filter(bp -> !SeijaUtil.intersectsWithEntity(new Box(bp), entity -> !entity.isSpectator() && !(entity instanceof ItemEntity) && !(entity instanceof ArmorStandEntity)))
-            //没被实体卡住
-            .filter(bp -> SurfaceUtil.surfaceCheck(bp, iSetSurfaceSize.get()))
-            //表面模式检测
-            .collect(Collectors.toList());
+            if (BlockUtil.blockposFilter(pos)) {
+                collect.add(new BlockPos(pos));
+            }
+        }
+
+
         PosSorter.sort(collect);
         //放置计数
         int placeCount = 0;
@@ -500,7 +503,7 @@ public class Printer extends LoaderAntiCrash {
             BlockState needState = BlockReplaceUtils.INSTANCE.getScheState(blockPos);//获取需要的方块状态
             if (placeBlock!=null&&needState.getBlock()!=placeBlock)continue;
             BlockState placeNeedState = BlockReplaceUtils.INSTANCE.normalReplaceState(needState);
-            PlaceDataPack placeDataPack = PlaceDataManager.INSTANCE.getPlaceData(blockPos, placeNeedState);//获取放置数据
+            PlaceDataPack placeDataPack = PlaceDataManager.getInstance().getPlaceData(blockPos, placeNeedState);//获取放置数据
             if (placeDataPack.data().valid()) {//如果数据可用
                 if (!InvUtil.switchBlock(placeNeedState.getBlock())) {
                     timer.reset();

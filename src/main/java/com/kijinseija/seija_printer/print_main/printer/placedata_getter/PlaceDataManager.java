@@ -29,7 +29,12 @@ import java.util.Arrays;
 import java.util.List;
 
 public class PlaceDataManager implements HasExtraSetting {
-    public static final PlaceDataManager INSTANCE = new PlaceDataManager();
+    private static final PlaceDataManager INSTANCE = new PlaceDataManager();
+    public static final PlaceDataManager getInstance(){
+        return INSTANCE;
+    }
+
+
     private static final MinecraftClient mc = MinecraftClient.getInstance();
 
     public PlaceDataPack getPlaceData(BlockPos pos, BlockState needState) {

@@ -43,7 +43,7 @@ public class ExtraSettingManager {
 
     private void registerExtraSetting() {
         hasExtraSettings.add(FixerManager.INSTANCE);
-        hasExtraSettings.add(PlaceDataManager.INSTANCE);
+        hasExtraSettings.add(PlaceDataManager.getInstance());
         hasExtraSettings.add(MainDecide.INSTANCE);
     }
 }

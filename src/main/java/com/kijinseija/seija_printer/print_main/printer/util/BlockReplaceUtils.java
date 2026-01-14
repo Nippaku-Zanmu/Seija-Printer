@@ -27,6 +27,10 @@ public class BlockReplaceUtils {
     public static final BlockReplaceUtils INSTANCE = new BlockReplaceUtils();
     Printer pri = Printer.getINSTANCE();
 
+    public static BlockState getScheStateNonReplace(BlockPos pos){
+       return SchematicWorldHandler.getSchematicWorld().getBlockState(pos);
+    }
+
 
     /**
      * 桥模式时计算周围方块是否需要支持时使用
@@ -35,10 +39,8 @@ public class BlockReplaceUtils {
      * @return {@link BlockState}
      * @see BlockState
      */
-
-
     public BlockState getScheState(BlockPos pos) {
-        return replaceState(SchematicWorldHandler.getSchematicWorld().getBlockState(pos), pos);
+        return replaceState(getScheStateNonReplace(pos), pos);
     }
 
     public BlockState replaceState(BlockState state, BlockPos pos) {
@@ -53,13 +55,20 @@ public class BlockReplaceUtils {
         }
         return repState;
     }
-
+    public List<Block> getReplaceBlocks(Block b){
+        for (Map.Entry<List<Block>, List<Block>> entry : pri.getBlockReplaceMapping().entrySet()) {
+            if (entry.getKey().contains(b))
+                return entry.getValue();
+        }
+        return List.of();
+    }
     private Block needBlockReplace(BlockState bs, BlockPos pos, boolean calcBridge) {
         List<Block> blocks = null;
-        for (Map.Entry<List<Block>, List<Block>> entry : pri.getBlockReplaceMapping().entrySet()) {
-            if (entry.getKey().contains(bs.getBlock()))
-                blocks = entry.getValue();
-        }
+//        for (Map.Entry<List<Block>, List<Block>> entry : pri.getBlockReplaceMapping().entrySet()) {
+//            if (entry.getKey().contains(bs.getBlock()))
+//                blocks = entry.getValue();
+//        }
+        blocks = getReplaceBlocks(bs.getBlock());
         if (blocks != null && !blocks.isEmpty())
             for (Block b : blocks) {
                 if (InvUtils.find(Item.BLOCK_ITEMS.get(b)).found())

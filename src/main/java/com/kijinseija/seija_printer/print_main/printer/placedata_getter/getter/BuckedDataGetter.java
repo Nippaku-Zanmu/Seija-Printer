@@ -7,6 +7,7 @@ package com.kijinseija.seija_printer.print_main.printer.placedata_getter.getter;
 
 import com.kijinseija.seija_printer.print_main.modules.Printer;
 import com.kijinseija.seija_printer.print_main.printer.placedata_getter.AbstractDataGetter;
+import com.kijinseija.seija_printer.print_main.printer.placedata_getter.vanilla_precision_placer.BlockStateVerify;
 import com.kijinseija.seija_printer.print_main.printer.util.RayTraceUtil;
 import com.kijinseija.seija_printer.print_main.printer.util.records.DirData;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
@@ -38,10 +39,10 @@ public class BuckedDataGetter extends AbstractDataGetter {
             }
             for (Vec3d clickVec : dirData.clickVecs(offsetDir, new DirData.DirDataConfig().setRaytrace(true).setStrictVec(true))) {
                 return new PlaceData(placePos.offset(offsetDir), offsetDir.getOpposite(), clickVec, true,
-                    (Printer.getINSTANCE().bSetRotate.get() ? null : RotationData.fromVec(clickVec)), () -> {
+                    ( RotationData.fromVec(clickVec)), () -> {
                     BlockHitResult blockHitResult = RayTraceUtil.INSTANCE.rayHitRes
-                        (mc.player.getEyePos(),  RotationData.build(mc.player.getYaw(),
-                                mc.player.getPitch()), false,
+                        (mc.player.getEyePos(),  RotationData.build(BlockStateVerify.sendYaw,
+                                BlockStateVerify.sendPitch), false,
                             mc.player.getAttributeValue(EntityAttributes.BLOCK_INTERACTION_RANGE));
 //                    ChatUtils.info(blockHitResult.getType() + "  " + blockHitResult.getBlockPos());
 //                    ChatUtils.info();

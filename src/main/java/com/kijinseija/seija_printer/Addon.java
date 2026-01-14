@@ -6,7 +6,6 @@
 package com.kijinseija.seija_printer;
 
 
-import com.kijinseija.seija_printer.loader.DiskClassLoader;
 import com.kijinseija.seija_printer.print_main.InitClass;
 import com.kijinseija.seija_printer.print_main.printer.placedata_getter.vanilla_precision_placer.BlockStateVerify;
 import meteordevelopment.meteorclient.MeteorClient;

@@ -2,13 +2,14 @@
 //file:noinspection GrDeprecatedAPIUsage
 plugins {
 
-    id "fabric-loom" version "1.11-SNAPSHOT"
+    id "fabric-loom" version "1.14-SNAPSHOT"
     id 'maven-publish'
 }
 
-sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
+//sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
 
-archivesBaseName = project.archives_base_name
+
+//archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
@@ -103,4 +104,8 @@ tasks {
         it.options.encoding = "UTF-8"
         it.options.release = 21
     }
+}
+//idea警告提示生成的
+void plugins(Closure<PluginDependencySpec> pluginDependencySpecClosure) {
+
 }

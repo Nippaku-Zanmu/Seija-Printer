@@ -13,6 +13,7 @@ import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceDataPack;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PosInfo;
 import com.kijinseija.seija_printer.print_main.printer.util.records.RotationData;
+import fi.dy.masa.litematica.data.DataManager;
 import meteordevelopment.meteorclient.utils.player.Rotations;
 import net.minecraft.block.*;
 import net.minecraft.block.enums.BedPart;
@@ -356,7 +357,27 @@ public class BlockUtil {
         }
         return blocks;
     }
-
+    //区域内方块迭代 注意down向下要负数
+    public static Iterable<BlockPos> sphereIterate(BlockPos centerPos, int radius, int up,int down){
+        return BlockPos.iterate(centerPos.getX()-radius,centerPos.getY()+down,centerPos.getZ()-radius
+        ,centerPos.getX()+radius,centerPos.getY()+up,centerPos.getZ()+radius);
+    }
+    public static boolean blockposFilter(BlockPos pos){
+        if (!DataManager.getRenderLayerRange().isPositionWithinRange(pos))
+            return false;
+        // 投影内不可见
+        if (BlockUtil.isInBlackList(pos))
+            return false;
+        //黑名单内
+        if (!BlockUtil.isValidState(BlockReplaceUtils.INSTANCE.getScheState(pos), pos))
+            return false;
+        //床头/上门无法放置
+        if (!SurfaceUtil.surfaceCheck(pos, pri.iSetSurfaceSize.get()))
+            return false;
+        //表面模式检测
+        return true;
+    }
+    //可以交互的方块列表
     public static List<Class<? extends Block>> canUseBlcks = new ArrayList<>(Arrays.asList(
         AbstractChestBlock.class, AbstractFurnaceBlock.class, CraftingTableBlock.class,
         LeverBlock.class,
@@ -460,6 +481,26 @@ public class BlockUtil {
 
     public static boolean isStuckPos(BlockPos pos) {
         return SeijaUtil.intersectsWithEntity(new Box(pos), entity -> !entity.isSpectator() && !(entity instanceof ItemEntity) && !(entity instanceof ArrowEntity));
+    }
+
+
+
+    /**
+     * is in black list 判断某位置投影中的方块是否在黑名单内
+     *
+     * @param pos pos
+     * @return {@link boolean}
+     */
+    public static boolean isInBlackList(BlockPos pos) {
+        if (Printer.getINSTANCE().liSetBlackLists.get().contains(BlockReplaceUtils.INSTANCE.getScheState(pos).getBlock())) {
+            return true;
+        }
+        for (PosInfo info : Printer.getINSTANCE().blackList) {
+            if (info.pos().equals(pos)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     //    public static Set<BlockPos> getSurface(BlockPos pos, int c) {

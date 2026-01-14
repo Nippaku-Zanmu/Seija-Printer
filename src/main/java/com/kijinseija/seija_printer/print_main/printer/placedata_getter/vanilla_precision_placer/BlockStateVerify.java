@@ -9,7 +9,6 @@ import com.kijinseija.seija_printer.print_main.modules.Printer;
 import com.kijinseija.seija_printer.print_main.printer.util.*;
 import com.kijinseija.seija_printer.print_main.printer.util.records.RotationData;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
-import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -18,7 +17,6 @@ import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
@@ -37,7 +35,7 @@ public class BlockStateVerify {
     private static Printer pri() {
         return Printer.getINSTANCE();
     }
-    private static float sendYaw,sendPitch=0;
+    public static float sendYaw,sendPitch=0;
 
     @EventHandler
     private static void onRotation(PacketEvent.Send event) {

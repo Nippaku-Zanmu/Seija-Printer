@@ -23,6 +23,7 @@ public class InitClass {
 
 
         Modules.get().add(Printer.getINSTANCE());
+        Modules.get().add(new ItemSearcher());
         Modules.get().add(new RayTraceTest());
 //            Modules.get().add(new YanZhen());
         Modules.get().add(new SideTest());

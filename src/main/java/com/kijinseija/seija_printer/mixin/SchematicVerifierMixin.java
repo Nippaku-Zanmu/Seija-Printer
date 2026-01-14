@@ -95,7 +95,7 @@ public abstract class SchematicVerifierMixin {
                         if (!replacedEqual) {
                             mismatch = new SchematicVerifier.BlockMismatch(SchematicVerifier.MismatchType.WRONG_BLOCK, stateSchematic, stateClient, 1);
                             this.wrongBlocksPositions.put(Pair.of(stateSchematic, stateClient), pos);
-                            System.out.println("PutWB"+pos);
+//                            System.out.println("PutWB"+pos);
                         } else {
                             mismatch = new SchematicVerifier.BlockMismatch(SchematicVerifier.MismatchType.WRONG_STATE, stateSchematic, stateClient, 1);
                             this.wrongStatesPositions.put(Pair.of(stateSchematic, stateClient), pos);
