@@ -239,10 +239,12 @@ public class BlockUtil {
     }
     //t inte f plac
     public static List<Direction> getSortedDirs(BlockPos pos,boolean mode) {
-        if (mode){
-            return pri.bSetSortDir.get() ? DirSorter.sort(getInteractDir(pos), pos) : getInteractDir(pos);
-        }
-        return pri.bSetSortDir.get() ? DirSorter.sort(getDirs(pos), pos) : getDirs(pos);
+        List<Direction> dirs =  mode? getInteractDir(pos) : getDirs(pos);
+        return pri.bSetSortDir.get() ?DirSorter.sort(dirs,pos,mode):dirs;
+//        if (mode){
+//            return pri.bSetSortDir.get() ? DirSorter.sort(getInteractDir(pos), pos) : getInteractDir(pos);
+//        }
+//        return pri.bSetSortDir.get() ? DirSorter.sort(getDirs(pos), pos) : getDirs(pos);
     }
     public static List<Direction> getInteractDir(BlockPos pos) {
         if (!mc.world.getWorldBorder().contains(pos))return new LinkedList<>();

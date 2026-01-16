@@ -46,7 +46,7 @@ public class PlaceDataManager implements HasExtraSetting {
         //若投影中某位置为空气,则返回
         List<Direction> dirs = BlockUtil.getSortedDirs(pos,false);
         List<ItemStack> stacks;
-        if (/*dirs.isEmpty() ||*/ needState.getBlock() instanceof AirBlock || (stacks = InvUtil.getBlockStacks(needState.getBlock())).size() == 0) {
+        if (/*dirs.isEmpty() ||*/ needState.getBlock() instanceof AirBlock || (stacks = InvUtil.getBlockStacks(needState.getBlock())).isEmpty()) {
             //没有可用Facing(后移至原版计算(for))//找不到方块//不可放置
 
             return PlaceDataPack.NULL;

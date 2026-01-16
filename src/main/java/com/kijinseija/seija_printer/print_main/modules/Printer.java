@@ -353,7 +353,8 @@ public class Printer extends LoaderAntiCrash {
     public final SettingGroup sgDebug = settings.createGroup("debug", false);
     private final Setting<Boolean> bSetRunSpeed = sgDebug.add(new BoolSetting.Builder()
         .name("RunSpeed").defaultValue(false).build());
-
+    private final Setting<Boolean> bSetListSize = sgDebug.add(new BoolSetting.Builder()
+        .name("block-list-size").defaultValue(false).build());
     private final SettingGroup sgReplaceBlockMapping = settings.createGroup("ReplaceBlock");
     private final Setting<Boolean> bSetEnableReplace = sgReplaceBlockMapping.add(
         new BoolSetting.Builder().name("enableReplace")
@@ -492,7 +493,9 @@ public class Printer extends LoaderAntiCrash {
                 collect.add(new BlockPos(pos));
             }
         }
-
+        if (bSetListSize.get()){
+            ChatUtils.sendMsg(Text.of(collect.size()+""));
+        }
 
         PosSorter.sort(collect);
         //放置计数

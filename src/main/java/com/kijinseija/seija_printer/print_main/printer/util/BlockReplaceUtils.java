@@ -15,6 +15,7 @@ import net.minecraft.state.property.Property;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -118,7 +119,7 @@ public class BlockReplaceUtils {
 
 
     public Block bridgeBlockReplace(BlockState bs, BlockPos pos) {
-        List<Direction> interactDir = BlockUtil.getSortedDirs(pos,true);
+        List<Direction> interactDir = Collections.emptyList();
 
         if (
             pri.bSetBridgeMode.get()//开了桥模式
@@ -126,7 +127,8 @@ public class BlockReplaceUtils {
                 && pos != null
                 && BlockUtil.canPlaceIn(pos)//实际也为空
                 && (!BlockUtil.getDirs(pos).isEmpty())//有点击方位
-                && (!interactDir.isEmpty()))//有用
+                && (! (interactDir = BlockUtil.getSortedDirs(pos,true)).isEmpty())//有用
+        )
         {
             for (Direction direction : interactDir) {
                 if (pri.liSetBridgeDirs.get().contains(direction)//是可以用的方位
@@ -146,6 +148,7 @@ public class BlockReplaceUtils {
         }
         return null;
     }
+
 
     private BlockState getScheStateBridegeMode(BlockPos pos) {
         BlockState state = SchematicWorldHandler.getSchematicWorld().getBlockState(pos);
