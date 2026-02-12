@@ -10,8 +10,7 @@ import meteordevelopment.meteorclient.gui.WindowScreen;
 import meteordevelopment.meteorclient.gui.widgets.containers.WTable;
 import meteordevelopment.meteorclient.gui.widgets.pressable.WCheckbox;
 import meteordevelopment.meteorclient.utils.Utils;
-import net.minecraft.util.math.Direction;
-
+import net.minecraft.core.Direction;
 import java.util.List;
 
 public class DirectionListSettingScreen extends WindowScreen {

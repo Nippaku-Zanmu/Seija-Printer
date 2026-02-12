@@ -9,12 +9,12 @@ import com.kijinseija.seija_printer.print_main.modules.Printer;
 import meteordevelopment.meteorclient.settings.BoolSetting;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.Settings;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class AbstractFixer {
-    public MinecraftClient mc = MinecraftClient.getInstance();
+    public Minecraft mc = Minecraft.getInstance();
 
     public AbstractFixer(String name) {
         bSetEnable = new BoolSetting.Builder().name(name).defaultValue(true).build();

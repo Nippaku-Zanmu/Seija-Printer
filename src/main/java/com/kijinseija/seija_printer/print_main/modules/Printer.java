@@ -6,7 +6,6 @@
 package com.kijinseija.seija_printer.print_main.modules;
 
 import com.kijinseija.seija_printer.Addon;
-import com.kijinseija.seija_printer.loader.LoaderAntiCrash;
 import com.kijinseija.seija_printer.print_main.printer.block_fixer.AbstractFixer;
 import com.kijinseija.seija_printer.print_main.printer.block_fixer.FixerManager;
 import com.kijinseija.seija_printer.print_main.printer.extra_setting.ExtraSettingManager;
@@ -21,23 +20,24 @@ import com.kijinseija.seija_printer.settings.impl.DirectionListSetting;
 import com.kijinseija.seija_printer.settings.impl.DoubleRangeSetting;
 import com.kijinseija.seija_printer.settings.impl.SettingsSetting;
 import com.kijinseija.seija_printer.settings.obj.DoubleRange;
-import fi.dy.masa.litematica.data.DataManager;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
+import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.*;
-
+import meteordevelopment.orbit.EventHandler;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import java.util.*;
-import java.util.stream.Collectors;
 
 
-public class Printer extends LoaderAntiCrash {
+
+public class Printer extends Module {
     public static Printer getINSTANCE() {
         return INSTANCE;
     }
@@ -370,88 +370,6 @@ public class Printer extends LoaderAntiCrash {
         if (bSetEnableReplace.get()) return rSetReplaceMap.get();
         return new HashMap<>();
     }
-//    private final Setting<String> sSetReplaceBlockFile =
-//        sgReplaceBlockFile.add(new StringSetting.Builder()
-//            .name("replaceBlockFile")
-//            .defaultValue("D://a.txt")
-//            .build());
-
-//    @Override
-//    public WWidget getWidget(GuiTheme theme) {
-//        WVerticalList list = theme.verticalList();
-//        WButton selectFile = list.add(theme.button("Select File")).widget();
-//        selectFile.action = () -> {
-//            String path = TinyFileDialogs.tinyfd_openFileDialog(
-//                "Select File",
-//                new File(MeteorClient.FOLDER, "BlockReplace.txt").getAbsolutePath(),
-//                filters,
-//                null,
-//                false
-//            );
-//
-//            if (path != null) {
-////                file = new File(path);
-////                fileName.set(file.getName());
-////                sSetReplaceBlockFile.set(path);
-//                sSetReplaceBlockFile.set(path);
-//            }
-//        };
-//        //File Select
-//        WButton start = list.add(theme.button("Load!")).expandX().widget();
-//        start.action = () -> new Thread(() -> loadMap(sSetReplaceBlockFile.get())).start();
-//
-//        return list;
-//    }
-//
-//    private PointerBuffer filters;
-//
-//    private void loadFileFilters() {
-//        filters = BufferUtils.createPointerBuffer(1);
-//        ByteBuffer txtFilter = MemoryUtil.memASCII("*.txt");
-//        filters.put(txtFilter);
-//        filters.rewind();
-//    }
-
-//    private void loadMap(String file) {
-//        BufferedReader br = null;
-//        try {
-//
-//            br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-//            replaceMap.clear();
-//            br.lines().forEach(s -> {
-//                String[] sp1 = s.split(":");
-//                if (sp1.length != 2) return;
-//                Block rep = Registries.BLOCK.get(Identifier.of(sp1[0]));
-//                //121
-//                if (blockCheck(rep)) return;
-//                List<Block> repBlocks = new ArrayList<>();
-//                String[] blocks = sp1[1].split(",");
-//
-//                for (String blockStr : blocks) {
-//                    Block block = Registries.BLOCK.get(Identifier.of(blockStr));
-//                    if (blockCheck(block)) return;
-//                    repBlocks.add(block);
-//                }
-//                replaceMap.put(rep, repBlocks);
-//            });
-//
-//        } catch (FileNotFoundException e) {
-//            ChatUtils.sendMsg(Text.of("Error"));
-//        } finally {
-//            try {
-//                if (br != null)
-//                    br.close();
-//            } catch (IOException ignored) {
-//
-//            }
-//        }
-//    }
-
-//    public boolean blockCheck(Block b) {
-//        return (b == null || b == Blocks.AIR);
-//    }
-//
-//    public final HashMap<Block, List<Block>> replaceMap = new HashMap<>();
 
 
     SeijaTimer timer = new SeijaTimer(() -> dRangeSetPrintingDelay.get().nextRandom());
@@ -461,7 +379,7 @@ public class Printer extends LoaderAntiCrash {
     public void doPrint() {
         if (RotationManager.INSTANCE.taskSize() > 4) return;
         if (!timer.passed(dRangeSetPrintingDelay.get().getCurrentRandom())) return;
-        if (mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.level == null) return;
         //刷掉过时的黑名单方块
         blackList.removeIf(b -> System.currentTimeMillis() - b.timestamp() > dSetAntiReplaceTime.get());
         //WorldSchematic worldSchematic = SchematicWorldHandler.getSchematicWorld();
@@ -484,7 +402,7 @@ public class Printer extends LoaderAntiCrash {
         int ymax = (int) Math.ceil(dRangeSetPrintingYRange.get().getMax());
         int ymin = (int) Math.floor(dRangeSetPrintingYRange.get().getMin());
         for(BlockPos pos:
-        BlockUtil.sphereIterate(mc.player.getBlockPos(), dSetPrintingRange.get().intValue(),
+        BlockUtil.sphereIterate(mc.player.blockPosition(), dSetPrintingRange.get().intValue(),
             ymax,
             ymin)
         ){
@@ -494,7 +412,7 @@ public class Printer extends LoaderAntiCrash {
             }
         }
         if (bSetListSize.get()){
-            ChatUtils.sendMsg(Text.of(collect.size()+""));
+            ChatUtils.sendMsg(Component.nullToEmpty(collect.size()+""));
         }
 
         PosSorter.sort(collect);
@@ -542,13 +460,13 @@ public class Printer extends LoaderAntiCrash {
         RenderUtil.isAniRenderSizeAdd = false;
     }
 
-    @Override
+    @EventHandler
     public void render3d(Render3DEvent event) {
-        if (event == null || mc == null || mc.world == null || mc.player == null) return;
+        if (event == null || mc == null || mc.level == null || mc.player == null) return;
         long timeStamp = System.currentTimeMillis();
         doPrint();
         if (bSetRunSpeed.get())
-            ChatUtils.sendMsg(Text.of("CalcTime:" + (System.currentTimeMillis() - timeStamp)));
+            ChatUtils.sendMsg(Component.nullToEmpty("CalcTime:" + (System.currentTimeMillis() - timeStamp)));
         RenderUtil.render(event);
     }
 //    @EventHandler
@@ -572,12 +490,12 @@ public class Printer extends LoaderAntiCrash {
 //
 //    }
 
-    @Override
+    @EventHandler
     public void tick(TickEvent.Post e) {
-        if (e == null || mc == null || mc.world == null || mc.player == null) return;
+        if (e == null || mc == null || mc.level == null || mc.player == null) return;
         RenderHelper.COLOR.setSpeed(dSetRainbowSpeed.get() / 100);
         RenderHelper.COLOR.getNext();
-        if (mc.world != FakePlacementContext.getFakePlayer().getEntityWorld())
+        if (mc.level != FakePlacementContext.getFakePlayer().level())
             FakePlacementContext.updatePlayerEntity();
     }
 

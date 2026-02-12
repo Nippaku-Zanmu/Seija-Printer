@@ -7,21 +7,17 @@ package com.kijinseija.seija_printer.print_main.printer.placedata_getter.vanilla
 
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ConnectingBlock;
-import net.minecraft.block.MultifaceGrowthBlock;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.state.property.Properties;
-import net.minecraft.state.property.Property;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.MultifaceSpreadeableBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.Property;
 
 
 public class MultifaceGrowthDecide implements Decide {
     private final Property[] facProps = new Property[]{
-        Properties.WEST, Properties.EAST, Properties.UP, Properties.DOWN
-        , Properties.NORTH, Properties.SOUTH
+        BlockStateProperties.WEST, BlockStateProperties.EAST, BlockStateProperties.UP, BlockStateProperties.DOWN
+        , BlockStateProperties.NORTH, BlockStateProperties.SOUTH
     };
 
     @Override
@@ -33,7 +29,7 @@ public class MultifaceGrowthDecide implements Decide {
 
             try {
                 //ChatUtils.sendMsg(Text.of(prop.getName() + needState.get(prop) + "," + nowState.get(prop)));
-                if ((needState.get(prop).equals(nowState.get(prop))) && (nowState.get(prop).equals(Boolean.TRUE))) {
+                if ((needState.getValue(prop).equals(nowState.getValue(prop))) && (nowState.getValue(prop).equals(Boolean.TRUE))) {
                     //ChatUtils.sendMsg(Text.of("Ret"+prop.getName() + needState.get(prop) + "," + nowState.get(prop)));
                     return true;
                 }
@@ -47,7 +43,7 @@ public class MultifaceGrowthDecide implements Decide {
 
     @Override
     public boolean isSuit(BlockState needState, BlockState nowState, BlockPos ignore) {
-        return needState.getBlock() instanceof MultifaceGrowthBlock && nowState.getBlock() instanceof MultifaceGrowthBlock;
+        return needState.getBlock() instanceof MultifaceSpreadeableBlock && nowState.getBlock() instanceof MultifaceSpreadeableBlock;
     }
     @Override
     public Setting[] getSettings() {

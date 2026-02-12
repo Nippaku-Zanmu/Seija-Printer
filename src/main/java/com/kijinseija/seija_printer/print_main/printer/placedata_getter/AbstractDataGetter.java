@@ -9,8 +9,8 @@ import com.kijinseija.seija_printer.print_main.printer.util.records.DirData;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
 import com.kijinseija.seija_printer.print_main.modules.Printer;
 import meteordevelopment.meteorclient.settings.Setting;
-import net.minecraft.block.BlockState;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class AbstractDataGetter {
     public Printer pri = Printer.getINSTANCE();

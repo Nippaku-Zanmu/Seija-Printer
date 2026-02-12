@@ -7,13 +7,13 @@ package com.kijinseija.seija_printer.print_main.printer.placedata_getter.vanilla
 
 import meteordevelopment.meteorclient.settings.BoolSetting;
 import meteordevelopment.meteorclient.settings.Setting;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FallingBlock;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.FallingBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class FallingBlockDecide implements Decide {
-    private static final MinecraftClient mc = MinecraftClient.getInstance();
+    private static final Minecraft mc = Minecraft.getInstance();
     private final Setting<Boolean> isEnable = new BoolSetting.Builder()
         .name("avoid-block-fall")
         .defaultValue(true)
@@ -26,7 +26,7 @@ public class FallingBlockDecide implements Decide {
 
     @Override
     public boolean test(BlockState needState, BlockState nowState, BlockPos placePos) {
-        return mc.world != null && !FallingBlock.canFallThrough(mc.world.getBlockState(placePos.down()))
+        return mc.level != null && !FallingBlock.isFree(mc.level.getBlockState(placePos.below()))
             && MainDecide.defaultTest(needState, nowState, placePos);
     }
 

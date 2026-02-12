@@ -9,8 +9,6 @@ import com.kijinseija.seija_printer.print_main.printer.block_fixer.FixerManager;
 import com.kijinseija.seija_printer.print_main.printer.placedata_getter.PlaceDataManager;
 import com.kijinseija.seija_printer.print_main.printer.placedata_getter.vanilla_precision_placer.state_decide.MainDecide;
 import meteordevelopment.meteorclient.settings.Settings;
-import net.minecraft.block.PowderSnowBlock;
-
 import java.util.ArrayList;
 import java.util.List;
 

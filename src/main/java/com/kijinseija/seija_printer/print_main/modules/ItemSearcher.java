@@ -21,18 +21,16 @@ import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.player.SlotUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Block;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.GenericContainerScreenHandler;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.ShulkerBoxScreenHandler;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-
-
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ChestMenu;
+import net.minecraft.world.inventory.ShulkerBoxMenu;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Block;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -78,13 +76,13 @@ public class ItemSearcher extends Module {
         print.action = () -> {
             if (!isActive()) return;
             blockInfo.forEach((key, count) -> {
-                MutableText blockCount = Text.literal("Block: ")
-                    .append(Text.translatable(key.getTranslationKey()))
+                MutableComponent blockCount = Component.literal("Block: ")
+                    .append(Component.translatable(key.getDescriptionId()))
                     .append("Count :");
                 if (count / 64 > 0) {
                     blockCount
                         .append(count / 64 + "")
-                        .append(Text.literal(" *64 ").withColor(0x87CAFF))
+                        .append(Component.literal(" *64 ").withColor(0x87CAFF))
                         //rgb(135, 202, 255)
                         .append("+ ");
                 }
@@ -118,9 +116,9 @@ public class ItemSearcher extends Module {
         BlockPos min = BlockPos.min(bpSetPoint1.get(), bpSetPoint2.get());
         BlockPos max = BlockPos.max(bpSetPoint1.get(), bpSetPoint2.get());
 
-        for (BlockPos bp : BlockPos.iterate(min, max)) {
+        for (BlockPos bp : BlockPos.betweenClosed(min, max)) {
             if (Thread.currentThread().isInterrupted()) {
-                ChatUtils.sendMsg("[AdvancedPrinter]", Text.of("Analysis stop"));
+                ChatUtils.sendMsg("[AdvancedPrinter]", Component.nullToEmpty("Analysis stop"));
                 break;
             }
 
@@ -137,7 +135,7 @@ public class ItemSearcher extends Module {
             // 方块一致
             if (ScheVerifyMixinUtil.isReplacedBlockEqual(
                 BlockReplaceUtils.getScheStateNonReplace(bp).getBlock(),
-                mc.world.getBlockState(bp).getBlock())) {
+                mc.level.getBlockState(bp).getBlock())) {
                 continue;
             }
 
@@ -151,12 +149,12 @@ public class ItemSearcher extends Module {
         }
 
         //拿到了需求数量后先减去背包内已有的
-        for (int i = 0; i < mc.player.getInventory().size(); i++) {
-            ItemStack stack = mc.player.getInventory().getStack(i);
+        for (int i = 0; i < mc.player.getInventory().getContainerSize(); i++) {
+            ItemStack stack = mc.player.getInventory().getItem(i);
             Block stealBlock = needSteal(stack.getItem());
             updateInfo(stealBlock, stack.getCount());
         }
-        ChatUtils.sendMsg("[AdvancedPrinter]", Text.of("Analysis complete"));
+        ChatUtils.sendMsg("[AdvancedPrinter]", Component.nullToEmpty("Analysis complete"));
 
     }
 
@@ -198,13 +196,13 @@ public class ItemSearcher extends Module {
     SeijaTimer stealTimer = new SeijaTimer(dRangeSetStealDelay.get()::nextRandom);
 
     private final void tick() {
-        ScreenHandler scrHand = mc.player.currentScreenHandler;
+        AbstractContainerMenu scrHand = mc.player.containerMenu;
         //ChatUtils.sendMsg(Text.of((scrHand instanceof GenericContainerScreenHandler) +"eq?"+ scrHand.getClass().getName()));
         //&&scrHand.getType().equals(ScreenHandlerType.GENERIC_9X3) ||scrHand.getType().equals(ScreenHandlerType.GENERIC_9X6)
 
 
-        if ((scrHand instanceof GenericContainerScreenHandler
-            || scrHand instanceof ShulkerBoxScreenHandler) && InvUtils.findEmpty().found()) {
+        if ((scrHand instanceof ChestMenu
+            || scrHand instanceof ShulkerBoxMenu) && InvUtils.findEmpty().found()) {
             if (stealTimer.passed(dRangeSetStealDelay.get().getCurrentRandom())) {
                 stealTimer.reset();
                 stealChest(scrHand);
@@ -217,10 +215,10 @@ public class ItemSearcher extends Module {
 
     int slot = 0;
 
-    private boolean stealChest(ScreenHandler scrHand) {
+    private boolean stealChest(AbstractContainerMenu scrHand) {
 
         while (slot < SlotUtils.indexToId(SlotUtils.MAIN_START)) {
-            ItemStack stealStack = scrHand.getSlot(slot).getStack();
+            ItemStack stealStack = scrHand.getSlot(slot).getItem();
             Block stealBlock = needSteal(stealStack.getItem());
             if (stealBlock != null) {
                 updateInfo(stealBlock, stealStack.getCount());

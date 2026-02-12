@@ -7,12 +7,11 @@ package com.kijinseija.seija_printer.settings.impl;
 
 import meteordevelopment.meteorclient.settings.IVisible;
 import meteordevelopment.meteorclient.settings.Setting;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtString;
-import net.minecraft.util.math.Direction;
-
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +27,7 @@ public class DirectionListSetting extends Setting<List<Direction>> {
         String[] values = str.split(",");
         List<Direction> dirs = new ArrayList<>(values.length);
         for (String s : values) {
-            Direction dir = Direction.byId(s);
+            Direction dir = Direction.byName(s);
             if (dir != null) dirs.add(dir);
         }
         return dirs;
@@ -45,10 +44,10 @@ public class DirectionListSetting extends Setting<List<Direction>> {
     }
 
     @Override
-    public NbtCompound save(NbtCompound tag) {
-        NbtList valueTag = new NbtList();
+    public CompoundTag save(CompoundTag tag) {
+        ListTag valueTag = new ListTag();
         for (Direction dir : get()) {
-            valueTag.add(NbtString.of(dir.getId()));
+            valueTag.add(StringTag.valueOf(dir.getName()));
         }
         tag.put("value", valueTag);
 
@@ -56,12 +55,12 @@ public class DirectionListSetting extends Setting<List<Direction>> {
     }
 
     @Override
-    public List<Direction> load(NbtCompound tag) {
+    public List<Direction> load(CompoundTag tag) {
         get().clear();
 
-        NbtList valueTag = tag.getListOrEmpty("value");
-        for (NbtElement tagI : valueTag) {
-            Direction dir = Direction.byId(tagI.asString().orElse(null));
+        ListTag valueTag = tag.getListOrEmpty("value");
+        for (Tag tagI : valueTag) {
+            Direction dir = Direction.byName(tagI.asString().orElse(null));
             if (dir != null)
                 get().add(dir);
         }

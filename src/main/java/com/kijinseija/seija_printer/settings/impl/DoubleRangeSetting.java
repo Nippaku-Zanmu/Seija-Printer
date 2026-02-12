@@ -12,7 +12,7 @@ import java.util.function.Consumer;
 import com.kijinseija.seija_printer.settings.obj.DoubleRange;
 import meteordevelopment.meteorclient.settings.IVisible;
 import meteordevelopment.meteorclient.settings.Setting;
-import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.CompoundTag;
 
 public class DoubleRangeSetting extends Setting<DoubleRange> {
     public final double min, max;
@@ -54,14 +54,14 @@ public class DoubleRangeSetting extends Setting<DoubleRange> {
     }
 
     @Override
-    protected NbtCompound save(NbtCompound tag) {
+    protected CompoundTag save(CompoundTag tag) {
         tag.putDouble("value1", get().value1);
         tag.putDouble("value2", get().value2);
         return tag;
     }
 
     @Override
-    public DoubleRange load(NbtCompound tag) {
+    public DoubleRange load(CompoundTag tag) {
         DoubleRange doubleRange = new DoubleRange(tag.getDouble("value1").orElse(0d),tag.getDouble("value2").orElse(0d));
         set(doubleRange);
         return get();

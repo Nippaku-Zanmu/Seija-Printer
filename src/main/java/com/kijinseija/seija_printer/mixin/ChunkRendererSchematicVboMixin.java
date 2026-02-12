@@ -8,7 +8,7 @@ package com.kijinseija.seija_printer.mixin;
 import com.kijinseija.seija_printer.print_main.printer.util.ScheVerifyMixinUtil;
 import fi.dy.masa.litematica.render.schematic.ChunkRendererSchematicVbo;
 import fi.dy.masa.litematica.util.OverlayType;
-import net.minecraft.block.BlockState;
+import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -38,11 +38,11 @@ public class ChunkRendererSchematicVboMixin {
 
             if (schematicHasAir)
             {
-                return (clientHasAir || (this.ignoreClientWorldFluids && stateClient.isLiquid())) ? OverlayType.NONE : OverlayType.EXTRA;
+                return (clientHasAir || (this.ignoreClientWorldFluids && stateClient.liquid())) ? OverlayType.NONE : OverlayType.EXTRA;
             }
             else
             {
-                if (clientHasAir || (this.ignoreClientWorldFluids && stateClient.isLiquid()))
+                if (clientHasAir || (this.ignoreClientWorldFluids && stateClient.liquid()))
                 {
                     return OverlayType.MISSING;
                 }

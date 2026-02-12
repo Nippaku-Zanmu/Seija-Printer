@@ -6,11 +6,10 @@
 package com.kijinseija.seija_printer.print_main.printer.util;
 
 import com.kijinseija.seija_printer.print_main.modules.Printer;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.state.property.Property;
-
 import java.util.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
 
 /**
  * sche verify mixin util
@@ -43,11 +42,11 @@ public class ScheVerifyMixinUtil {
             Comparable now = null;
             Comparable need = null;
             try {
-                now = client.get(property);
+                now = client.getValue(property);
             } catch (IllegalArgumentException ignored) {
             }
             try {
-                need = sche.get(property);
+                need = sche.getValue(property);
             } catch (IllegalArgumentException ignored) {
             }
             if (now != need) {

@@ -14,9 +14,7 @@ import meteordevelopment.meteorclient.gui.widgets.input.WTextBox;
 import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
 import meteordevelopment.meteorclient.gui.widgets.pressable.WPressable;
 import meteordevelopment.meteorclient.settings.BlockListSetting;
-
-import net.minecraft.block.Block;
-
+import net.minecraft.world.level.block.Block;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +55,7 @@ public class BlockReplaceSettingScreen extends WindowScreen {
             WButton editKeys = table.add(theme.button(GuiRenderer.EDIT)).widget();
             int keyRenderCount = 0;//渲染的预览被替换方块数
             for (; keyRenderCount < keyBlocks.size() && keyRenderCount < 4; keyRenderCount++) {
-                table.add(theme.item(keyBlocks.get(keyRenderCount).asItem().getDefaultStack()));
+                table.add(theme.item(keyBlocks.get(keyRenderCount).asItem().getDefaultInstance()));
             }//方块预览
             int extraKeyBlockCount = keyBlocks.size() - 4;
             table.add(theme.tooltip(extraKeyBlockCount > 0 ? "+" + extraKeyBlockCount + "  ->  " : "  ->  "));
@@ -85,7 +83,7 @@ public class BlockReplaceSettingScreen extends WindowScreen {
 
             int valRenderCount = 0;//渲染的预览替换方块数
             for (; valRenderCount < valueBlocks.size() && valRenderCount <= 4; valRenderCount++) {
-                table.add(theme.item(valueBlocks.get(valRenderCount).asItem().getDefaultStack()));
+                table.add(theme.item(valueBlocks.get(valRenderCount).asItem().getDefaultInstance()));
             }//方块预览
             int extraValBlockCount = valueBlocks.size() - 4;
             table.add(theme.tooltip(extraValBlockCount > 0 ? "+" + extraValBlockCount : ""));

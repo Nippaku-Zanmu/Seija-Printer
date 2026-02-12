@@ -12,8 +12,8 @@ import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 
 public class ScheDebug extends Module {
     public ScheDebug() {
@@ -26,6 +26,6 @@ public class ScheDebug extends Module {
 
     @Override
     public void onActivate() {
-        ChatUtils.sendMsg(Text.of(BlockReplaceUtils.INSTANCE.getScheState(posSetting.get()).getBlock().toString()));
+        ChatUtils.sendMsg(Component.nullToEmpty(BlockReplaceUtils.INSTANCE.getScheState(posSetting.get()).getBlock().toString()));
     }
 }

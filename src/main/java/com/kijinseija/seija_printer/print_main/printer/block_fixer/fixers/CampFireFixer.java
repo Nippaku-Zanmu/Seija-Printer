@@ -11,13 +11,14 @@ import com.kijinseija.seija_printer.print_main.printer.util.records.DirData;
 import com.kijinseija.seija_printer.print_main.printer.util.records.DirDataI;
 import com.kijinseija.seija_printer.print_main.printer.util.InvUtil;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
-import net.minecraft.block.*;
-import net.minecraft.item.ShovelItem;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.ShovelItem;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.CampfireBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.Vec3;
 import java.util.List;
 
 public class CampFireFixer extends AbstractFixer {
@@ -33,7 +34,7 @@ public class CampFireFixer extends AbstractFixer {
             return CONTINUE;
         }
         for (Direction dir : dirData.dirs()) {
-            for (Vec3d clickVec : dirData.clickVecsInte(dir)) {
+            for (Vec3 clickVec : dirData.clickVecsInte(dir)) {
                 if (InvUtil.switchItem(stack -> stack.getItem()instanceof ShovelItem)) {
                     BlockUtil.interactBlock(PlaceData.newInstance(dirData.placePos(),dir,clickVec,true,null));
                     return SUCCESS;
@@ -45,9 +46,9 @@ public class CampFireFixer extends AbstractFixer {
 
     @Override
     public boolean needFix(BlockPos pos, BlockState needState) {
-        Block block = mc.world.getBlockState(pos).getBlock();
+        Block block = mc.level.getBlockState(pos).getBlock();
         return needState.getBlock() instanceof CampfireBlock
             && needState.getBlock()==block
-            && mc.world.getBlockState(pos).get(Properties.LIT);
+            && mc.level.getBlockState(pos).getValue(BlockStateProperties.LIT);
     }
 }

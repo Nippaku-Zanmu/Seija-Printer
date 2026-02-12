@@ -5,11 +5,11 @@
 
 package com.kijinseija.seija_printer.print_main.printer.block_fixer.fixers.click_fixer;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.RedstoneWireBlock;
-import net.minecraft.util.math.BlockPos;
+import static net.minecraft.world.level.block.RedStoneWireBlock.*;
 
-import static net.minecraft.block.RedstoneWireBlock.*;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.RedStoneWireBlock;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class RedStoneFixer extends AbstractClickFixer{
     public RedStoneFixer() {
@@ -21,9 +21,9 @@ public class RedStoneFixer extends AbstractClickFixer{
         if (!super.needFix(pos,needState)) {
             return false;
         }
-        BlockState blockState = mc.world.getBlockState(pos);
+        BlockState blockState = mc.level.getBlockState(pos);
         if (
-            blockState.getBlock() instanceof RedstoneWireBlock &&needState.getBlock()==blockState.getBlock()) {
+            blockState.getBlock() instanceof RedStoneWireBlock &&needState.getBlock()==blockState.getBlock()) {
             return (isFullyConnected(blockState)^isFullyConnected(needState))
                 &&(isNotConnected(blockState)^isNotConnected(needState))
                 &&(isNotConnected(needState)||isFullyConnected(needState))
@@ -34,10 +34,10 @@ public class RedStoneFixer extends AbstractClickFixer{
         return false;
     }
     private static boolean isFullyConnected(BlockState state) {
-        return state.get(WIRE_CONNECTION_NORTH).isConnected() && state.get(WIRE_CONNECTION_SOUTH).isConnected() && state.get(WIRE_CONNECTION_EAST).isConnected() && state.get(WIRE_CONNECTION_WEST).isConnected();
+        return state.getValue(NORTH).isConnected() && state.getValue(SOUTH).isConnected() && state.getValue(EAST).isConnected() && state.getValue(WEST).isConnected();
     }
 
     private static boolean isNotConnected(BlockState state) {
-        return !state.get(WIRE_CONNECTION_NORTH).isConnected() && !state.get(WIRE_CONNECTION_SOUTH).isConnected() && !state.get(WIRE_CONNECTION_EAST).isConnected() && !state.get(WIRE_CONNECTION_WEST).isConnected();
+        return !state.getValue(NORTH).isConnected() && !state.getValue(SOUTH).isConnected() && !state.getValue(EAST).isConnected() && !state.getValue(WEST).isConnected();
     }
 }

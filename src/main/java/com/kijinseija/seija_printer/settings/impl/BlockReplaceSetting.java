@@ -7,14 +7,13 @@ package com.kijinseija.seija_printer.settings.impl;
 
 import meteordevelopment.meteorclient.settings.IVisible;
 import meteordevelopment.meteorclient.settings.Setting;
-import net.minecraft.block.Block;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-import net.minecraft.nbt.NbtList;
-import net.minecraft.nbt.NbtString;
-import net.minecraft.registry.Registries;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.block.Block;
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -42,8 +41,8 @@ public class BlockReplaceSetting extends Setting<HashMap<List<Block>, List<Block
 
 
     @Override
-    protected NbtCompound save(NbtCompound tag) {
-        NbtList valueTag = new NbtList();//总列表 存储键值对
+    protected CompoundTag save(CompoundTag tag) {
+        ListTag valueTag = new ListTag();//总列表 存储键值对
         for (Map.Entry<List<Block>, List<Block>> blockEntry : get().entrySet()) {
             List<Block> keyBlocks = blockEntry.getKey();
             List<Block> valueBlocks = blockEntry.getValue();
@@ -52,17 +51,17 @@ public class BlockReplaceSetting extends Setting<HashMap<List<Block>, List<Block
                 continue;
 
             //单个
-            NbtCompound entryTag = new NbtCompound();//单个键值对标签
+            CompoundTag entryTag = new CompoundTag();//单个键值对标签
 
-            NbtList keyBlockList = new NbtList();
+            ListTag keyBlockList = new ListTag();
             for (Block block : keyBlocks) {
-                keyBlockList.add(NbtString.of(Registries.BLOCK.getId(block).toString()));
+                keyBlockList.add(StringTag.valueOf(BuiltInRegistries.BLOCK.getKey(block).toString()));
             }//填写key
             entryTag.put("keyBlocks", keyBlockList);
 
-            NbtList valueBlockList = new NbtList();
+            ListTag valueBlockList = new ListTag();
             for (Block block : valueBlocks) {
-                valueBlockList.add(NbtString.of(Registries.BLOCK.getId(block).toString()));
+                valueBlockList.add(StringTag.valueOf(BuiltInRegistries.BLOCK.getKey(block).toString()));
             }//填valueBlock
             entryTag.put("valBlocks", valueBlockList);
 
@@ -76,23 +75,23 @@ public class BlockReplaceSetting extends Setting<HashMap<List<Block>, List<Block
     }
 
     @Override
-    protected HashMap<List<Block>, List<Block>> load(NbtCompound tag) {
+    protected HashMap<List<Block>, List<Block>> load(CompoundTag tag) {
         get().clear();
-        NbtList entryListTag = tag.getListOrEmpty("value");
+        ListTag entryListTag = tag.getListOrEmpty("value");
 
         for (int i = 0; i < entryListTag.size(); i++) {
-            NbtCompound entryTag = entryListTag.getCompound(i).orElse(null);
+            CompoundTag entryTag = entryListTag.getCompound(i).orElse(null);
             if (entryTag==null)continue;
-            NbtList keyBlocksTag = entryTag.getListOrEmpty("keyBlocks");
+            ListTag keyBlocksTag = entryTag.getListOrEmpty("keyBlocks");
             ArrayList<Block> keyList = new ArrayList<>();
-            for (NbtElement tagI : keyBlocksTag) {
-                Block block = Registries.BLOCK.get(Identifier.of(tagI.asString().orElse("")));
+            for (Tag tagI : keyBlocksTag) {
+                Block block = BuiltInRegistries.BLOCK.getValue(Identifier.parse(tagI.asString().orElse("")));
                 keyList.add(block);
             }
-            NbtList valBlocksTag = entryTag.getListOrEmpty("valBlocks");
+            ListTag valBlocksTag = entryTag.getListOrEmpty("valBlocks");
             ArrayList<Block> valList = new ArrayList<>();
-            for (NbtElement tagI : valBlocksTag) {
-                Block block = Registries.BLOCK.get(Identifier.of(tagI.asString().orElse("")));
+            for (Tag tagI : valBlocksTag) {
+                Block block = BuiltInRegistries.BLOCK.getValue(Identifier.parse(tagI.asString().orElse("")));
                 valList.add(block);
             }
             get().put(keyList, valList);

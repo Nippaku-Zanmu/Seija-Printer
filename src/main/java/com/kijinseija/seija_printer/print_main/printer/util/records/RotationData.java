@@ -6,15 +6,14 @@
 package com.kijinseija.seija_printer.print_main.printer.util.records;
 
 import com.kijinseija.seija_printer.print_main.printer.util.SeijaUtil;
-import net.minecraft.util.math.Vec3d;
-
 import java.util.Objects;
+import net.minecraft.world.phys.Vec3;
 
 public record RotationData(double yaw, double pitch,Runnable task) {
     public static RotationData build(double yaw, double pitch){
         return new RotationData(yaw,pitch, null);
     }
-    public static RotationData fromVec(Vec3d vec){
+    public static RotationData fromVec(Vec3 vec){
         return new RotationData(SeijaUtil.getYaw(vec),SeijaUtil.getPitch(vec),null);
     }
 

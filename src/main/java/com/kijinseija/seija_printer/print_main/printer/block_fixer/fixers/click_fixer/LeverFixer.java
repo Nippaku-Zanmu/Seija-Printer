@@ -5,10 +5,10 @@
 
 package com.kijinseija.seija_printer.print_main.printer.block_fixer.fixers.click_fixer;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.LeverBlock;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.LeverBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class LeverFixer extends AbstractClickFixer{
     public LeverFixer() {
@@ -20,10 +20,10 @@ public class LeverFixer extends AbstractClickFixer{
         if (!super.needFix(pos,needState)) {
             return false;
         }
-        BlockState blockState = mc.world.getBlockState(pos);
+        BlockState blockState = mc.level.getBlockState(pos);
         if (
             blockState.getBlock() instanceof LeverBlock&&needState.getBlock()==blockState.getBlock()) {
-            return! blockState.get(Properties.POWERED) .equals (needState.get(Properties.POWERED));
+            return! blockState.getValue(BlockStateProperties.POWERED) .equals (needState.getValue(BlockStateProperties.POWERED));
         }
         return false;
     }

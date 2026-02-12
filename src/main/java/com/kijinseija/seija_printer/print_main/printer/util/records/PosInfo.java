@@ -6,9 +6,9 @@
 package com.kijinseija.seija_printer.print_main.printer.util.records;
 
 import meteordevelopment.meteorclient.utils.render.color.Color;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec3;
 
-public record PosInfo(BlockPos pos, Direction torchDir, Vec3d clickVec,boolean isPlaceMode, long timestamp, Color renderColor) {
+public record PosInfo(BlockPos pos, Direction torchDir, Vec3 clickVec,boolean isPlaceMode, long timestamp, Color renderColor) {
     }

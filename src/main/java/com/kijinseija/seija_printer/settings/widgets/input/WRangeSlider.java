@@ -6,8 +6,8 @@
 package com.kijinseija.seija_printer.settings.widgets.input;
 
 import meteordevelopment.meteorclient.gui.widgets.WWidget;
-import net.minecraft.client.gui.Click;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.util.Mth;
 
 public abstract class WRangeSlider extends WWidget {
     public Runnable action;
@@ -29,8 +29,8 @@ public abstract class WRangeSlider extends WWidget {
     protected double valueAtDragStart;
 
     public WRangeSlider(double value1, double value2, double min, double max) {
-        this.value1 = MathHelper.clamp(value1, min, max);
-        this.value2 = MathHelper.clamp(value2, min, max);
+        this.value1 = Mth.clamp(value1, min, max);
+        this.value2 = Mth.clamp(value2, min, max);
         this.min = min;
         this.max = max;
     }
@@ -48,7 +48,7 @@ public abstract class WRangeSlider extends WWidget {
     }
 
     @Override
-    public boolean onMouseClicked(Click click, boolean used) {
+    public boolean onMouseClicked(MouseButtonEvent click, boolean used) {
         final double mouseX = click.x();
 
 
@@ -123,13 +123,13 @@ public abstract class WRangeSlider extends WWidget {
             if (mouseOverX) {
                 if (currentValue == 1) {
                     valueWidth1 += mouseX - lastMouseX;
-                    valueWidth1 = MathHelper.clamp(valueWidth1, 0, width - s);
+                    valueWidth1 = Mth.clamp(valueWidth1, 0, width - s);
 
                     set((valueWidth1 / (width - s)) * (max - min) + min, value2);
 
                 } else if (currentValue == 2) {
                     valueWidth2 += mouseX - lastMouseX;
-                    valueWidth2 = MathHelper.clamp(valueWidth2, 0, width - s);
+                    valueWidth2 = Mth.clamp(valueWidth2, 0, width - s);
 
                     set(value1, (valueWidth2 / (width - s)) * (max - min) + min);
                 }
@@ -158,7 +158,7 @@ public abstract class WRangeSlider extends WWidget {
     }
 
     @Override
-    public boolean onMouseReleased(Click click) {
+    public boolean onMouseReleased(MouseButtonEvent click) {
         if (dragging) {
             if (value1 != valueAtDragStart && actionOnRelease != null) {
                 actionOnRelease.run();
@@ -211,7 +211,7 @@ public abstract class WRangeSlider extends WWidget {
     }
 
     public void setMin(double min) {
-        min = MathHelper.clamp(min, this.min, this.max);
+        min = Mth.clamp(min, this.min, this.max);
         if (Math.max(value1, value2) < min) {
             value1 = value2 = min;
         } else if (value1 <= value2) {
@@ -220,7 +220,7 @@ public abstract class WRangeSlider extends WWidget {
     }
 
     public void setMax(double max) {
-        max = MathHelper.clamp(max, this.min, this.max);
+        max = Mth.clamp(max, this.min, this.max);
         if (Math.min(value1, value2) > max) {
             value1 = value2 = max;
         } else if (value1 > value2) {
@@ -234,7 +234,7 @@ public abstract class WRangeSlider extends WWidget {
      * @param value value
      */
     private void setLowDistance(double value) {
-        value = MathHelper.clamp(value, min, max);
+        value = Mth.clamp(value, min, max);
         if (Math.abs(value1 - value) <= Math.abs(value2 - value)) {
             valueAtDragStart = value1;
             value1 = value;

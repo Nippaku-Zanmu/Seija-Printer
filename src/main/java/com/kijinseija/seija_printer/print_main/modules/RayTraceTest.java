@@ -14,15 +14,18 @@ import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.projectile.ProjectileUtil;
-import net.minecraft.text.Text;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.*;
-import net.minecraft.world.RaycastContext;
-
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import java.util.HashMap;
 import java.util.List;
 
@@ -31,16 +34,16 @@ public class RayTraceTest extends Module {
     public RayTraceTest() {
         super(Addon.CATEGORY, "RayTest", "");
         dirmap = new HashMap<>();
-        dirmap.put(Direction.DOWN, new Vec3d(-3.838728915128419E-18, -1.0, 1.2240450621459233E-16));
-        dirmap.put(Direction.UP, new Vec3d(0.0, 1.0, 0.0));
-        dirmap.put(Direction.EAST, new Vec3d(1.0, -0.0, 1.2246468525851679E-16));
-        dirmap.put(Direction.NORTH, new Vec3d(1.2246468525851679E-16, -0.0, -1.0));
-        dirmap.put(Direction.SOUTH, new Vec3d(0.0, -0.0, 1.0));
-        dirmap.put(Direction.WEST, new Vec3d(-1.0, -0.0, 0.0));
+        dirmap.put(Direction.DOWN, new Vec3(-3.838728915128419E-18, -1.0, 1.2240450621459233E-16));
+        dirmap.put(Direction.UP, new Vec3(0.0, 1.0, 0.0));
+        dirmap.put(Direction.EAST, new Vec3(1.0, -0.0, 1.2246468525851679E-16));
+        dirmap.put(Direction.NORTH, new Vec3(1.2246468525851679E-16, -0.0, -1.0));
+        dirmap.put(Direction.SOUTH, new Vec3(0.0, -0.0, 1.0));
+        dirmap.put(Direction.WEST, new Vec3(-1.0, -0.0, 0.0));
 
     }
 
-    HashMap<Direction, Vec3d> dirmap;
+    HashMap<Direction, Vec3> dirmap;
     SettingGroup sgDefault = settings.getDefaultGroup();
     Setting<Double> x = sgDefault.add(new DoubleSetting.Builder().name("x").build());
     Setting<Double> y = sgDefault.add(new DoubleSetting.Builder().name("y").build());
@@ -48,14 +51,14 @@ public class RayTraceTest extends Module {
 
     Setting<List<Direction>> dirs = sgDefault.add(new DirectionListSetting.Builder().name("Dir").build());
 
-    protected final Vec3d getRotationVector(float pitch, float yaw) {
+    protected final Vec3 getRotationVector(float pitch, float yaw) {
         float f = pitch * ((float) Math.PI / 180);
         float g = -yaw * ((float) Math.PI / 180);
-        float h = MathHelper.cos(g);
-        float i = MathHelper.sin(g);
-        float j = MathHelper.cos(f);
-        float k = MathHelper.sin(f);
-        return new Vec3d(i * j, -k, h * j);
+        float h = Mth.cos(g);
+        float i = Mth.sin(g);
+        float j = Mth.cos(f);
+        float k = Mth.sin(f);
+        return new Vec3(i * j, -k, h * j);
     }
 
     @Override
@@ -87,7 +90,7 @@ public class RayTraceTest extends Module {
         if (entity2 == null) {
             return;
         }
-        if (mc.world == null) {
+        if (mc.level == null) {
             return;
         }
 
@@ -97,14 +100,14 @@ public class RayTraceTest extends Module {
         HitResult crosshairTarget = null;
 
         //crosshairTarget = entity2.raycast(d, 1, false);
-        Vec3d vec3d = PredictUtility.getPredPlayerVec().offset(Direction.UP,SeijaUtil.getEyeHeight());
-        Vec3d targetVec = new Vec3d(x.get(),y.get(),z.get());
-        Vec3d vec3d2 = getRotationVector((float) SeijaUtil.getPitch(targetVec), (float) SeijaUtil.getYaw(targetVec));//entity2.getRotationVec(1.0f);
-        ChatUtils.sendMsg(Text.of("P:" +mc.getCameraEntity().getPitch()+","+ SeijaUtil.getPitch(targetVec)));
-        ChatUtils.sendMsg(Text.of("Y:" +mc.getCameraEntity().getYaw()+","+ SeijaUtil.getYaw(targetVec)));
-        Vec3d vec3d3 = vec3d.add(vec3d2.x * d, vec3d2.y * d, vec3d2.z * d);
+        Vec3 vec3d = PredictUtility.getPredPlayerVec().relative(Direction.UP,SeijaUtil.getEyeHeight());
+        Vec3 targetVec = new Vec3(x.get(),y.get(),z.get());
+        Vec3 vec3d2 = getRotationVector((float) SeijaUtil.getPitch(targetVec), (float) SeijaUtil.getYaw(targetVec));//entity2.getRotationVec(1.0f);
+        ChatUtils.sendMsg(Component.nullToEmpty("P:" +mc.getCameraEntity().getXRot()+","+ SeijaUtil.getPitch(targetVec)));
+        ChatUtils.sendMsg(Component.nullToEmpty("Y:" +mc.getCameraEntity().getYRot()+","+ SeijaUtil.getYaw(targetVec)));
+        Vec3 vec3d3 = vec3d.add(vec3d2.x * d, vec3d2.y * d, vec3d2.z * d);
 
-        crosshairTarget =  mc.world.raycast(new RaycastContext(vec3d, vec3d3, RaycastContext.ShapeType.OUTLINE, false ? RaycastContext.FluidHandling.ANY : RaycastContext.FluidHandling.NONE, entity2));
+        crosshairTarget =  mc.level.clip(new ClipContext(vec3d, vec3d3, ClipContext.Block.OUTLINE, false ? ClipContext.Fluid.ANY : ClipContext.Fluid.NONE, entity2));
 
 
         boolean bl = false;
@@ -122,23 +125,23 @@ public class RayTraceTest extends Module {
         e *= e;
 
         if (crosshairTarget != null) {
-            e = crosshairTarget.getPos().squaredDistanceTo(vec3d);
+            e = crosshairTarget.getLocation().distanceToSqr(vec3d);
         }
 
 
-        Box box = entity2.getBoundingBox().stretch(vec3d2.multiply(d)).expand(1.0, 1.0, 1.0);
-        EntityHitResult entityHitResult = ProjectileUtil.raycast(entity2, vec3d, vec3d3, box, entity -> !entity.isSpectator() && entity.canHit(), e);
+        AABB box = entity2.getBoundingBox().expandTowards(vec3d2.scale(d)).inflate(1.0, 1.0, 1.0);
+        EntityHitResult entityHitResult = ProjectileUtil.getEntityHitResult(entity2, vec3d, vec3d3, box, entity -> !entity.isSpectator() && entity.isPickable(), e);
         if (entityHitResult != null) {
-            Vec3d vec3d4 = entityHitResult.getPos();
-            double g = vec3d.squaredDistanceTo(vec3d4);
+            Vec3 vec3d4 = entityHitResult.getLocation();
+            double g = vec3d.distanceToSqr(vec3d4);
             if (bl && g > 9.0) {
-                crosshairTarget = BlockHitResult.createMissed(vec3d4, Direction.getFacing(vec3d2.x, vec3d2.y, vec3d2.z), BlockPos.ofFloored(vec3d4));
+                crosshairTarget = BlockHitResult.miss(vec3d4, Direction.getApproximateNearest(vec3d2.x, vec3d2.y, vec3d2.z), BlockPos.containing(vec3d4));
             } else if (g < e || crosshairTarget == null) {
                 crosshairTarget = entityHitResult;
             }
         }
-        if (crosshairTarget.getPos() != null)
-            ChatUtils.sendMsg(Text.of(crosshairTarget.getPos() + ":::" + crosshairTarget.getType().name()));
+        if (crosshairTarget.getLocation() != null)
+            ChatUtils.sendMsg(Component.nullToEmpty(crosshairTarget.getLocation() + ":::" + crosshairTarget.getType().name()));
     }
 
 }

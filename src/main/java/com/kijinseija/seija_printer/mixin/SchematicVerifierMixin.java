@@ -13,14 +13,14 @@ import fi.dy.masa.litematica.util.ItemUtils;
 import fi.dy.masa.litematica.world.WorldSchematic;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.util.math.BlockPos;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.spongepowered.asm.mixin.*;
 
 import java.util.HashSet;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.state.BlockState;
 
 import static com.kijinseija.seija_printer.print_main.printer.util.ScheVerifyMixinUtil.isReplacedBlockEqual;
 
@@ -54,7 +54,7 @@ public abstract class SchematicVerifierMixin {
     private Object2ObjectOpenHashMap<BlockPos, SchematicVerifier.BlockMismatch> blockMismatches;
 
     @Shadow
-    private ClientWorld worldClient;
+    private ClientLevel worldClient;
     @Shadow(remap = false)
     private WorldSchematic worldSchematic;
     @Shadow(remap = false)
@@ -101,7 +101,7 @@ public abstract class SchematicVerifierMixin {
                             this.wrongStatesPositions.put(Pair.of(stateSchematic, stateClient), pos);
                         }
                     }
-                } else if (!Configs.Visuals.IGNORE_EXISTING_FLUIDS.getBooleanValue() || !stateClient.isLiquid()) {
+                } else if (!Configs.Visuals.IGNORE_EXISTING_FLUIDS.getBooleanValue() || !stateClient.liquid()) {
                     mismatch = new SchematicVerifier.BlockMismatch(SchematicVerifier.MismatchType.EXTRA, stateSchematic, stateClient, 1);
                     this.extraBlocksPositions.put(Pair.of(stateSchematic, stateClient), pos);
                 }

@@ -12,8 +12,6 @@ import meteordevelopment.meteorclient.gui.themes.meteor.MeteorGuiTheme;
 import meteordevelopment.meteorclient.gui.widgets.containers.WHorizontalList;
 import meteordevelopment.meteorclient.gui.widgets.input.WTextBox;
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
-import net.minecraft.text.Text;
-
 import java.util.Locale;
 
 public class WDoubleRangeEdit extends WHorizontalList {

@@ -5,15 +5,15 @@
 
 package com.kijinseija.seija_printer.mixin;
 
-import net.minecraft.client.network.PendingUpdateManager;
-import net.minecraft.client.world.ClientWorld;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.prediction.BlockStatePredictionHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(ClientWorld.class)
+@Mixin(ClientLevel.class)
 public interface ClientWorldAccessor {
-    @Accessor("pendingUpdateManager")
-    PendingUpdateManager getPendingUpdateManager();
+    @Accessor("blockStatePredictionHandler")
+    BlockStatePredictionHandler getPendingUpdateManager();
 //    @Invoker("getPendingUpdateManager")
 //    PendingUpdateManager getPendingUpdateManager();
 }

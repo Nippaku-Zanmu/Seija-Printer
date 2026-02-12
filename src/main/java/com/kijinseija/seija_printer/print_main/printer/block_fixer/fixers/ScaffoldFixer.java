@@ -15,14 +15,13 @@ import com.kijinseija.seija_printer.print_main.printer.util.records.DirDataI;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceData;
 import com.kijinseija.seija_printer.print_main.printer.util.records.PosInfo;
 import meteordevelopment.meteorclient.utils.render.color.Color;
-import net.minecraft.block.AirBlock;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.ScaffoldingBlock;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
-
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.level.block.AirBlock;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.ScaffoldingBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import java.util.List;
 
 public class ScaffoldFixer extends AbstractFixer {
@@ -36,21 +35,21 @@ public class ScaffoldFixer extends AbstractFixer {
     public int fixBlock(BlockPos pos, BlockState needState) {
         for (Direction off : Direction.values()) {
             if (off == Direction.UP) continue;
-            BlockPos helperPos = pos.offset(off);
-            if (!(mc.world.getBlockState(helperPos).getBlock() instanceof ScaffoldingBlock
-            &&mc.world.getBlockState(helperPos).get(ScaffoldingBlock.DISTANCE)<6)) continue;
+            BlockPos helperPos = pos.relative(off);
+            if (!(mc.level.getBlockState(helperPos).getBlock() instanceof ScaffoldingBlock
+            &&mc.level.getBlockState(helperPos).getValue(ScaffoldingBlock.DISTANCE)<6)) continue;
             List<Direction> dirs = BlockUtil.getSortedDirs(helperPos,true);
             if (off != Direction.DOWN) {
 
                 if (!dirs.contains(Direction.UP)) continue;
                 DirData data = new DirData(helperPos, dirs);
 
-                for (Vec3d clickVec : data.clickVecsInte(Direction.UP)) {
+                for (Vec3 clickVec : data.clickVecsInte(Direction.UP)) {
 
                     PlaceData interactData = PlaceData.NULL;
                     if (pri().bSetIllegalRotate.get()) {
                         interactData = PlaceData.newInstance(helperPos, Direction.UP, clickVec, true, BlockRotDataGetter.getRotateDataFromDir(off.getOpposite()));
-                    } else if (Direction.fromHorizontalDegrees(SeijaUtil.getYaw(clickVec)) == off.getOpposite())
+                    } else if (Direction.fromYRot(SeijaUtil.getYaw(clickVec)) == off.getOpposite())
                         //1.21 Direction.fromRotation
                     {
                         interactData = PlaceData.newInstance(helperPos, Direction.UP, clickVec, true, null);
@@ -68,7 +67,7 @@ public class ScaffoldFixer extends AbstractFixer {
                 dirs.remove(Direction.UP);
                 DirData data = new DirData(helperPos, dirs);
                 for (Direction clickDir : dirs) {
-                    for (Vec3d clickVec : data.clickVecsInte(clickDir)) {
+                    for (Vec3 clickVec : data.clickVecsInte(clickDir)) {
                         PlaceData interactData =  PlaceData.newInstance(helperPos, clickDir, clickVec, true, null);
                         if (InvUtil.switchBlock(Blocks.SCAFFOLDING)) {
                             BlockUtil.interactBlock(interactData);
@@ -85,7 +84,7 @@ public class ScaffoldFixer extends AbstractFixer {
 
     @Override
     public boolean needFix(BlockPos pos, BlockState needState) {
-        return mc.world.getBlockState(pos).getBlock()instanceof AirBlock
+        return mc.level.getBlockState(pos).getBlock()instanceof AirBlock
             &&needState.getBlock()instanceof ScaffoldingBlock;
     }
 }

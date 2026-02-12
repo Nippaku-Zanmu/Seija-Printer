@@ -9,9 +9,8 @@ import com.kijinseija.seija_printer.Addon;
 import meteordevelopment.meteorclient.settings.IVisible;
 import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.Settings;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtElement;
-
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import java.util.function.Consumer;
 
 public class SettingsSetting extends Setting<Settings> {
@@ -53,18 +52,18 @@ public class SettingsSetting extends Setting<Settings> {
 //    }
 
     @Override
-    public NbtCompound save(NbtCompound tag) {
+    public CompoundTag save(CompoundTag tag) {
         tag.put("settings", value.toTag());
         return tag;
     }
 
     @Override
-    public Settings load(NbtCompound tag) {
-        NbtElement settingsTag = tag.get("settings");
+    public Settings load(CompoundTag tag) {
+        Tag settingsTag = tag.get("settings");
         Settings settings = defaultValue;
         Addon.LOG.info("Def" + defaultValue.toTag().asString());
-        if (settingsTag instanceof NbtCompound) {
-            settings.fromTag((NbtCompound) settingsTag);
+        if (settingsTag instanceof CompoundTag) {
+            settings.fromTag((CompoundTag) settingsTag);
         }
         return settings;
     }

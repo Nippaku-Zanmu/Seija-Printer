@@ -5,10 +5,10 @@
 
 package com.kijinseija.seija_printer.print_main.printer.block_fixer.fixers.click_fixer;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.DaylightDetectorBlock;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.DaylightDetectorBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class DaylightDetectorFixer extends AbstractClickFixer{
     public DaylightDetectorFixer() {
@@ -20,10 +20,10 @@ public class DaylightDetectorFixer extends AbstractClickFixer{
         if (!super.needFix(pos,needState)) {
             return false;
         }
-        BlockState blockState = mc.world.getBlockState(pos);
+        BlockState blockState = mc.level.getBlockState(pos);
         if (
             blockState.getBlock() instanceof DaylightDetectorBlock &&needState.getBlock()==blockState.getBlock()) {
-            return! blockState.get(Properties.INVERTED) .equals (needState.get(Properties.INVERTED));
+            return! blockState.getValue(BlockStateProperties.INVERTED) .equals (needState.getValue(BlockStateProperties.INVERTED));
         }
         return false;
     }

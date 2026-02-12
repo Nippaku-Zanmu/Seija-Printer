@@ -13,20 +13,13 @@ import meteordevelopment.meteorclient.mixininterface.IClientPlayerInteractionMan
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.network.ClientPlayerInteractionManager;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.Packet;
-import net.minecraft.network.packet.c2s.play.ClickSlotC2SPacket;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -35,7 +28,7 @@ import java.util.function.Predicate;
 
 
 public class InvUtil {
-    private final static MinecraftClient mc = MinecraftClient.getInstance();
+    private final static Minecraft mc = Minecraft.getInstance();
     private final static Printer pri = Printer.getINSTANCE();
 
     private static void invSwitch(int slot, int hotbarSlot) {
@@ -74,14 +67,14 @@ public class InvUtil {
         FindItemResult resHot = InvUtils.findInHotbar(p);
         if (resHot.found()) {
             InvUtils.swap(resHot.slot(), false);
-            if ((!pri.bSetAntiWrongBlock.get()) || p.test(mc.player.getMainHandStack()))
+            if ((!pri.bSetAntiWrongBlock.get()) || p.test(mc.player.getMainHandItem()))
                 return true;
             return false;
         }
         if (isCreativeMode()&&b!=null) {
 
            // mc.player.getInventory().(mc.player.getStackInHand(Hand.MAIN_HAND));
-            mc.interactionManager.clickCreativeStack(new ItemStack(b,1),
+            mc.gameMode.handleCreativeModeItemAdd(new ItemStack(b,1),
                 36 + getSlot());
 
         } else {
@@ -124,8 +117,8 @@ public class InvUtil {
             return getUsefulSlots(pri.sSetInvSwapSlot.get());
         } catch (Exception e) {
             pri.sSetInvSwapSlot.reset();
-            ChatUtils.sendMsg(Text.of(e.getMessage()));
-            ChatUtils.sendMsg(Text.of("检测到异常: 数据不符合格式 自动处理:已自动还原为默认数据"));
+            ChatUtils.sendMsg(Component.nullToEmpty(e.getMessage()));
+            ChatUtils.sendMsg(Component.nullToEmpty("检测到异常: 数据不符合格式 自动处理:已自动还原为默认数据"));
         }
         return getUsefulSlots(pri.sSetInvSwapSlot.getDefaultValue());
     }
@@ -168,10 +161,10 @@ public class InvUtil {
         if (b.equals(Blocks.WATER)) return Items.WATER_BUCKET;
         if (b.equals(Blocks.LAVA)) return Items.LAVA_BUCKET;
         if (b.equals(Blocks.POWDER_SNOW)) return Items.POWDER_SNOW_BUCKET;
-        return Item.BLOCK_ITEMS.get(b);
+        return Item.BY_BLOCK.get(b);
     }
 
     public static boolean isCreativeMode() {
-        return mc.player.getAbilities().creativeMode;
+        return mc.player.getAbilities().instabuild;
     }
 }

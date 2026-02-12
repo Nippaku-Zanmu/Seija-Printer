@@ -5,9 +5,10 @@
 
 package com.kijinseija.seija_printer.print_main.printer.block_fixer.fixers.click_fixer;
 
-import net.minecraft.block.*;
-import net.minecraft.state.property.Properties;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.RepeaterBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class RSTRepeaterFixer extends AbstractClickFixer {
 
@@ -21,11 +22,11 @@ public class RSTRepeaterFixer extends AbstractClickFixer {
         if (!super.needFix(pos,needState)) {
             return false;
         }
-        BlockState blockState = mc.world.getBlockState(pos);
+        BlockState blockState = mc.level.getBlockState(pos);
         if (
             blockState.getBlock() instanceof RepeaterBlock
                 &&needState.getBlock()==blockState.getBlock()) {
-            return !blockState.get(Properties.DELAY).equals(needState.get(Properties.DELAY));
+            return !blockState.getValue(BlockStateProperties.DELAY).equals(needState.getValue(BlockStateProperties.DELAY));
         }
         return false;
     }
