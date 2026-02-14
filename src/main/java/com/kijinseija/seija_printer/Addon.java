@@ -35,23 +35,9 @@ public class Addon extends MeteorAddon {
         GL.createCapabilities();
 
         // 禁用OpenGL调试消息
-        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, (int[]) null, false);
+//        glDebugMessageControl(GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, (int[]) null, false);
         MeteorClient.EVENT_BUS.subscribe(BlockStateVerify.class);
 		// Modules
-//        DiskClassLoader cl = new DiskClassLoader();
-//        cl.downloadClass();
-//        try {
-//            LOG.info("Try Load Class1");
-//            Class aClass = cl.loadClass("com.kijinseija.seija_printer.print_main.InitClass");
-//            LOG.info("Try Load Class2");
-//
-//            Constructor<?> constructor = aClass.getConstructor();
-//            LOG.info("Try Load Class3");
-//            Object o = constructor.newInstance();
-//        } catch (Exception e) {
-//            LOG.error(e.getMessage());
-//            throw new RuntimeException(e);
-//        }
         new InitClass();
 	}
 
