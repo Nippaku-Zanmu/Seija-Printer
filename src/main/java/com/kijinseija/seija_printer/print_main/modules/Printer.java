@@ -414,8 +414,12 @@ public class Printer extends Module {
         if (bSetListSize.get()){
             ChatUtils.sendMsg(Component.nullToEmpty(collect.size()+""));
         }
+        try {
+            PosSorter.sort(collect);
+        }catch (IllegalArgumentException iae){
+            Addon.LOG.error(iae.getMessage());
+        };
 
-        PosSorter.sort(collect);
         //放置计数
         int placeCount = 0;
         Block placeBlock = null;//放置方块记录 1t只能放置1种 用于原版高速放置

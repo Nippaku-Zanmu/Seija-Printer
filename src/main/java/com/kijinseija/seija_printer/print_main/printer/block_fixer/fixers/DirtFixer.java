@@ -16,11 +16,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.HoeItem;
 import net.minecraft.world.item.ShovelItem;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.DirtPathBlock;
-import net.minecraft.world.level.block.FarmBlock;
-import net.minecraft.world.level.block.SpreadingSnowyDirtBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
@@ -52,10 +48,10 @@ public class DirtFixer extends AbstractFixer {
         Block block = mc.level.getBlockState(pos).getBlock();
         if (needState.getBlock() instanceof DirtPathBlock && !InvUtil.findItem(stack -> stack.getItem() instanceof ShovelItem))
             return false;
-        if (needState.getBlock() instanceof FarmBlock && !InvUtil.findItem(stack -> stack.getItem() instanceof HoeItem))
+        if (needState.getBlock() instanceof FarmlandBlock && !InvUtil.findItem(stack -> stack.getItem() instanceof HoeItem))
             return false;
-        return ((needState.getBlock() instanceof DirtPathBlock || needState.getBlock() instanceof FarmBlock)
-            && (block instanceof SpreadingSnowyDirtBlock || block.equals(Blocks.DIRT)
+        return ((needState.getBlock() instanceof DirtPathBlock || needState.getBlock() instanceof FarmlandBlock)
+            && (block instanceof SpreadingSnowyBlock || block.equals(Blocks.DIRT)
             || block.equals(Blocks.ROOTED_DIRT) || block.equals(Blocks.PODZOL)));
     }
 }

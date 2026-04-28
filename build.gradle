@@ -1,8 +1,7 @@
 //file:noinspection JCenterRepository
 //file:noinspection GrDeprecatedAPIUsage
 plugins {
-
-    id "fabric-loom" version "1.15-SNAPSHOT"
+    id 'net.fabricmc.fabric-loom' version '1.15.+'
     id 'maven-publish'
 }
 
@@ -22,9 +21,10 @@ repositories {
         url = "https://jitpack.io"
     }
 
-
     maven { url = "https://www.cursemaven.com" }
-    maven { url = "https://masa.dy.fi/maven" }
+    maven {url = "https://masa.dy.fi/maven/sakura-ryoko"
+        content {includeGroupAndSubgroups("fi.dy.masa")}
+    }
     maven { url = "https://maven.terraformersmc.com/releases/" }
     maven {
         name = "Meteor Dev Releases"
@@ -48,22 +48,22 @@ loom {
 dependencies {
     // Minecraft
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
-    mappings loom.officialMojangMappings()
+//    mappings loom.officialMojangMappings()
 
-    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
 
-    //Meteor(1.21)
-//    modImplementation files('D:\\hack\\SeijaLib\\meteor-client-0.6.0-2229.jar')
+    //Meteor
+//    implementation files('D:\\hack\\SeijaLib\\meteor-client-26.1.2-2.jar')
 
-    modImplementation "meteordevelopment:meteor-client:${project.minecraft_version}-SNAPSHOT"
+    implementation "meteordevelopment:meteor-client:${meteor_version}-SNAPSHOT"
 
 
     //litematica 1.21
 //    modImplementation "com.github.sakura-ryoko:litematica:${project.minecraft_version}-${project.litematica_version}"
 //    modImplementation "com.github.sakura-ryoko:malilib:${project.minecraft_version}-${project.malilib_version}"
-    modImplementation("com.github.sakura-ryoko:malilib:${malilib_version}")
-    modImplementation("com.github.sakura-ryoko:litematica:${litematica_version}")
+    implementation "fi.dy.masa.malilib:malilib-fabric-${project.minecraft_version_l}:${project.malilib_version}"
+    implementation "fi.dy.masa.litematica:litematica-fabric-${project.minecraft_version_l}:${project.litematica_version}"
 
 }
 
@@ -104,7 +104,7 @@ tasks {
 
     tasks.withType(JavaCompile).configureEach {
         it.options.encoding = "UTF-8"
-        it.options.release = 21
+        it.options.release = 25
     }
 }
 //idea警告提示生成的

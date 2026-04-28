@@ -12,12 +12,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.DirtPathBlock;
-import net.minecraft.world.level.block.FarmBlock;
-import net.minecraft.world.level.block.FlowerPotBlock;
-import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import java.util.Collections;
@@ -111,7 +106,7 @@ public class BlockReplaceUtils {
             return Blocks.FLOWER_POT;
         else if (bs.getBlock() instanceof RotatedPillarBlock && InvUtil.findItem(stack -> stack.getItem() instanceof AxeItem) && (!InvUtil.findBlock(bs.getBlock()))) {
             return strippedMap.get(bs.getBlock());
-        } else if (bs.getBlock() instanceof FarmBlock || bs.getBlock() instanceof DirtPathBlock) {
+        } else if (bs.getBlock() instanceof FarmlandBlock || bs.getBlock() instanceof DirtPathBlock) {
             for (Block dirt : DIRTS) {
                 if (InvUtil.findBlock(dirt))
                     return dirt;

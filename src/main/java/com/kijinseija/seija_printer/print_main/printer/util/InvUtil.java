@@ -6,10 +6,7 @@
 package com.kijinseija.seija_printer.print_main.printer.util;
 
 import com.kijinseija.seija_printer.print_main.modules.Printer;
-import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import meteordevelopment.meteorclient.MeteorClient;
-import meteordevelopment.meteorclient.mixininterface.IClientPlayerInteractionManager;
+
 import meteordevelopment.meteorclient.utils.player.ChatUtils;
 import meteordevelopment.meteorclient.utils.player.FindItemResult;
 import meteordevelopment.meteorclient.utils.player.InvUtils;

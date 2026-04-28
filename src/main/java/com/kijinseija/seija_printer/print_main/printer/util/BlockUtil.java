@@ -525,9 +525,9 @@ public class BlockUtil {
         return directions;
     }
 
-    public static boolean isStuckPos(BlockPos pos) {
-        return SeijaUtil.intersectsWithEntity(new AABB(pos), entity -> !entity.isSpectator() && !(entity instanceof ItemEntity) && !(entity instanceof Arrow));
-    }
+//    public static boolean isStuckPos(BlockPos pos) {
+//        return SeijaUtil.intersectsWithEntity(new AABB(pos), entity -> !entity.isSpectator() && !(entity instanceof ItemEntity) && !(entity instanceof Arrow));
+//    }
 
 
 

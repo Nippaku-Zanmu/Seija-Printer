@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "name": "Advanced Litematica Printer",
   "id": "seija-printer",
-  "version": "1.5.5",
+  "version": "1.5.6",
   "description": "Fast printer for litematica made with meteor.",
   "authors": [
     "Nippaku_Zanmu"
@@ -22,8 +22,8 @@
   ],
   "accessWidener":  "seija-printer.accesswidener",
   "depends": {
-    "java": ">=21",
-    "minecraft": "1.21.*",
+    "java": ">=25",
+    "minecraft": "*",
     "meteor-client": ">=0.5.0"
   }
 }

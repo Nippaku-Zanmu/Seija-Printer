@@ -1,4 +1,4 @@
-accessWidener v1 named
+accessWidener v1 official
 #accessible field net/minecraft/block/FlowerPotBlock content Lnet/minecraft/block/Block;
 #accessible field net/minecraft/item/AxeItem STRIPPED_BLOCKS Ljava/util/Map;
 #accessible method net/minecraft/item/VerticallyAttachableBlockItem getPlacementState (Lnet/minecraft/item/ItemPlacementContext;)Lnet/minecraft/block/BlockState;
