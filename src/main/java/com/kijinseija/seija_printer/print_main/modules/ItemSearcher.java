@@ -5,6 +5,7 @@ import com.kijinseija.seija_printer.print_main.printer.util.*;
 import com.kijinseija.seija_printer.settings.impl.DoubleRangeSetting;
 import com.kijinseija.seija_printer.settings.obj.DoubleRange;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
+import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.gui.GuiTheme;
 import meteordevelopment.meteorclient.gui.widgets.WWidget;
@@ -24,6 +25,8 @@ import meteordevelopment.orbit.EventHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.protocol.game.ClientboundContainerClosePacket;
+import net.minecraft.network.protocol.game.ServerboundContainerClosePacket;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ChestMenu;
 import net.minecraft.world.inventory.ShulkerBoxMenu;
@@ -31,6 +34,9 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
+
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -107,6 +113,7 @@ public class ItemSearcher extends Module {
 
 
     Map<Block, Integer> blockInfo = new ConcurrentHashMap<>();
+    Map<Block, Integer> stealBlockInfo = Collections.synchronizedMap(new HashMap<>());
 //    存储方块信息,方块替换
 //    HashMap<Item, Integer> itemInfo = new HashMap<>();
 
@@ -148,20 +155,33 @@ public class ItemSearcher extends Module {
 
         }
 
+        updateStealInfo();
+        ChatUtils.sendMsg("[AdvancedPrinter]", Component.nullToEmpty("Analysis complete"));
+
+    }
+
+    private void updateStealInfo() {
+        stealBlockInfo = new HashMap<>(blockInfo);
         //拿到了需求数量后先减去背包内已有的
         for (int i = 0; i < mc.player.getInventory().getContainerSize(); i++) {
             ItemStack stack = mc.player.getInventory().getItem(i);
             Block stealBlock = needSteal(stack.getItem());
-            updateInfo(stealBlock, stack.getCount());
+            decreaseItemCount(stealBlock, stack.getCount());
         }
-        ChatUtils.sendMsg("[AdvancedPrinter]", Component.nullToEmpty("Analysis complete"));
+    }
 
+    //减少清单内物品数量
+    private void decreaseItemCount(Block block, int count) {
+        stealBlockInfo.computeIfPresent(block, (b, i) -> {
+            int now = i - count;
+            return now <= 0 ? null : now;
+        });
     }
 
     //是否需要拿走 需要拿则返回拿的方块类型
     private Block needSteal(Item item) {
         if (item instanceof BlockItem) {
-            for (Map.Entry<Block, Integer> blockIntegerEntry : blockInfo.entrySet()) {
+            for (Map.Entry<Block, Integer> blockIntegerEntry : stealBlockInfo.entrySet()) {
                 //方块替换检测
                 Block scheBlock = blockIntegerEntry.getKey();
                 List<Block> replaceBlocks = BlockReplaceUtils.INSTANCE.getReplaceBlocks(scheBlock);
@@ -178,14 +198,6 @@ public class ItemSearcher extends Module {
         return null;
     }
 
-    //减少清单内物品数量
-    private void updateInfo(Block block, int count) {
-        blockInfo.computeIfPresent(block, (b, i) -> {
-            int now = i - count;
-            return now <= 0 ? null : now;
-        });
-    }
-
 
     @Override
     public void onDeactivate() {
@@ -195,7 +207,7 @@ public class ItemSearcher extends Module {
 
     SeijaTimer stealTimer = new SeijaTimer(dRangeSetStealDelay.get()::nextRandom);
 
-    private final void tick() {
+    private  void tick() {
         AbstractContainerMenu scrHand = mc.player.containerMenu;
         //ChatUtils.sendMsg(Text.of((scrHand instanceof GenericContainerScreenHandler) +"eq?"+ scrHand.getClass().getName()));
         //&&scrHand.getType().equals(ScreenHandlerType.GENERIC_9X3) ||scrHand.getType().equals(ScreenHandlerType.GENERIC_9X6)
@@ -212,6 +224,13 @@ public class ItemSearcher extends Module {
         } else slot = 0;
     }
 
+    @EventHandler
+    private void onPacket(PacketEvent.Send e) {
+        if (e.packet instanceof ServerboundContainerClosePacket){
+            updateStealInfo();
+            
+        }
+    }
 
     int slot = 0;
 
@@ -221,7 +240,7 @@ public class ItemSearcher extends Module {
             ItemStack stealStack = scrHand.getSlot(slot).getItem();
             Block stealBlock = needSteal(stealStack.getItem());
             if (stealBlock != null) {
-                updateInfo(stealBlock, stealStack.getCount());
+                decreaseItemCount(stealBlock, stealStack.getCount());
                 InvUtils.shiftClick().slotId(slot);
                 slot++;
                 return true;
