@@ -28,7 +28,7 @@ jobs:
 
 
       - name: Build
-        run: ./gradlew build
+        run:  chmod +x ./gradlew build
       - name: Create Dev Build release
         uses: marvinpinto/action-automatic-releases@latest
         with:
