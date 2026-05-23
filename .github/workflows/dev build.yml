@@ -26,9 +26,11 @@ jobs:
         with:
           node-version: 24
 
-
+      - name: Make gradlew executable
+        run: chmod +x ./gradlew
+         
       - name: Build
-        run:  chmod +x ./gradlew build
+        run:  ./gradlew build
       - name: Create Dev Build release
         uses: marvinpinto/action-automatic-releases@latest
         with:
