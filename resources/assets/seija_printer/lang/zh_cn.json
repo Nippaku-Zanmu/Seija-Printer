@@ -1,0 +1,18 @@
+{
+  "key.category.seija-printer.controls": "Seija & Feixue 打印机",
+  "key.seija_printer.enable": "启用打印功能",
+  "key.seija_printer.disable": "停用打印功能",
+  "key.seija_printer.open_debug": "打开调试界面",
+  "key.seija_printer.toggle": "切换打印功能（兼容旧版）",
+  "message.seija_printer.enabled": "[Seija & Feixue 打印机] 打印功能已启用",
+  "message.seija_printer.disabled": "[Seija & Feixue 打印机] 打印功能已停用",
+  "screen.seija_printer.debug.title": "Seija & Feixue 打印机调试",
+  "screen.seija_printer.debug.no_module": "没有可用模块",
+  "screen.seija_printer.debug.enable": "启用",
+  "screen.seija_printer.debug.disable": "停用",
+  "screen.seija_printer.debug.start_analysis": "开始分析",
+  "screen.seija_printer.debug.print_list": "输出清单",
+  "screen.seija_printer.debug.save": "保存",
+  "screen.seija_printer.debug.reset_all": "全部重置",
+  "screen.seija_printer.debug.reset": "重置"
+}

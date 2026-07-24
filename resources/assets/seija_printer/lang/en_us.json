@@ -1,0 +1,18 @@
+{
+  "key.category.seija-printer.controls": "Seija & Feixue Printer",
+  "key.seija_printer.enable": "Enable printer",
+  "key.seija_printer.disable": "Disable printer",
+  "key.seija_printer.open_debug": "Open debug screen",
+  "key.seija_printer.toggle": "Toggle printer (legacy)",
+  "message.seija_printer.enabled": "[Seija & Feixue Printer] Printing enabled",
+  "message.seija_printer.disabled": "[Seija & Feixue Printer] Printing disabled",
+  "screen.seija_printer.debug.title": "Seija & Feixue Printer Debug",
+  "screen.seija_printer.debug.no_module": "No module",
+  "screen.seija_printer.debug.enable": "Enable",
+  "screen.seija_printer.debug.disable": "Disable",
+  "screen.seija_printer.debug.start_analysis": "Start analysis",
+  "screen.seija_printer.debug.print_list": "Print list",
+  "screen.seija_printer.debug.save": "Save",
+  "screen.seija_printer.debug.reset_all": "Reset all",
+  "screen.seija_printer.debug.reset": "Reset"
+}

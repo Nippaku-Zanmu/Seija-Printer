@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "com.kijinseija.seija_printer.mixin",
+  "compatibilityLevel": "JAVA_25",
+  "client": [
+    "ClientWorldAccessor",
+    "ChunkRendererSchematicVboMixin",
+    "SchematicVerifierMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "overwrites": {
+    "requireAnnotations": true
+  }
+}
