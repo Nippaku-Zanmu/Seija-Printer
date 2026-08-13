@@ -51,8 +51,8 @@ public class RenderUtil {
         renderList.forEach(pi -> {
             BlockPos pos = pi.pos();
             double per = 1 - (System.currentTimeMillis() - pi.timestamp()) / pri.dSetRenderTime.get();
-            Vec3 posH1 = BlockUtil.blockCenter(pos).add(per * 0.5, per * 0.5, per * 0.5);
-            Vec3 posH2 = BlockUtil.blockCenter(pos).subtract(per * 0.5, per * 0.5, per * 0.5);
+            Vec3 posH1 = pos.getCenter().add(per * 0.5, per * 0.5, per * 0.5);
+            Vec3 posH2 = pos.getCenter().subtract(per * 0.5, per * 0.5, per * 0.5);
 
             if (pri.bSetRenderFill.get()) {
                 Color col = pri.colSetFillColor.get().rainbow ? pi.renderColor().a(pri.colSetFillColor.get().a) : new Color(pri.colSetFillColor.get().r, pri.colSetFillColor.get().g, pri.colSetFillColor.get().b, (int) (per * pri.colSetFillColor.get().a));
@@ -79,7 +79,7 @@ public class RenderUtil {
             }
             event.renderer.box(new AABB(c1,c2),pri.colSetFillColor.get(),pri.colSetOutLineColor.get(),ShapeMode.Both,1);
             Vec3 off = center.relative(dir,0.4);
-            Vec3 centerPos = BlockUtil.blockCenter(pi.pos());
+            Vec3 centerPos = pi.pos().getCenter();
             event.renderer.line(center.x,center.y,center.z, off.x, off.y, off.z,pi.isPlaceMode()?Color.WHITE:Color.BLACK);
             event.renderer.box(new AABB(centerPos.add(0.05,0.05,0.05),centerPos.add(-0.05,-0.05,-0.05)),Color.ORANGE,pri.colSetOutLineColor.get(),ShapeMode.Both,1);
         });
@@ -87,7 +87,7 @@ public class RenderUtil {
 
     private static void animationRender(Render3DEvent event) {
         //更新显示中点
-        Vec3 placeCenter = BlockUtil.blockCenter(renderList.get(renderList.size() - 1).pos());
+        Vec3 placeCenter = renderList.get(renderList.size() - 1).pos().getCenter();
         double distance = aniRenderCenter.distanceTo(placeCenter);
         if (distance > 16 || distance < 0.1) {
             aniRenderCenter = placeCenter;
@@ -116,5 +116,6 @@ public class RenderUtil {
                 updateAniRenderSize(-pri.dSetSizeShrinkMultiplier.get());
         }
         renderList.removeIf(b -> System.currentTimeMillis() - b.timestamp() > pri.dSetRenderTime.get());
+
     }
 }

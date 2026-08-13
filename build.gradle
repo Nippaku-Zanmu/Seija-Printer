@@ -62,8 +62,8 @@ dependencies {
     //litematica 1.21
 //    modImplementation "com.github.sakura-ryoko:litematica:${project.minecraft_version}-${project.litematica_version}"
 //    modImplementation "com.github.sakura-ryoko:malilib:${project.minecraft_version}-${project.malilib_version}"
-    implementation "fi.dy.masa.malilib:malilib-fabric-${project.minecraft_version}:${project.malilib_version}"
-    implementation "fi.dy.masa.litematica:litematica-fabric-${project.minecraft_version}:${project.litematica_version}"
+    implementation "fi.dy.masa.malilib:malilib-fabric-${project.minecraft_version_l}:${project.malilib_version}"
+    implementation "fi.dy.masa.litematica:litematica-fabric-${project.minecraft_version_l}:${project.litematica_version}"
 
 }
 
