@@ -18,7 +18,7 @@ public class DirSorter {
 
     //AI生成 将Dirs基于方块坐标按可见的面积降序
     public static List<Direction> sort(List<Direction> dirs, BlockPos placePos,boolean interact) {
-        Vec3 blockCenter = placePos.getCenter();
+        Vec3 blockCenter = BlockUtil.blockCenter(placePos);
 
         Vec3 eyePos = mc.player.getEyePosition();
         // 视线向量（不归一化）

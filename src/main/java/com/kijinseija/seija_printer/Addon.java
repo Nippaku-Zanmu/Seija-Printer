@@ -25,7 +25,7 @@ import static org.lwjgl.opengl.GL43.glDebugMessageControl;
 
 public class Addon extends MeteorAddon {
 	public static final Logger LOG = LogManager.getLogger();
-	public static final Category CATEGORY = new Category("printer",()-> new ItemStack(Items.BLUE_BANNER));
+	public static final Category CATEGORY = new Category("printer",()-> new ItemStack(Items.BANNER.blue()));
 
 	@Override
 	public void onInitialize() {
