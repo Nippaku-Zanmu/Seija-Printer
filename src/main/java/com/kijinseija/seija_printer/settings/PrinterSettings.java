@@ -78,7 +78,7 @@ public class PrinterSettings {
 
     private void dirSettingW(GuiTheme theme, WTable table, DirectionListSetting setting) {
         WButton button = table.add(theme.button("Select")).expandCellX().widget();
-        button.action = () -> mc.setScreen(new DirectionListSettingScreen(theme, setting));
+        button.action = () -> mc.setScreenAndShow(new DirectionListSettingScreen(theme, setting));
 
         WButton reset = table.add(theme.button(GuiRenderer.RESET)).widget();
         reset.action = setting::reset;
@@ -89,7 +89,7 @@ public class PrinterSettings {
 
         WButton button = widget.add(theme.button("Edit")).expandCellX().widget();
         widget.add(new WSelectedCountLabel(setting).color(theme.textSecondaryColor()));
-        button.action = () -> mc.setScreen(new SettingsSettingScreen(theme, setting));
+        button.action = () -> mc.setScreenAndShow(new SettingsSettingScreen(theme, setting));
         WButton reset = table.add(theme.button(GuiRenderer.RESET)).widget();
         reset.action = setting::reset;
     }
@@ -113,7 +113,7 @@ public class PrinterSettings {
     private void blockReplaceW(GuiTheme theme, WTable table, BlockReplaceSetting setting) {
 
         WButton button = table.add(theme.button("Select")).expandCellX().widget();
-        button.action = () -> mc.setScreen(new BlockReplaceSettingScreen(theme, setting));
+        button.action = () -> mc.setScreenAndShow(new BlockReplaceSettingScreen(theme, setting));
 
         WButton reset = table.add(theme.button(GuiRenderer.RESET)).widget();
         reset.action = setting::reset;

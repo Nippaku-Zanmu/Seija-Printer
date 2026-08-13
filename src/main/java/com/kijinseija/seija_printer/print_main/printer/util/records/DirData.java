@@ -26,7 +26,7 @@ public record DirData(BlockPos placePos, List<Direction> dirs) {
 
     public Vec3 getClickVec(Direction offsetDir, boolean strictVec) {
         //if (i >= dirs.size() - 1) return null;
-        Vec3 centerVec = placePos.getCenter();
+        Vec3 centerVec = BlockUtil.blockCenter(placePos);
         //Direction offsetDir = dirs.get(i);
         return centerVec.relative(offsetDir, strictVec ? -0.1 : 0.5);
     }
@@ -196,7 +196,7 @@ public record DirData(BlockPos placePos, List<Direction> dirs) {
 
     public Vec3 getClickVecInte(Direction offsetDir) {
         //if (i >= dirs.size() - 1) return null;
-        Vec3 centerVec = placePos.getCenter();
+        Vec3 centerVec = BlockUtil.blockCenter(placePos);
         //Direction offsetDir = dirs.get(i);
         return centerVec.relative(offsetDir, pri.bSetStrictVec.get()&&pri.isStrictVecInte()?0.501:0.5);
     }
@@ -209,7 +209,7 @@ public record DirData(BlockPos placePos, List<Direction> dirs) {
     public List<Vec3> getClickVecInte1(Direction offsetDir, int mode) {
         ArrayList<Vec3> res = new ArrayList<>();
 
-        Vec3 clickVec = placePos.getCenter().relative(offsetDir, pri.bSetStrictVec.get()&&pri.isStrictVecInte()?0.501:0.5);
+        Vec3 clickVec = BlockUtil.blockCenter(placePos).relative(offsetDir, pri.bSetStrictVec.get()&&pri.isStrictVecInte()?0.501:0.5);
         if (pri.bSetRandomOffset.get())
             clickVec = BlockUtil.randomOffsetVec(clickVec, offsetDir);
         if (offsetDir.getAxis() != Direction.Axis.Y)
