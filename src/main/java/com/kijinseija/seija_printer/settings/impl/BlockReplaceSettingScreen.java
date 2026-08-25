@@ -73,7 +73,7 @@ public class BlockReplaceSettingScreen extends WindowScreen {
                     table.clear();
                     widgets();
                 });//关闭窗口时应用选择的配置
-                mc.setScreen(keyScreen);
+                mc.setScreenAndShow(keyScreen);
             };
 
 
@@ -99,7 +99,7 @@ public class BlockReplaceSettingScreen extends WindowScreen {
                     table.clear();
                     widgets();
                 });
-                mc.setScreen(valueScreen);
+                mc.setScreenAndShow(valueScreen);
             };
 
 

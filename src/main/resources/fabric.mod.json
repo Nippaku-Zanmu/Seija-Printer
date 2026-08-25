@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "name": "Advanced Litematica Printer",
   "id": "seija-printer",
-  "version": "1.5.6",
+  "version": "${version}",
   "description": "Fast printer for litematica made with meteor.",
   "authors": [
     "Nippaku_Zanmu"
