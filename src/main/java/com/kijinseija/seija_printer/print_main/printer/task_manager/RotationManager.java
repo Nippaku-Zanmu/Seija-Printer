@@ -47,7 +47,7 @@ public class RotationManager {
 
     }
 
-    public boolean addTask(RotationData data) {
+    private boolean addTask(RotationData data) {
         if (taskList.size() > 10)
             return false;
         //todo smooth rotate 7/24
