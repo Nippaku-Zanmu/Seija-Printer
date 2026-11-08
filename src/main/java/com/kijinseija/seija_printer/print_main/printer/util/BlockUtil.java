@@ -14,68 +14,23 @@ import com.kijinseija.seija_printer.print_main.printer.util.records.PlaceDataPac
 import com.kijinseija.seija_printer.print_main.printer.util.records.PosInfo;
 import com.kijinseija.seija_printer.print_main.printer.util.records.RotationData;
 import fi.dy.masa.litematica.data.DataManager;
-import meteordevelopment.meteorclient.utils.player.Rotations;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
-import net.minecraft.network.protocol.game.ServerboundSwingPacket;
+import net.minecraft.network.protocol.game.ServerboundPunchPacket;
 import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.projectile.arrow.Arrow;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.AbstractCandleBlock;
-import net.minecraft.world.level.block.AbstractChestBlock;
-import net.minecraft.world.level.block.AbstractFurnaceBlock;
-import net.minecraft.world.level.block.AirBlock;
-import net.minecraft.world.level.block.AnvilBlock;
-import net.minecraft.world.level.block.BarrelBlock;
-import net.minecraft.world.level.block.BaseFireBlock;
-import net.minecraft.world.level.block.BeaconBlock;
-import net.minecraft.world.level.block.BedBlock;
-import net.minecraft.world.level.block.BellBlock;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.BrewingStandBlock;
-import net.minecraft.world.level.block.CakeBlock;
-import net.minecraft.world.level.block.CartographyTableBlock;
-import net.minecraft.world.level.block.CommandBlock;
-import net.minecraft.world.level.block.ComparatorBlock;
-import net.minecraft.world.level.block.CraftingTableBlock;
-import net.minecraft.world.level.block.DispenserBlock;
-import net.minecraft.world.level.block.DoorBlock;
-import net.minecraft.world.level.block.DoublePlantBlock;
-import net.minecraft.world.level.block.DragonEggBlock;
-import net.minecraft.world.level.block.DropperBlock;
-import net.minecraft.world.level.block.EnchantingTableBlock;
-import net.minecraft.world.level.block.FenceGateBlock;
-import net.minecraft.world.level.block.FlowerPotBlock;
-import net.minecraft.world.level.block.GrindstoneBlock;
-import net.minecraft.world.level.block.HopperBlock;
-import net.minecraft.world.level.block.JukeboxBlock;
-import net.minecraft.world.level.block.LecternBlock;
-import net.minecraft.world.level.block.LeverBlock;
-import net.minecraft.world.level.block.LiquidBlock;
-import net.minecraft.world.level.block.LoomBlock;
-import net.minecraft.world.level.block.NoteBlock;
-import net.minecraft.world.level.block.RedStoneWireBlock;
-import net.minecraft.world.level.block.RepeaterBlock;
-import net.minecraft.world.level.block.ScaffoldingBlock;
-import net.minecraft.world.level.block.ShulkerBoxBlock;
-import net.minecraft.world.level.block.SignBlock;
-import net.minecraft.world.level.block.SmithingTableBlock;
-import net.minecraft.world.level.block.StonecutterBlock;
-import net.minecraft.world.level.block.SupportType;
-import net.minecraft.world.level.block.TrapDoorBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BedPart;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.levelgen.LegacyRandomSource;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import java.util.*;
@@ -114,10 +69,11 @@ public class BlockUtil {
 
                 if (pri.bSetPacketPlace.get()) {
                     mc.player.connection.send(new ServerboundUseItemOnPacket(InteractionHand.MAIN_HAND, getHitRes(pos, dir, hitVec), SeijaUtil.getSequence()));
-                    mc.player.connection.send(new ServerboundSwingPacket(InteractionHand.MAIN_HAND));
+                    mc.player.connection.send(new ServerboundPunchPacket());
                 } else {
                     mc.gameMode.useItemOn(mc.player, InteractionHand.MAIN_HAND, getHitRes(pos, dir, hitVec));
-                    mc.player.swing(InteractionHand.MAIN_HAND);
+                    mc.player.swing(InteractionHand.MAIN_HAND,mc.player.getItemInHand(InteractionHand.MAIN_HAND).getInteractAnimation(),false);
+                    mc.player.connection.send(new ServerboundPunchPacket());
                 }
 
                 PosInfo blackInfo = isPlaceMode ? RenderHelper.getBlackInfo(pos.relative(dir), dir, hitVec, true):
@@ -142,61 +98,7 @@ public class BlockUtil {
     }
 
     public static void applyPlaceData(PlaceDataPack pdp) {
-
         RotationManager.INSTANCE.addTask(genTasks(pdp));
-
-        if (true)return;
-        boolean isPlaceMode = pdp.placeMode();
-        boolean isBucket = mc.player.getMainHandItem().getItem() instanceof BucketItem;
-        PlaceData data = pdp.data();
-        Vec3 hitVec = data.hitVec();
-        final BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos(data.pos().getX(), data.pos().getY(), data.pos().getZ());
-        Direction dir = data.dir();
-
-
-        Runnable r = () -> {
-            boolean sneakToggle = false;
-            if (isPlaceMode && pri.bSetSneak.get()) {
-                if (!mc.player.isShiftKeyDown()) {
-                    sneakToggle = true;
-                    mc.player.setShiftKeyDown(true);
-                }
-            }
-
-            if (data.test() == null || data.test().getAsBoolean()) {
-                illegalRotate(data.exRotateData());
-                if (isBucket) {
-                    mc.gameMode.useItem(mc.player, InteractionHand.MAIN_HAND);
-                }
-
-                if (pri.bSetPacketPlace.get()) {
-                    mc.player.connection.send(new ServerboundUseItemOnPacket(InteractionHand.MAIN_HAND, getHitRes(pos, dir, hitVec), SeijaUtil.getSequence()));
-                    mc.player.connection.send(new ServerboundSwingPacket(InteractionHand.MAIN_HAND));
-                } else {
-                    mc.gameMode.useItemOn(mc.player, InteractionHand.MAIN_HAND, getHitRes(pos, dir, hitVec));
-                    mc.player.swing(InteractionHand.MAIN_HAND);
-                }
-
-                PosInfo blackInfo = isPlaceMode ? RenderHelper.getBlackInfo(pos.relative(dir), dir, hitVec, true):
-                RenderHelper.getBlackInfo(pos, dir, hitVec, false);
-                pri.blackList.add(blackInfo);
-                RenderUtil.renderList.add(blackInfo);
-            }
-
-            if (sneakToggle) {
-                mc.player.setShiftKeyDown(false);
-            }
-
-        };
-        if (pri.bSetRotate.get() || isBucket) {
-            if (pri.bSetPacketRotate.get()) {
-                mc.player.connection.send(new ServerboundMovePlayerPacket.Rot((float) SeijaUtil.getYaw(hitVec), (float) SeijaUtil.getPitch(hitVec), mc.player.onGround(), mc.player.horizontalCollision));
-                r.run();
-            } else
-                Rotations.rotate(SeijaUtil.getYaw(hitVec), SeijaUtil.getPitch(hitVec), r);
-        } else {
-            r.run();
-        }
     }
 
     public static void interactBlock(PlaceData data) {
@@ -427,7 +329,7 @@ public class BlockUtil {
     public static List<Class<? extends Block>> canUseBlcks = new ArrayList<>(Arrays.asList(
         AbstractChestBlock.class, AbstractFurnaceBlock.class, CraftingTableBlock.class,
         LeverBlock.class,
-        DoorBlock.class, TrapDoorBlock.class, BedBlock.class, RedStoneWireBlock.class,
+        DoorBlock.class, TrapDoorBlock.class, BedBlock.class, RedstoneWireBlock.class,
         ScaffoldingBlock.class,
         HopperBlock.class, EnchantingTableBlock.class, NoteBlock.class, JukeboxBlock.class,
         CakeBlock.class,

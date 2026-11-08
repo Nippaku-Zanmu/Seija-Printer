@@ -5,10 +5,10 @@
 
 package com.kijinseija.seija_printer.print_main.printer.block_fixer.fixers.click_fixer;
 
-import static net.minecraft.world.level.block.RedStoneWireBlock.*;
+import net.minecraft.world.level.block.RedstoneWireBlock;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.RedStoneWireBlock;
+import static net.minecraft.world.level.block.RedstoneWireBlock.*;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class RedStoneFixer extends AbstractClickFixer{
@@ -23,7 +23,7 @@ public class RedStoneFixer extends AbstractClickFixer{
         }
         BlockState blockState = mc.level.getBlockState(pos);
         if (
-            blockState.getBlock() instanceof RedStoneWireBlock &&needState.getBlock()==blockState.getBlock()) {
+            blockState.getBlock() instanceof RedstoneWireBlock &&needState.getBlock()==blockState.getBlock()) {
             return (isFullyConnected(blockState)^isFullyConnected(needState))
                 &&(isNotConnected(blockState)^isNotConnected(needState))
                 &&(isNotConnected(needState)||isFullyConnected(needState))

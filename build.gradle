@@ -1,7 +1,7 @@
 //file:noinspection JCenterRepository
 //file:noinspection GrDeprecatedAPIUsage
 plugins {
-    id 'net.fabricmc.fabric-loom' version '1.15.+'
+    id 'net.fabricmc.fabric-loom' version '1.19.3'
     id 'maven-publish'
 }
 

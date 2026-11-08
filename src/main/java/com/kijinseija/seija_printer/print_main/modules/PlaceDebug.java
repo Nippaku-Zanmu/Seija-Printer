@@ -24,7 +24,7 @@ public class PlaceDebug extends Module {
     public void onPacket(PacketEvent.Send send){
         if (send.packet instanceof ServerboundUseItemOnPacket) {
             ServerboundUseItemOnPacket packet = (ServerboundUseItemOnPacket) send.packet;
-            BlockHitResult bhr = packet.getHitResult();
+            BlockHitResult bhr = packet.hitResult();
 
             ChatUtils.sendMsg(Component.nullToEmpty(bhr.getBlockPos()+"  Side:"+bhr.getDirection()+" Vec:"+bhr.getLocation()+"Type:"+bhr.getType()));
         }

@@ -408,7 +408,7 @@ public class Printer extends Module {
         ){
 
             if (BlockUtil.blockposFilter(pos)) {
-                collect.add(new BlockPos(pos));
+                collect.add(new BlockPos(pos.getX(),pos.getY(),pos.getZ()));
             }
         }
         if (bSetListSize.get()){

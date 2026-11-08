@@ -5,18 +5,25 @@
 
 package com.kijinseija.seija_printer.print_main.printer.util;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.kijinseija.seija_printer.print_main.modules.Printer;
 import fi.dy.masa.litematica.world.SchematicWorldHandler;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.item.AxeItem;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.component.BlockTransformers;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.levelgen.blockpredicates.MatchingBlocksPredicate;
+import net.minecraft.world.level.levelgen.feature.stateproviders.CopyPropertiesProvider;
+import net.minecraft.world.level.levelgen.feature.stateproviders.RuleBasedStateProvider;
+import net.minecraft.world.level.levelgen.feature.stateproviders.SimpleStateProvider;
+
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,8 +35,8 @@ public class BlockReplaceUtils {
     public static final BlockReplaceUtils INSTANCE = new BlockReplaceUtils();
     Printer pri = Printer.getINSTANCE();
 
-    public static BlockState getScheStateNonReplace(BlockPos pos){
-       return SchematicWorldHandler.getSchematicWorld().getBlockState(pos);
+    public static BlockState getScheStateNonReplace(BlockPos pos) {
+        return SchematicWorldHandler.getSchematicWorld().getBlockState(pos);
     }
 
 
@@ -56,13 +63,15 @@ public class BlockReplaceUtils {
         }
         return repState;
     }
-    public List<Block> getReplaceBlocks(Block b){
+
+    public List<Block> getReplaceBlocks(Block b) {
         for (Map.Entry<List<Block>, List<Block>> entry : pri.getBlockReplaceMapping().entrySet()) {
             if (entry.getKey().contains(b))
                 return entry.getValue();
         }
         return List.of();
     }
+
     private Block needBlockReplace(BlockState bs, BlockPos pos, boolean calcBridge) {
         List<Block> blocks = null;
 //        for (Map.Entry<List<Block>, List<Block>> entry : pri.getBlockReplaceMapping().entrySet()) {
@@ -104,9 +113,10 @@ public class BlockReplaceUtils {
 
         if (bs.getBlock() instanceof FlowerPotBlock)
             return Blocks.FLOWER_POT;
-        else if (bs.getBlock() instanceof RotatedPillarBlock && InvUtil.findItem(stack -> stack.getItem() instanceof AxeItem) && (!InvUtil.findBlock(bs.getBlock()))) {
-            return strippedMap.get(bs.getBlock());
-        } else if (bs.getBlock() instanceof FarmlandBlock || bs.getBlock() instanceof DirtPathBlock) {
+        else if (bs.getBlock() instanceof RotatedPillarBlock && InvUtil.findItem(stack -> stack.is(ItemTags.AXES)) && (!InvUtil.findBlock(bs.getBlock()))) {
+
+            return strippedMap.inverse().get(bs.getBlock());
+        } else if (bs.getBlock() instanceof FarmlandBlock || bs.getBlock().equals(Blocks.DIRT_PATH)) {
             for (Block dirt : DIRTS) {
                 if (InvUtil.findBlock(dirt))
                     return dirt;
@@ -127,9 +137,8 @@ public class BlockReplaceUtils {
                 && pos != null
                 && BlockUtil.canPlaceIn(pos)//实际也为空
                 && (!BlockUtil.getDirs(pos).isEmpty())//有点击方位
-                && (! (interactDir = BlockUtil.getSortedDirs(pos,true)).isEmpty())//有用
-        )
-        {
+                && (!(interactDir = BlockUtil.getSortedDirs(pos, true)).isEmpty())//有用
+        ) {
             for (Direction direction : interactDir) {
                 if (pri.liSetBridgeDirs.get().contains(direction)//是可以用的方位
                     && !BlockUtil.isCanPlaceInBlock(getScheStateBridegeMode(pos.relative(direction)).getBlock())
@@ -166,17 +175,27 @@ public class BlockReplaceUtils {
     }
 
 
-    public final Map<Block, Block> strippedMap = new HashMap<>();
+    //    public final Map<Block, Block> strippedMap = new HashMap<>();
+    public static final BiMap<Block, Block> strippedMap = HashBiMap.create();
 
-    //把mc的Map反过来 方便查询
-    private void initMap() {
-        for (Map.Entry<Block, Block> blockBlockEntry : AxeItem.STRIPPABLES.entrySet()) {
-            strippedMap.put(blockBlockEntry.getValue(), blockBlockEntry.getKey());
-        }
+    static {
+        initMap();
+    }
+
+//读取mc的Map
+    private static void initMap() {
+
+
+        ((RuleBasedStateProvider) BlockTransformers.axeStrippables().blockStateProvider().value())
+            .rules().forEach(rule -> {
+                strippedMap.put(((MatchingBlocksPredicate) rule.ifTrue()).blocks.get(0).value(),
+                    ((SimpleStateProvider) ((CopyPropertiesProvider) rule.then().value()).source().value()).state().getBlock()
+
+                );
+            });
     }
 
     private BlockReplaceUtils() {
-        initMap();
     }
 
 }
